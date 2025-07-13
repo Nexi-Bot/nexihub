@@ -1,6 +1,23 @@
 <?php
 http_response_code(503);
 $page_title = "Service Unavailable - 503";
+$page_description = "We're temporarily down for maintenance.";
+include 'includes/header.php';
+?>
+
+<style>
+:root {
+    --primary-color: #e64f21;
+    --secondary-color: #d63917;
+    --background-dark: #0a0a0a;
+    --background-light: #1a1a1a;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --border-color: #333333;
+}
+
+.error-container {p_response_code(503);
+$page_title = "Service Unavailable - 503";
 $page_description = "Service temporarily unavailable.";
 include 'includes/header.php';
 ?>

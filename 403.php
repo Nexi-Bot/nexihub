@@ -6,6 +6,16 @@ include 'includes/header.php';
 ?>
 
 <style>
+:root {
+    --primary-color: #e64f21;
+    --secondary-color: #d63917;
+    --background-dark: #0a0a0a;
+    --background-light: #1a1a1a;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --border-color: #333333;
+}
+
 .error-container {
     min-height: 80vh;
     display: flex;

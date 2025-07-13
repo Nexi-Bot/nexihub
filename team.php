@@ -320,16 +320,16 @@ include 'includes/header.php';
                 </div>
                 <div class="member-info">
                     <h3 class="member-name">Maisie</h3>
-                    <p class="member-title">Internal Communications Manager</p>
+                    <p class="member-title">Head of Human Resources</p>
                     <p class="member-description">
-                        Maisie ensures clear and effective communication across all Nexi Hub teams. She develops engagement 
-                        strategies for our global workforce, manages internal messaging, and fosters a connected company culture 
-                        that spans continents and time zones.
+                        Maisie leads our Human Resources department, overseeing talent acquisition, employee development, 
+                        and workplace culture. She ensures our global team has the support and resources needed to thrive 
+                        while maintaining Nexi Hub's core values across all operations.
                     </p>
                     <div class="member-expertise">
-                        <span class="expertise-tag">Internal Communications</span>
-                        <span class="expertise-tag">Employee Engagement</span>
-                        <span class="expertise-tag">Global Team Coordination</span>
+                        <span class="expertise-tag">Human Resources</span>
+                        <span class="expertise-tag">Talent Management</span>
+                        <span class="expertise-tag">Employee Development</span>
                     </div>
                 </div>
             </div>
@@ -386,10 +386,10 @@ include 'includes/header.php';
                 </div>
                 <div class="member-info">
                     <h3 class="member-name">Vacant</h3>
-                    <p class="member-title">Internal Communications Manager</p>
+                    <p class="member-title">Head of Human Resources</p>
                     <p class="member-description">
-                        Ensuring clear, consistent communication across all teams and regions. 
-                        Building engagement strategies that keep our global workforce connected and informed.
+                        Leading our Human Resources initiatives, overseeing talent acquisition, employee development, 
+                        and building a positive workplace culture across our global operations.
                     </p>
                     <div class="member-status">
                         <span class="status-badge vacant">Position Available</span>
