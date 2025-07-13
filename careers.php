@@ -457,40 +457,29 @@ include 'includes/header.php';
             </button>
         </div>
         
-        <form id="applicationForm" class="application-form" method="POST" action="">
+        <form id="applicationForm" method="POST" action="">
             <input type="hidden" name="position" id="positionInput">
-            
-            <div class="form-progress">
-                <h4>Application Progress</h4>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: 0%"></div>
-                </div>
-            </div>
             
             <div class="form-section">
                 <h3>Personal Information</h3>
-                <p class="form-subtitle">Please provide your basic information for our records.</p>
-                
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="first_name" class="required">First Name</label>
-                        <input type="text" id="first_name" name="first_name" placeholder="Enter your first name" required>
-                        <div class="form-helper">This will be used for official communications</div>
+                        <label for="first_name">First Name *</label>
+                        <input type="text" id="first_name" name="first_name" required>
                     </div>
                     <div class="form-group">
-                        <label for="last_name" class="required">Last Name</label>
-                        <input type="text" id="last_name" name="last_name" placeholder="Enter your last name" required>
+                        <label for="last_name">Last Name *</label>
+                        <input type="text" id="last_name" name="last_name" required>
                     </div>
                 </div>
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="email" class="required">Email Address</label>
-                        <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
-                        <div class="form-helper">We'll use this to contact you about your application</div>
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" required>
                     </div>
                     <div class="form-group">
-                        <label for="country" class="required">Country</label>
+                        <label for="country">Country *</label>
                         <select id="country" name="country" required>
                             <option value="">Select your country</option>
                             <option value="US">United States</option>
@@ -515,48 +504,39 @@ include 'includes/header.php';
                 </div>
                 
                 <div class="form-group">
-                    <label for="date_of_birth" class="required">Date of Birth</label>
+                    <label for="date_of_birth">Date of Birth *</label>
                     <input type="date" id="date_of_birth" name="date_of_birth" required>
-                    <div class="form-helper">Required for legal compliance and age verification</div>
                 </div>
             </div>
             
             <div class="form-section">
                 <h3>Discord Information</h3>
-                <p class="form-subtitle">Discord is our primary communication platform for team collaboration.</p>
-                
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="discord_username" class="required">Discord Username</label>
+                        <label for="discord_username">Discord Username *</label>
                         <input type="text" id="discord_username" name="discord_username" placeholder="username#1234" required>
-                        <div class="form-helper">Include the full username with discriminator</div>
                     </div>
                     <div class="form-group">
-                        <label for="discord_id" class="required">Discord User ID</label>
+                        <label for="discord_id">Discord User ID *</label>
                         <input type="text" id="discord_id" name="discord_id" placeholder="123456789012345678" required>
-                        <div class="form-helper">Enable Developer Mode in Discord settings to copy your ID</div>
                     </div>
                 </div>
             </div>
             
             <div class="form-section">
                 <h3>Application Details</h3>
-                <p class="form-subtitle">Tell us about yourself and why you're interested in joining our team.</p>
-                
                 <div class="form-group">
-                    <label for="experience" class="required">Relevant Experience & Skills</label>
-                    <textarea id="experience" name="experience" rows="5" placeholder="Tell us about your relevant experience, skills, and qualifications for this role. Include any projects, achievements, or certifications that showcase your abilities..." required></textarea>
-                    <div class="form-helper">Be specific about technologies, tools, and methodologies you've worked with</div>
+                    <label for="experience">Relevant Experience & Skills *</label>
+                    <textarea id="experience" name="experience" rows="4" placeholder="Tell us about your relevant experience, skills, and qualifications for this role..." required></textarea>
                 </div>
                 
                 <div class="form-group">
-                    <label for="motivation" class="required">Why do you want to join Nexi Hub?</label>
-                    <textarea id="motivation" name="motivation" rows="4" placeholder="What motivates you to apply for this position? How do you align with our mission to 'Build. Automate. Scale.'? What excites you about our platform ecosystem?" required></textarea>
-                    <div class="form-helper">Help us understand your passion and how you'll contribute to our vision</div>
+                    <label for="motivation">Why do you want to join Nexi Hub? *</label>
+                    <textarea id="motivation" name="motivation" rows="4" placeholder="What motivates you to apply for this position? How do you align with our mission?" required></textarea>
                 </div>
                 
                 <div class="form-group">
-                    <label for="availability" class="required">Availability</label>
+                    <label for="availability">Availability *</label>
                     <select id="availability" name="availability" required>
                         <option value="">Select your availability</option>
                         <option value="Immediately">Available immediately</option>
@@ -565,45 +545,35 @@ include 'includes/header.php';
                         <option value="2-3 months">Available in 2-3 months</option>
                         <option value="Other">Other (please specify in additional info)</option>
                     </select>
-                    <div class="form-helper">When would you be able to start contributing to our team?</div>
                 </div>
                 
                 <div class="form-group">
                     <label for="additional_info">Additional Information</label>
-                    <textarea id="additional_info" name="additional_info" rows="3" placeholder="Any additional information you'd like to share about yourself, your interests, or anything else that might be relevant to your application..."></textarea>
-                    <div class="form-helper">Optional: Share anything else that showcases who you are</div>
+                    <textarea id="additional_info" name="additional_info" rows="3" placeholder="Any additional information you'd like to share..."></textarea>
                 </div>
             </div>
             
             <div class="form-section">
-                <h3>Legal Agreements</h3>
-                <p class="form-subtitle">Please review and agree to the following terms to complete your application.</p>
-                
+                <h3>Agreements</h3>
                 <div class="checkbox-group">
-                    <input type="checkbox" id="contract_agreement" name="contract_agreement" required>
-                    <label for="contract_agreement">
-                        I agree to sign a <strong>contract and Non-Disclosure Agreement (NDA)</strong> if offered this position. I understand that this role involves access to confidential information and proprietary systems.
-                    </label>
-                </div>
-                
-                <div class="checkbox-group">
-                    <input type="checkbox" id="email_agreement" name="email_agreement" required>
-                    <label for="email_agreement">
-                        I agree to <strong>receive and use a Nexi Hub email address</strong> for official communications. I understand this will be my primary email for work-related activities.
-                    </label>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="contract_agreement" name="contract_agreement" required>
+                        <label for="contract_agreement">I agree to sign a contract and Non-Disclosure Agreement (NDA) if offered this position *</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="email_agreement" name="email_agreement" required>
+                        <label for="email_agreement">I agree to receive and use a Nexi Hub email address for official communications *</label>
+                    </div>
+                    <div class="checkbox-item legal-acceptance">
+                        <input type="checkbox" id="legal_acceptance" name="legal_acceptance" required>
+                        <label for="legal_acceptance">I accept all terms and conditions outlined in <a href="/legal" target="_blank">nexihub.uk/legal</a> *</label>
+                    </div>
                 </div>
             </div>
             
-            <div class="form-submit-section">
-                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-                    By submitting this application, you acknowledge that you have read and agree to our 
-                    <a href="/legal#privacy" style="color: var(--primary-color);">Privacy Policy</a> and 
-                    <a href="/legal#terms" style="color: var(--primary-color);">Terms of Service</a>.
-                </p>
-                <button type="button" class="btn btn-secondary cancel-btn" style="margin-right: 1rem;">Cancel</button>
-                <button type="submit" name="submit_application" class="submit-btn">
-                    Submit Application
-                </button>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary cancel-btn">Cancel</button>
+                <button type="submit" name="submit_application" class="btn btn-primary">Submit Application</button>
             </div>
         </form>
     </div>
