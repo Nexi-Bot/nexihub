@@ -26,9 +26,23 @@ define('DISCORD_REDIRECT_URI', $discord_redirect);
 ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', $is_local ? 0 : 1); // Only require HTTPS in production
 ini_set('session.use_only_cookies', 1);
+ini_set('session.gc_maxlifetime', 300); // 5 minutes
 
 if (!session_id()) {
     session_start();
+}
+
+// Check for session timeout (5 minutes of inactivity)
+function checkSessionTimeout() {
+    if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 300)) {
+        // Session timed out, destroy it
+        session_unset();
+        session_destroy();
+        session_start();
+        return false;
+    }
+    $_SESSION['LAST_ACTIVITY'] = time(); // Update last activity time
+    return true;
 }
 
 // Database Connection
@@ -75,13 +89,13 @@ function isLoggedIn() {
 }
 
 function requireAuth() {
-    if (!isLoggedIn()) {
+    if (!checkSessionTimeout() || !isLoggedIn()) {
         redirectTo('/staff/login');
     }
 }
 
 function requirePartialAuth() {
-    if (!isset($_SESSION['staff_id'])) {
+    if (!checkSessionTimeout() || !isset($_SESSION['staff_id'])) {
         redirectTo('/staff/login');
     }
 }
