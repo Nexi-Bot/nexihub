@@ -25,37 +25,37 @@ include 'includes/header.php';
                 <svg viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"/>
                 </svg>
-                Privacy Policy
+                <span class="nav-text">Privacy Policy</span>
             </a>
             <a href="#sla" class="legal-nav-link">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                     <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
                 </svg>
-                Service Level Agreement
+                <span class="nav-text">Service Level</span>
             </a>
             <a href="#terms" class="legal-nav-link">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A9,9 0 0,0 21,12C21,11.5 20.96,11 20.87,10.5C20.6,10 20,10 20,10H18V9A2,2 0 0,0 16,7H15V6A2,2 0 0,0 13,4H12M7,7.5A1.5,1.5 0 0,1 8.5,9A1.5,1.5 0 0,1 7,10.5A1.5,1.5 0 0,1 5.5,9A1.5,1.5 0 0,1 7,7.5M7.5,16C8.5,16 9.24,16.5 10,17H5C5.76,16.5 6.5,16 7.5,16Z"/>
                 </svg>
-                Terms of Service
+                <span class="nav-text">Terms of Service</span>
             </a>
             <a href="#cookies" class="legal-nav-link">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12,3A9,9 0 0,1 21,12A9,9 0 0,1 12,21A9,9 0 0,1 3,12A9,9 0 0,1 12,3M12,5A7,7 0 0,0 5,12A7,7 0 0,0 12,19A7,7 0 0,0 19,12A7,7 0 0,0 12,5M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7Z"/>
                 </svg>
-                Cookie Policy
+                <span class="nav-text">Cookie Policy</span>
             </a>
             <a href="#acceptable-use" class="legal-nav-link">
                 <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10
+                    <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M16.5,7.5L15.09,8.91L12,5.83L8.91,8.91L7.5,7.5L10.59,4.41C11.37,3.64 12.63,3.64 13.41,4.41L16.5,7.5M7.5,16.5L8.91,15.09L12,18.17L15.09,15.09L16.5,16.5L13.41,19.59C12.63,20.36 11.37,20.36 10.59,19.59L7.5,16.5Z"/>
                 </svg>
-                Acceptable Use Policy
+                <span class="nav-text">Acceptable Use</span>
             </a>
             <a href="#data-retention" class="legal-nav-link">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
                 </svg>
-                Data Retention Policy
+                <span class="nav-text">Data Retention</span>
             </a>
         </div>
     </div>

@@ -1,9 +1,27 @@
 RewriteEngine On
 
-# Route all requests to index.php for clean URLs
+# Staff portal routing - handle before general routing
+RewriteRule ^staff/login/?$ staff/login.php [L]
+RewriteRule ^staff/dashboard/?$ staff/dashboard.php [L]
+RewriteRule ^staff/logout/?$ staff/logout.php [L]
+RewriteRule ^staff/discord-auth/?$ staff/discord-auth.php [L]
+RewriteRule ^staff/discord-callback/?$ staff/discord-callback.php [L]
+RewriteRule ^staff/email-auth/?$ staff/email-auth.php [L]
+RewriteRule ^staff/two-fa-auth/?$ staff/two-fa-auth.php [L]
+RewriteRule ^staff/forgot-password/?$ staff/forgot-password.php [L]
+
+# Main site routing
+RewriteRule ^about/?$ about.php [L]
+RewriteRule ^team/?$ team.php [L]
+RewriteRule ^careers/?$ careers.php [L]
+RewriteRule ^contact/?$ contact.php [L]
+RewriteRule ^legal/?$ legal.php [L]
+
+# Route all other requests to index.php for clean URLs
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !^/index\.php
+RewriteCond %{REQUEST_URI} !^/staff/
 RewriteRule ^(.*)$ /index.php [QSA,L]
 
 # Handle root directory

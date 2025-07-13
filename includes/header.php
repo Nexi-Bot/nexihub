@@ -23,17 +23,22 @@
                 
                 <nav class="nav">
                     <ul class="nav-list">
-                        <li><a href="/" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'index.php') ? 'active' : ''; ?>">Home</a></li>
-                        <li><a href="/about" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'about.php') ? 'active' : ''; ?>">About Nexi</a></li>
-                        <li><a href="/team" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'team.php') ? 'active' : ''; ?>">The Team</a></li>
-                        <li><a href="/careers" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'careers.php') ? 'active' : ''; ?>">Careers</a></li>
-                        <li><a href="/contact" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'contact.php') ? 'active' : ''; ?>">Contact</a></li>
-                        <li><a href="/legal" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'legal.php') ? 'active' : ''; ?>">Legal</a></li>
+                        <?php
+                        // Get current route for active navigation
+                        $current_route = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+                        if (empty($current_route)) $current_route = 'home';
+                        ?>
+                        <li><a href="/" class="nav-link <?php echo ($current_route == 'home' || $current_route == '') ? 'active' : ''; ?>">Home</a></li>
+                        <li><a href="/about" class="nav-link <?php echo ($current_route == 'about') ? 'active' : ''; ?>">About Nexi</a></li>
+                        <li><a href="/team" class="nav-link <?php echo ($current_route == 'team') ? 'active' : ''; ?>">The Team</a></li>
+                        <li><a href="/careers" class="nav-link <?php echo ($current_route == 'careers') ? 'active' : ''; ?>">Careers</a></li>
+                        <li><a href="/contact" class="nav-link <?php echo ($current_route == 'contact') ? 'active' : ''; ?>">Contact</a></li>
+                        <li><a href="/legal" class="nav-link <?php echo ($current_route == 'legal') ? 'active' : ''; ?>">Legal</a></li>
                     </ul>
                 </nav>
                 
                 <div class="header-actions">
-                    <a href="/login" class="btn btn-primary">Staff Login</a>
+                    <a href="/staff/login" class="btn btn-primary">Staff Login</a>
                 </div>
             </div>
         </div>
