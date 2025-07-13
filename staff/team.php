@@ -16,21 +16,43 @@ if ($_POST && $action) {
         case 'update_permissions':
             $staffId = $_POST['staff_id'];
             $permissions = $_POST['permissions'] ?? [];
-            // In a real app, you'd update the staff permissions in the database
+            
+            // Update staff permissions in session storage
+            if (!isset($_SESSION['staff_updates'])) {
+                $_SESSION['staff_updates'] = [];
+            }
+            $_SESSION['staff_updates'][$staffId]['permissions'] = $permissions;
+            
             $message = "Staff permissions updated successfully!";
             break;
             
         case 'deactivate_staff':
             $staffId = $_POST['staff_id'];
-            // In a real app, you'd deactivate the staff member
+            
+            // Update staff status in session storage
+            if (!isset($_SESSION['staff_updates'])) {
+                $_SESSION['staff_updates'] = [];
+            }
+            $_SESSION['staff_updates'][$staffId]['status'] = 'inactive';
+            
             $message = "Staff member deactivated successfully!";
             break;
+            
         case 'update_staff':
             $staffId = $_POST['staff_id'];
             $updates = $_POST;
-            // In a real app, you'd update the staff member's information in the database
+            unset($updates['staff_id']); // Remove staff_id from updates
+            
+            // Update staff information in session storage
+            if (!isset($_SESSION['staff_updates'])) {
+                $_SESSION['staff_updates'] = [];
+            }
+            $_SESSION['staff_updates'][$staffId] = array_merge($_SESSION['staff_updates'][$staffId] ?? [], $updates);
+            
             $message = "Staff information updated successfully!";
             break;
+            
+        case 'invite_staff':
             $email = $_POST['email'];
             $role = $_POST['role'];
             // In a real app, you'd send an invitation email
@@ -48,7 +70,7 @@ $staffMembers = [
         'preferred_name' => 'Ollie',
         'discord_username' => 'olliereaney',
         'discord_id' => '123456789012345678',
-        'discord_avatar' => 'https://cdn.discordapp.com/embed/avatars/0.png',
+        'discord_avatar' => 'https://i.pravatar.cc/150?img=1',
         'role' => 'Chief Executive Officer & Founder',
         'department' => 'Executive Leadership',
         'manager' => null,
@@ -77,7 +99,7 @@ $staffMembers = [
         'preferred_name' => 'Benjamin',
         'discord_username' => 'benjaminclarke',
         'discord_id' => '234567890123456789',
-        'discord_avatar' => 'https://cdn.discordapp.com/embed/avatars/1.png',
+        'discord_avatar' => 'https://i.pravatar.cc/150?img=2',
         'role' => 'Managing Director',
         'department' => 'Executive Leadership',
         'manager' => 'Oliver Reaney',
@@ -105,7 +127,7 @@ $staffMembers = [
         'preferred_name' => 'Paige',
         'discord_username' => 'paigewilliams',
         'discord_id' => '345678901234567890',
-        'discord_avatar' => 'https://cdn.discordapp.com/embed/avatars/2.png',
+        'discord_avatar' => 'https://i.pravatar.cc/150?img=3',
         'role' => 'Chief Innovation Officer',
         'department' => 'Executive Leadership',
         'manager' => 'Oliver Reaney',
@@ -133,7 +155,7 @@ $staffMembers = [
         'preferred_name' => 'Chukwumam',
         'discord_username' => 'chukwumam',
         'discord_id' => '456789012345678901',
-        'discord_avatar' => 'https://cdn.discordapp.com/embed/avatars/3.png',
+        'discord_avatar' => 'https://i.pravatar.cc/150?img=4',
         'role' => 'Deputy Managing Director & Development Lead',
         'department' => 'Senior Leadership',
         'manager' => 'Benjamin Clarke',
@@ -161,7 +183,7 @@ $staffMembers = [
         'preferred_name' => 'Sam',
         'discord_username' => 'samthompson',
         'discord_id' => '567890123456789012',
-        'discord_avatar' => 'https://cdn.discordapp.com/embed/avatars/4.png',
+        'discord_avatar' => 'https://i.pravatar.cc/150?img=5',
         'role' => 'Chief Operating Officer',
         'department' => 'Senior Leadership',
         'manager' => 'Benjamin Clarke',
@@ -189,7 +211,7 @@ $staffMembers = [
         'preferred_name' => 'Christopher',
         'discord_username' => 'christopherdavis',
         'discord_id' => '678901234567890123',
-        'discord_avatar' => 'https://cdn.discordapp.com/embed/avatars/5.png',
+        'discord_avatar' => 'https://i.pravatar.cc/150?img=6',
         'role' => 'Chief Financial Officer',
         'department' => 'Senior Leadership',
         'manager' => 'Benjamin Clarke',
@@ -217,7 +239,7 @@ $staffMembers = [
         'preferred_name' => 'Barbara',
         'discord_username' => 'barbaramartinez',
         'discord_id' => '789012345678901234',
-        'discord_avatar' => 'https://cdn.discordapp.com/embed/avatars/6.png',
+        'discord_avatar' => 'https://i.pravatar.cc/150?img=7',
         'role' => 'Chief Legal Officer',
         'department' => 'Senior Leadership',
         'manager' => 'Benjamin Clarke',
@@ -245,7 +267,7 @@ $staffMembers = [
         'preferred_name' => 'Maisie',
         'discord_username' => 'maisiejohnson',
         'discord_id' => '890123456789012345',
-        'discord_avatar' => 'https://cdn.discordapp.com/embed/avatars/7.png',
+        'discord_avatar' => 'https://i.pravatar.cc/150?img=8',
         'role' => 'Head of Human Resources',
         'department' => 'Corporate Functions',
         'manager' => 'Benjamin Clarke',
@@ -267,6 +289,19 @@ $staffMembers = [
         ]
     ]
 ];
+
+// Apply any session-stored updates to staff data
+if (isset($_SESSION['staff_updates'])) {
+    foreach ($staffMembers as &$staff) {
+        if (isset($_SESSION['staff_updates'][$staff['id']])) {
+            $updates = $_SESSION['staff_updates'][$staff['id']];
+            foreach ($updates as $key => $value) {
+                $staff[$key] = $value;
+            }
+        }
+    }
+    unset($staff); // Break the reference
+}
 
 $availablePermissions = [
     'user_management' => 'User Management',
@@ -877,11 +912,17 @@ include __DIR__ . '/../includes/header.php';
                         <?php echo ucfirst($staff['status']); ?>
                     </span>
                     
+                    <?php if (isset($_SESSION['staff_updates'][$staff['id']])): ?>
+                        <span style="position: absolute; top: 1rem; left: 1rem; background: #10b981; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.7rem; font-weight: 600;">
+                            UPDATED
+                        </span>
+                    <?php endif; ?>
+                    
                     <div class="staff-header">
                         <img src="<?php echo htmlspecialchars($staff['discord_avatar']); ?>" 
                              alt="<?php echo htmlspecialchars($staff['preferred_name']); ?>'s Avatar" 
                              class="staff-avatar"
-                             onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png';">
+                             onerror="this.src='https://i.pravatar.cc/150?img=0';">
                         <div class="staff-info">
                             <h3><?php echo htmlspecialchars($staff['full_name']); ?></h3>
                             <p class="preferred-name">Preferred: <?php echo htmlspecialchars($staff['preferred_name']); ?></p>

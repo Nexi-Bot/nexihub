@@ -12,7 +12,7 @@ function getUserIP() {
     if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
         $ip = $_SERVER['HTTP_CLIENT_IP'];
     }
-    // Check for IP passed from proxy
+    // Check for IP pass                     onerror="this.src='https://i.pravatar.cc/150?img=0';">d from proxy
     elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
         // Can contain multiple IPs, get the first one
         $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
@@ -47,7 +47,7 @@ $staffMembers = [
         'preferred_name' => 'Ollie',
         'discord_username' => 'olliereaney',
         'discord_id' => '123456789012345678',
-        'discord_avatar' => 'https://cdn.discordapp.com/embed/avatars/0.png',
+        'discord_avatar' => 'https://i.pravatar.cc/150?img=1',
         'role' => 'Chief Executive Officer & Founder',
         'department' => 'Executive Leadership',
         'manager' => null,
@@ -69,7 +69,7 @@ $staffMembers = [
         'preferred_name' => 'Benjamin',
         'discord_username' => 'benjaminclarke',
         'discord_id' => '234567890123456789',
-        'discord_avatar' => 'https://cdn.discordapp.com/embed/avatars/1.png',
+        'discord_avatar' => 'https://i.pravatar.cc/150?img=2',
         'role' => 'Managing Director',
         'department' => 'Executive Leadership',
         'manager' => 'Oliver Reaney',
@@ -91,7 +91,7 @@ $staffMembers = [
         'preferred_name' => 'Maisie',
         'discord_username' => 'maisiereaney',
         'discord_id' => '345678901234567890',
-        'discord_avatar' => 'https://cdn.discordapp.com/embed/avatars/2.png',
+        'discord_avatar' => 'https://i.pravatar.cc/150?img=3',
         'role' => 'Head of Corporate Functions',
         'department' => 'Corporate Functions',
         'manager' => 'Oliver Reaney',
