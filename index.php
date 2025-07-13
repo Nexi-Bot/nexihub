@@ -15,7 +15,7 @@ include 'includes/header.php';
             </p>
             <div class="hero-actions">
                 <a href="#platforms" class="btn btn-primary">Explore Our Platforms</a>
-                <a href="/about.php" class="btn btn-secondary">Learn More</a>
+                <a href="/about" class="btn btn-secondary">Learn More</a>
             </div>
         </div>
     </div>
@@ -170,7 +170,7 @@ include 'includes/header.php';
                         </div>
                     </div>
                 </div>
-                <a href="/about.php" class="btn btn-primary">Learn Our Story</a>
+                <a href="/about" class="btn btn-primary">Learn Our Story</a>
             </div>
             <div class="why-choose-visual">
                 <div class="visual-stats">
@@ -225,8 +225,8 @@ include 'includes/header.php';
                 Discover the future of digital tools with our innovative platform ecosystem.
             </p>
             <div class="cta-actions">
-                <a href="/contact.php" class="btn btn-primary">Get in Touch</a>
-                <a href="/careers.php" class="btn btn-secondary">Join Our Team</a>
+                <a href="/contact" class="btn btn-primary">Get in Touch</a>
+                <a href="/careers" class="btn btn-secondary">Join Our Team</a>
             </div>
         </div>
     </div>

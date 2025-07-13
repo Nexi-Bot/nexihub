@@ -139,7 +139,7 @@ include 'includes/header.php';
             </div>
             <h2>Application Submitted Successfully!</h2>
             <p>Thank you for your interest in joining Nexi Hub. Our team will review your application and get back to you within 2-3 business days.</p>
-            <a href="/careers.php" class="btn btn-primary">Submit Another Application</a>
+            <a href="/careers" class="btn btn-primary">Submit Another Application</a>
         </div>
     </div>
 </section>
@@ -154,7 +154,7 @@ include 'includes/header.php';
             </div>
             <h2>Submission Error</h2>
             <p>There was an issue submitting your application. Please try again or contact us directly.</p>
-            <a href="/contact.php" class="btn btn-primary">Contact Support</a>
+            <a href="/contact" class="btn btn-primary">Contact Support</a>
         </div>
     </div>
 </section>

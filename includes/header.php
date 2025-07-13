@@ -24,16 +24,16 @@
                 <nav class="nav">
                     <ul class="nav-list">
                         <li><a href="/" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'index.php') ? 'active' : ''; ?>">Home</a></li>
-                        <li><a href="/about.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'about.php') ? 'active' : ''; ?>">About Nexi</a></li>
-                        <li><a href="/team.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'team.php') ? 'active' : ''; ?>">The Team</a></li>
-                        <li><a href="/careers.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'careers.php') ? 'active' : ''; ?>">Careers</a></li>
-                        <li><a href="/contact.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'contact.php') ? 'active' : ''; ?>">Contact</a></li>
-                        <li><a href="/legal.php" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'legal.php') ? 'active' : ''; ?>">Legal</a></li>
+                        <li><a href="/about" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'about.php') ? 'active' : ''; ?>">About Nexi</a></li>
+                        <li><a href="/team" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'team.php') ? 'active' : ''; ?>">The Team</a></li>
+                        <li><a href="/careers" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'careers.php') ? 'active' : ''; ?>">Careers</a></li>
+                        <li><a href="/contact" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'contact.php') ? 'active' : ''; ?>">Contact</a></li>
+                        <li><a href="/legal" class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'legal.php') ? 'active' : ''; ?>">Legal</a></li>
                     </ul>
                 </nav>
                 
                 <div class="header-actions">
-                    <a href="/login.php" class="btn btn-primary">Staff Login</a>
+                    <a href="/login" class="btn btn-primary">Staff Login</a>
                 </div>
             </div>
         </div>

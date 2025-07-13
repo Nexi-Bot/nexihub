@@ -4,11 +4,7 @@ $page_description = "Meet the talented individuals behind Nexi Hub - Build. Auto
 include 'includes/header.php';
 ?>
 
-<sect                  <div class="member-photo">
-                    <img src="/assets/images/Chukwumam.jpg" alt="Chukwumam" class="member-image">
-                </div>           <div class="member-photo">
-                    <img src="/assets/images/Paige.jpg" alt="Paige" class="member-image">
-                </div> class="hero">
+<section class="hero">
     <div class="container">
         <div class="hero-content">
             <h1 class="hero-title">Meet The Team</h1>
@@ -65,7 +61,7 @@ include 'includes/header.php';
         <div class="team-grid">
             <div class="team-member">
                 <div class="member-photo">
-                    <img src="/assets/images/Ollie.jpg" alt="Ollie" class="member-image">
+                    <img src="assets/images/Ollie.jpg" alt="Ollie" class="member-image">
                 </div>
                 <div class="member-info">
                     <h3 class="member-name">Ollie</h3>
@@ -85,7 +81,7 @@ include 'includes/header.php';
 
             <div class="team-member">
                 <div class="member-photo">
-                    <img src="/assets/images/Benjamin.jpg" alt="Benjamin" class="member-image">
+                    <img src="assets/images/Benjamin.jpg" alt="Benjamin" class="member-image">
                 </div>
                 <div class="member-info">
                     <h3 class="member-name">Benjamin</h3>
@@ -104,9 +100,7 @@ include 'includes/header.php';
 
             <div class="team-member">
                 <div class="member-photo">
-                    <div class="photo-placeholder">
-                        <span class="member-initial">P</span>
-                    </div>
+                    <img src="assets/images/Paige.jpg" alt="Paige" class="member-image">
                 </div>
                 <div class="member-info">
                     <h3 class="member-name">Paige</h3>
@@ -133,9 +127,7 @@ include 'includes/header.php';
         <div class="team-grid">
             <div class="team-member">
                 <div class="member-photo">
-                    <div class="photo-placeholder">
-                        <span class="member-initial">C</span>
-                    </div>
+                    <img src="assets/images/Chukwumam.jpg" alt="Chukwumam" class="member-image">
                 </div>
                 <div class="member-info">
                     <h3 class="member-name">Chukwumam</h3>
@@ -155,7 +147,7 @@ include 'includes/header.php';
 
             <div class="team-member">
                 <div class="member-photo">
-                    <img src="/assets/images/Sam.gif" alt="Sam" class="member-image">
+                    <img src="assets/images/Sam.gif" alt="Sam" class="member-image">
                 </div>
                 <div class="member-info">
                     <h3 class="member-name">Sam</h3>
@@ -174,7 +166,7 @@ include 'includes/header.php';
 
             <div class="team-member">
                 <div class="member-photo">
-                    <img src="/assets/images/Christopher.jpg" alt="Christopher" class="member-image">
+                    <img src="assets/images/Christopher.jpg" alt="Christopher" class="member-image">
                 </div>
                 <div class="member-info">
                     <h3 class="member-name">Christopher</h3>
@@ -196,7 +188,7 @@ include 'includes/header.php';
         <div class="team-grid team-grid-center">
             <div class="team-member">
                 <div class="member-photo">
-                    <img src="/assets/images/Barbara.jpg" alt="Barbara" class="member-image">
+                    <img src="assets/images/Barbara.jpg" alt="Barbara" class="member-image">
                 </div>
                 <div class="member-info">
                     <h3 class="member-name">Barbara</h3>
@@ -492,7 +484,7 @@ include 'includes/header.php';
                     We're rapidly expanding and looking for talented individuals who want to make a real impact in the digital technology space. 
                     Join our team and help shape the future of web development, automation, and enterprise solutions.
                 </p>
-                <a href="/careers.php" class="btn btn-primary">View All Open Positions</a>
+                <a href="/careers" class="btn btn-primary">View All Open Positions</a>
             </div>
         </div>
     </div>

@@ -11,7 +11,7 @@ include 'includes/header.php';
             <p>Our staff portal is currently under development and will be available soon.</p>
             <p>If you're a team member and need access, please contact your supervisor or reach out to IT support.</p>
             <div class="hero-actions">
-                <a href="/contact.php" class="btn btn-primary">Contact Support</a>
+                <a href="/contact" class="btn btn-primary">Contact Support</a>
                 <a href="/" class="btn btn-secondary">Return Home</a>
             </div>
         </div>

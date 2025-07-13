@@ -31,10 +31,10 @@
                         <h3 class="footer-title">Quick Links</h3>
                         <ul class="footer-list">
                             <li><a href="/" class="footer-link">Home</a></li>
-                            <li><a href="/about.php" class="footer-link">About Nexi</a></li>
-                            <li><a href="/careers.php" class="footer-link">Careers</a></li>
-                            <li><a href="/team.php" class="footer-link">The Team</a></li>
-                            <li><a href="/legal.php" class="footer-link">Legal</a></li>
+                            <li><a href="/about" class="footer-link">About Nexi</a></li>
+                            <li><a href="/careers" class="footer-link">Careers</a></li>
+                            <li><a href="/team" class="footer-link">The Team</a></li>
+                            <li><a href="/legal" class="footer-link">Legal</a></li>
                         </ul>
                     </div>
 
@@ -44,7 +44,7 @@
                             <li><a href="https://nexiweb.uk" target="_blank" class="footer-link">Nexi Web</a></li>
                             <li><a href="https://nexibot.uk" target="_blank" class="footer-link">Nexi Bot</a></li>
                             <li><a href="https://nexipulse.uk" target="_blank" class="footer-link">Nexi Pulse</a></li>
-                            <li><a href="/contact.php" class="footer-link">Contact</a></li>
+                            <li><a href="/contact" class="footer-link">Contact</a></li>
                         </ul>
                     </div>
                 </div>
@@ -54,8 +54,8 @@
                 <div class="footer-bottom-content">
                     <p class="footer-copyright">© <?php echo date('Y'); ?> Nexi Hub. All rights reserved.</p>
                     <div class="footer-bottom-links">
-                        <a href="/legal.php" class="footer-bottom-link">Privacy Policy</a>
-                        <a href="/legal.php" class="footer-bottom-link">Terms of Service</a>
+                        <a href="/legal" class="footer-bottom-link">Privacy Policy</a>
+                        <a href="/legal" class="footer-bottom-link">Terms of Service</a>
                     </div>
                 </div>
             </div>
