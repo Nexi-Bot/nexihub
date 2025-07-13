@@ -25,37 +25,37 @@ include 'includes/header.php';
                 <svg viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"/>
                 </svg>
-                Privacy
+                Privacy Policy
             </a>
             <a href="#sla" class="legal-nav-link">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                     <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
                 </svg>
-                SLA
+                Service Level Agreement
             </a>
             <a href="#terms" class="legal-nav-link">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A9,9 0 0,0 21,12C21,11.5 20.96,11 20.87,10.5C20.6,10 20,10 20,10H18V9A2,2 0 0,0 16,7H15V6A2,2 0 0,0 13,4H12M7,7.5A1.5,1.5 0 0,1 8.5,9A1.5,1.5 0 0,1 7,10.5A1.5,1.5 0 0,1 5.5,9A1.5,1.5 0 0,1 7,7.5M7.5,16C8.5,16 9.24,16.5 10,17H5C5.76,16.5 6.5,16 7.5,16Z"/>
                 </svg>
-                Terms
+                Terms of Service
             </a>
             <a href="#cookies" class="legal-nav-link">
                 <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12,3A9,9 0 0,1 21,12A9,9 0 0,1 12,21A9,9 0 0,1 3,12A9,9 0 0,1 12,3M12,5A7,7 0 0,0 5,12A7,7 0 0,0 12,19A7,7 0 0,0 19,12A7,7 0 0,0 12,5M9.5,8A1.5,1.5 0 0,1 11,9.5A1.5,1.5 0 0,1 9.5,11A1.5,1.5 0 0,1 8,9.5A1.5,1.5 0 0,1 9.5,8M16,9A1,1 0 0,1 17,10A1,1 0 0,1 16,11A1,1 0 0,1 15,10A1,1 0 0,1 16,9M14.5,12.5A1.5,1.5 0 0,1 16,14A1.5,1.5 0 0,1 14.5,15.5A1.5,1.5 0 0,1 13,14A1.5,1.5 0 0,1 14.5,12.5M8,13A1,1 0 0,1 9,14A1,1 0 0,1 8,15A1,1 0 0,1 7,14A1,1 0 0,1 8,13Z"/>
+                    <path d="M12,3A9,9 0 0,1 21,12A9,9 0 0,1 12,21A9,9 0 0,1 3,12A9,9 0 0,1 12,3M12,5A7,7 0 0,0 5,12A7,7 0 0,0 12,19A7,7 0 0,0 19,12A7,7 0 0,0 12,5M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7Z"/>
                 </svg>
-                Cookies
+                Cookie Policy
             </a>
-            <a href="#aup" class="legal-nav-link">
+            <a href="#acceptable-use" class="legal-nav-link">
                 <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z"/>
+                    <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10
                 </svg>
-                Use Policy
+                Acceptable Use Policy
             </a>
-            <a href="#security" class="legal-nav-link">
+            <a href="#data-retention" class="legal-nav-link">
                 <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11.5C15.4,12.3 16,13.2 16,14.5C16,16.9 14.9,18 12.5,18C10.1,18 9,16.9 9,14.5C9,13.2 9.6,12.3 10.2,11.5V10C10.2,8.6 11.6,7 12,7Z"/>
+                    <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
                 </svg>
-                Security
+                Data Retention Policy
             </a>
         </div>
     </div>
@@ -112,45 +112,45 @@ include 'includes/header.php';
             <div class="product-card">
                 <div class="product-icon">
                     <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12,3A9,9 0 0,1 21,12A9,9 0 0,1 12,21A9,9 0 0,1 3,12A9,9 0 0,1 12,3M12,5A7,7 0 0,0 5,12A7,7 0 0,0 12,19A7,7 0 0,0 19,12A7,7 0 0,0 12,5M9.5,8A1.5,1.5 0 0,1 11,9.5A1.5,1.5 0 0,1 9.5,11A1.5,1.5 0 0,1 8,9.5A1.5,1.5 0 0,1 9.5,8M16,9A1,1 0 0,1 17,10A1,1 0 0,1 16,11A1,1 0 0,1 15,10A1,1 0 0,1 16,9M14.5,12.5A1.5,1.5 0 0,1 16,14A1.5,1.5 0 0,1 14.5,15.5A1.5,1.5 0 0,1 13,14A1.5,1.5 0 0,1 14.5,12.5M8,13A1,1 0 0,1 9,14A1,1 0 0,1 8,15A1,1 0 0,1 7,14A1,1 0 0,1 8,13Z"/>
+                        <path d="M12,3A9,9 0 0,1 21,12A9,9 0 0,1 12,21A9,9 0 0,1 3,12A9,9 0 0,1 12,3M12,5A7,7 0 0,0 5,12A7,7 0 0,0 12,19A7,7 0 0,0 19,12A7,7 0 0,0 12,5M12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7Z"/>
                     </svg>
                 </div>
-                <h3 class="product-title">Cookies Policy</h3>
+                <h3 class="product-title">Cookie Policy</h3>
                 <p class="product-description">
-                    Information about how we use cookies and similar technologies on our website. Learn about the types of cookies we use and how to manage your preferences.
+                    How we use cookies and similar technologies to enhance your experience across our platforms. Details on cookie types, purposes, and your control options.
                 </p>
                 <a href="#cookies" class="product-link">
-                    Read Cookies Policy →
+                    Read Cookie Policy →
                 </a>
             </div>
 
             <div class="product-card">
                 <div class="product-icon">
                     <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z"/>
+                        <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6Z"/>
                     </svg>
                 </div>
                 <h3 class="product-title">Acceptable Use Policy</h3>
                 <p class="product-description">
-                    Guidelines for appropriate use of our services. Outlines prohibited activities, content restrictions, and enforcement procedures to ensure a safe environment for all users.
+                    Comprehensive guidelines for appropriate use of our services. Detailed rules, restrictions, and enforcement procedures to ensure a safe environment for all users.
                 </p>
-                <a href="#aup" class="product-link">
-                    Read Use Policy →
+                <a href="#acceptable-use" class="product-link">
+                    Read Acceptable Use Policy →
                 </a>
             </div>
 
             <div class="product-card">
                 <div class="product-icon">
                     <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11.5C15.4,12.3 16,13.2 16,14.5C16,16.9 14.9,18 12.5,18C10.1,18 9,16.9 9,14.5C9,13.2 9.6,12.3 10.2,11.5V10C10.2,8.6 11.6,7 12,7Z"/>
+                        <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
                     </svg>
                 </div>
-                <h3 class="product-title">Security Policy</h3>
+                <h3 class="product-title">Data Retention Policy</h3>
                 <p class="product-description">
-                    Our comprehensive approach to security including data protection measures, infrastructure security, incident response procedures, and vulnerability reporting.
+                    Our comprehensive data retention schedule covering all types of data we collect. Details on retention periods, deletion procedures, and legal compliance requirements.
                 </p>
-                <a href="#security" class="product-link">
-                    Read Security Policy →
+                <a href="#data-retention" class="product-link">
+                    Read Data Retention Policy →
                 </a>
             </div>
         </div>
@@ -779,10 +779,10 @@ include 'includes/header.php';
     </div>
 </section>
 
-<!-- Cookies Policy Section -->
+<!-- Cookie Policy Section -->
 <section id="cookies" class="content-section legal-section">
     <div class="container">
-        <h2 class="section-title">Cookies Policy</h2>
+        <h2 class="section-title">Cookie Policy</h2>
         <div class="content-text">
             <div class="company-info">
                 <strong>Nexi Bot LTD</strong><br>
@@ -790,48 +790,69 @@ include 'includes/header.php';
                 Last Updated: 05/07/2025
             </div>
 
-            <h3>1. WHAT ARE COOKIES</h3>
+            <h3>1. INTRODUCTION</h3>
             <p>
-                Cookies are small text files that are stored on your device when you visit our website. They help us provide you with a better browsing experience by remembering your preferences and improving our services.
+                This Cookie Policy explains how Nexi Bot LTD ("we," "us," "our," or "the Company") uses cookies and similar technologies when you visit our websites or use our services.
             </p>
 
-            <h3>2. HOW WE USE COOKIES</h3>
-            <h4>2.1 Essential Cookies</h4>
-            <p>These cookies are necessary for the website to function properly:</p>
+            <h3>2. WHAT ARE COOKIES</h3>
+            <p>
+                Cookies are small text files that are placed on your device when you visit our website. They help us provide you with a better experience by remembering your preferences and improving our services.
+            </p>
+
+            <h3>3. TYPES OF COOKIES WE USE</h3>
+
+            <h4>3.1 Essential Cookies</h4>
+            <p>These cookies are necessary for our websites to function properly:</p>
             <ul>
-                <li>Authentication and security cookies</li>
+                <li>Authentication cookies to keep you logged in</li>
+                <li>Security cookies to protect against fraud</li>
+                <li>Load balancing cookies for optimal performance</li>
                 <li>Session management cookies</li>
-                <li>Load balancing cookies</li>
             </ul>
 
-            <h4>2.2 Analytics Cookies</h4>
-            <p>We use analytics cookies to understand how visitors interact with our website:</p>
+            <h4>3.2 Performance and Analytics Cookies</h4>
+            <p>These cookies help us understand how you use our services:</p>
             <ul>
-                <li>Page view tracking</li>
-                <li>User behavior analysis</li>
-                <li>Performance monitoring</li>
+                <li>Google Analytics for website usage statistics</li>
+                <li>Performance monitoring for service optimization</li>
+                <li>Error tracking for service improvements</li>
+                <li>User behavior analysis for better user experience</li>
             </ul>
 
-            <h4>2.3 Preference Cookies</h4>
-            <p>These cookies remember your choices and preferences:</p>
+            <h4>3.3 Functional Cookies</h4>
+            <p>These cookies enhance your experience:</p>
             <ul>
-                <li>Language settings</li>
-                <li>Theme preferences</li>
-                <li>Form data retention</li>
+                <li>Language preference settings</li>
+                <li>Theme and display preferences</li>
+                <li>Form data to prevent loss of information</li>
+                <li>Feature accessibility settings</li>
             </ul>
-
-            <h3>3. MANAGING COOKIES</h3>
-            <p>
-                You can control and manage cookies through your browser settings. However, disabling cookies may affect the functionality of our website.
-            </p>
 
             <h3>4. THIRD-PARTY COOKIES</h3>
-            <p>We may use third-party services that set their own cookies:</p>
+            <p>We use services from trusted third parties that may place cookies on your device:</p>
             <ul>
-                <li>Google Analytics for website analytics</li>
-                <li>Stripe for payment processing</li>
-                <li>Discord integration services</li>
+                <li><strong>Google Analytics:</strong> Website analytics and performance monitoring</li>
+                <li><strong>Stripe:</strong> Payment processing and fraud prevention</li>
+                <li><strong>Cloudflare:</strong> Security and performance optimization</li>
+                <li><strong>Discord:</strong> Integration with Discord services</li>
             </ul>
+
+            <h3>5. MANAGING YOUR COOKIE PREFERENCES</h3>
+            <p>You can control cookies through:</p>
+            <ul>
+                <li>Browser settings to block or delete cookies</li>
+                <li>Our cookie consent banner when first visiting our site</li>
+                <li>Account settings for logged-in users</li>
+                <li>Third-party opt-out tools where available</li>
+            </ul>
+
+            <h3>6. CONTACT INFORMATION</h3>
+            <p>
+                For questions about our Cookie Policy:<br>
+                <strong>Email:</strong> legal@nexihub.uk<br>
+                <strong>Address:</strong> 80A Ruskin Avenue, Welling, London, DA16 3QQ
+            </p>
 
             <div class="document-version">
                 <strong>Document Version:</strong> 1.0<br>
@@ -842,7 +863,7 @@ include 'includes/header.php';
 </section>
 
 <!-- Acceptable Use Policy Section -->
-<section id="aup" class="content-section alt legal-section">
+<section id="acceptable-use" class="content-section alt legal-section">
     <div class="container">
         <h2 class="section-title">Acceptable Use Policy</h2>
         <div class="content-text">
@@ -852,48 +873,79 @@ include 'includes/header.php';
                 Last Updated: 05/07/2025
             </div>
 
-            <h3>1. SCOPE AND PURPOSE</h3>
+            <h3>1. INTRODUCTION</h3>
             <p>
-                This Acceptable Use Policy governs your use of all Nexi Hub services and platforms. By using our services, you agree to comply with this policy.
+                This Acceptable Use Policy ("AUP") governs your use of Nexi Hub services and sets out the standards of behavior we expect from all users.
             </p>
 
             <h3>2. PROHIBITED ACTIVITIES</h3>
+
             <h4>2.1 Illegal Activities</h4>
+            <p>You may not use our services for:</p>
             <ul>
-                <li>Any activity that violates applicable laws or regulations</li>
+                <li>Any illegal activities or content</li>
                 <li>Copyright or trademark infringement</li>
-                <li>Fraud, identity theft, or financial crimes</li>
+                <li>Fraud, phishing, or identity theft</li>
+                <li>Money laundering or terrorist financing</li>
                 <li>Distribution of illegal content</li>
             </ul>
 
-            <h4>2.2 Harmful Activities</h4>
+            <h4>2.2 Harmful Content</h4>
+            <p>Prohibited content includes:</p>
             <ul>
-                <li>Harassment, bullying, or threatening behavior</li>
-                <li>Distribution of malware or viruses</li>
-                <li>Attempting to gain unauthorized access to systems</li>
-                <li>Denial of service attacks</li>
+                <li>Hate speech, harassment, or discrimination</li>
+                <li>Violent or graphic content</li>
+                <li>Adult content or pornography</li>
+                <li>Content promoting self-harm</li>
+                <li>Malware, viruses, or malicious code</li>
             </ul>
 
-            <h4>2.3 Abuse of Services</h4>
+            <h4>2.3 Service Abuse</h4>
+            <p>You must not:</p>
             <ul>
-                <li>Exceeding reasonable usage limits</li>
-                <li>Creating multiple accounts to circumvent restrictions</li>
-                <li>Interfering with other users' use of the service</li>
-                <li>Automated abuse or spam</li>
+                <li>Attempt to gain unauthorized access to our systems</li>
+                <li>Interfere with or disrupt our services</li>
+                <li>Use our services for spam or unsolicited communications</li>
+                <li>Exceed reasonable usage limits</li>
+                <li>Reverse engineer or attempt to extract source code</li>
             </ul>
 
-            <h3>3. CONTENT RESTRICTIONS</h3>
-            <p>Users must not upload, post, or distribute content that is:</p>
+            <h3>3. CONTENT STANDARDS</h3>
+            <p>All content must be:</p>
             <ul>
-                <li>Illegal, harmful, or offensive</li>
-                <li>Infringing on intellectual property rights</li>
-                <li>Containing personal information of others without consent</li>
-                <li>Spam or unsolicited commercial content</li>
+                <li>Legal and not infringing on third-party rights</li>
+                <li>Accurate and not misleading</li>
+                <li>Respectful and not offensive</li>
+                <li>Appropriate for the intended audience</li>
+                <li>Compliant with platform-specific guidelines</li>
             </ul>
 
             <h3>4. ENFORCEMENT</h3>
+
+            <h4>4.1 Violations</h4>
+            <p>Violations may result in:</p>
+            <ul>
+                <li>Content removal or modification</li>
+                <li>Account suspension or termination</li>
+                <li>Service restrictions or limitations</li>
+                <li>Legal action where appropriate</li>
+                <li>Reporting to relevant authorities</li>
+            </ul>
+
+            <h4>4.2 Appeals Process</h4>
+            <p>If you believe enforcement action was taken in error:</p>
+            <ul>
+                <li>Contact our support team within 30 days</li>
+                <li>Provide detailed explanation of the circumstances</li>
+                <li>Include any relevant evidence or documentation</li>
+                <li>Allow up to 14 days for review and response</li>
+            </ul>
+
+            <h3>5. REPORTING VIOLATIONS</h3>
             <p>
-                Violations of this policy may result in warnings, account suspension, or termination of services. We reserve the right to remove content and take appropriate action without notice.
+                To report violations of this policy:<br>
+                <strong>Email:</strong> abuse@nexihub.uk<br>
+                <strong>Include:</strong> Detailed description, URLs, screenshots, and your contact information
             </p>
 
             <div class="document-version">
@@ -904,58 +956,114 @@ include 'includes/header.php';
     </div>
 </section>
 
-<!-- Security Policy Section -->
-<section id="security" class="content-section legal-section">
+<!-- Data Retention Policy Section -->
+<section id="data-retention" class="content-section legal-section">
     <div class="container">
-        <h2 class="section-title">Security Policy</h2>
+        <h2 class="section-title">Data Retention Policy</h2>
         <div class="content-text">
             <div class="company-info">
                 <strong>Nexi Bot LTD</strong><br>
                 Company Registration Number: 16502958<br>
+                ICO Registration Number: ZB910034<br>
                 Last Updated: 05/07/2025
             </div>
 
-            <h3>1. SECURITY COMMITMENT</h3>
+            <h3>1. INTRODUCTION</h3>
             <p>
-                Nexi Hub is committed to maintaining the highest standards of security to protect our users' data and services. We implement comprehensive security measures across all our platforms.
+                This Data Retention Policy outlines how long we retain different types of personal data and the criteria we use to determine retention periods.
             </p>
 
-            <h3>2. SECURITY MEASURES</h3>
-            <h4>2.1 Data Protection</h4>
+            <h3>2. RETENTION PRINCIPLES</h3>
+            <p>We retain personal data only for as long as necessary to:</p>
             <ul>
-                <li>End-to-end encryption for data in transit</li>
-                <li>AES-256 encryption for data at rest</li>
-                <li>Regular security audits and penetration testing</li>
-                <li>Secure backup and recovery procedures</li>
+                <li>Provide our services effectively</li>
+                <li>Comply with legal obligations</li>
+                <li>Resolve disputes and enforce agreements</li>
+                <li>Protect our legitimate business interests</li>
+                <li>Meet regulatory requirements</li>
             </ul>
 
-            <h4>2.2 Access Controls</h4>
+            <h3>3. RETENTION SCHEDULES</h3>
+
+            <h4>3.1 Customer Data</h4>
             <ul>
-                <li>Multi-factor authentication for admin accounts</li>
-                <li>Role-based access control (RBAC)</li>
-                <li>Regular access reviews and deprovisioning</li>
-                <li>Secure authentication protocols</li>
+                <li><strong>Active Accounts:</strong> Throughout service provision</li>
+                <li><strong>Inactive Accounts:</strong> 12 months after last activity</li>
+                <li><strong>Deleted Accounts:</strong> 30 days (for account recovery)</li>
+                <li><strong>Payment Data:</strong> 7 years (legal requirement)</li>
+                <li><strong>Support Tickets:</strong> 3 years after resolution</li>
             </ul>
 
-            <h4>2.3 Infrastructure Security</h4>
+            <h4>3.2 Employee Data</h4>
             <ul>
-                <li>Firewall protection and intrusion detection</li>
-                <li>Regular security updates and patches</li>
-                <li>Secure development practices</li>
-                <li>24/7 security monitoring</li>
+                <li><strong>Current Employees:</strong> Throughout employment</li>
+                <li><strong>Former Employees:</strong> 6 years after termination</li>
+                <li><strong>Payroll Records:</strong> 7 years (legal requirement)</li>
+                <li><strong>Training Records:</strong> 3 years after completion</li>
+                <li><strong>Unsuccessful Applicants:</strong> 6 months after process</li>
             </ul>
 
-            <h3>3. INCIDENT RESPONSE</h3>
-            <p>
-                In the event of a security incident, we follow established procedures to contain, investigate, and resolve issues while keeping affected users informed.
-            </p>
+            <h4>3.3 Technical Data</h4>
+            <ul>
+                <li><strong>Server Logs:</strong> 12 months</li>
+                <li><strong>Security Logs:</strong> 24 months</li>
+                <li><strong>Analytics Data:</strong> 24 months</li>
+                <li><strong>Error Logs:</strong> 6 months</li>
+                <li><strong>Backup Data:</strong> 30 days</li>
+            </ul>
 
-            <h3>4. REPORTING SECURITY ISSUES</h3>
+            <h4>3.4 Marketing Data</h4>
+            <ul>
+                <li><strong>Newsletter Subscribers:</strong> Until unsubscribed + 12 months</li>
+                <li><strong>Marketing Campaigns:</strong> 3 years</li>
+                <li><strong>Website Analytics:</strong> 24 months</li>
+                <li><strong>Cookie Data:</strong> As specified in Cookie Policy</li>
+            </ul>
+
+            <h3>4. DELETION PROCEDURES</h3>
+
+            <h4>4.1 Automated Deletion</h4>
+            <p>We have automated systems that:</p>
+            <ul>
+                <li>Monitor data retention periods</li>
+                <li>Flag data for review when retention period expires</li>
+                <li>Automatically delete data where appropriate</li>
+                <li>Generate deletion reports for compliance</li>
+            </ul>
+
+            <h4>4.2 Manual Review</h4>
+            <p>Some data requires manual review before deletion:</p>
+            <ul>
+                <li>Data subject to legal hold</li>
+                <li>Data involved in ongoing disputes</li>
+                <li>Data required for regulatory compliance</li>
+                <li>Data with extended retention requirements</li>
+            </ul>
+
+            <h3>5. EXCEPTIONS TO RETENTION PERIODS</h3>
+            <p>We may retain data beyond standard periods when:</p>
+            <ul>
+                <li>Required by law or regulation</li>
+                <li>Subject to legal proceedings or investigations</li>
+                <li>Necessary for the establishment, exercise, or defense of legal claims</li>
+                <li>Required for legitimate business purposes with appropriate safeguards</li>
+            </ul>
+
+            <h3>6. DATA SUBJECT RIGHTS</h3>
+            <p>You have the right to:</p>
+            <ul>
+                <li>Request deletion of your personal data</li>
+                <li>Object to processing for legitimate interests</li>
+                <li>Withdraw consent where processing is based on consent</li>
+                <li>Request information about retention periods for your data</li>
+            </ul>
+
+            <h3>7. CONTACT INFORMATION</h3>
             <p>
-                If you discover a security vulnerability, please report it responsibly to: <strong>security@nexihub.uk</strong>
-            </p>
-            <p>
-                We appreciate responsible disclosure and will work with security researchers to address issues promptly.
+                For questions about data retention:<br>
+                <strong>Email:</strong> legal@nexihub.uk<br>
+                <strong>Data Protection Officer:</strong> dpo@nexihub.uk<br>
+                <strong>Address:</strong> 80A Ruskin Avenue, Welling, London, DA16 3QQ
             </p>
 
             <div class="document-version">
