@@ -11,13 +11,16 @@ define('STRIPE_PUBLISHABLE_KEY', 'pk_live_51RgSvsHxd4KTYsDdodmX55cZkcaGwzXGgARw7
 define('STRIPE_SECRET_KEY', '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');
 
 // Discord OAuth Configuration
-define('DISCORD_CLIENT_ID', 'YOUR_DISCORD_CLIENT_ID'); // You'll need to provide this
-define('DISCORD_CLIENT_SECRET', 'YOUR_DISCORD_CLIENT_SECRET'); // You'll need to provide this
-define('DISCORD_REDIRECT_URI', 'https://nexihub.uk/staff/discord-callback');
+define('DISCORD_CLIENT_ID', '1394054979811282955'); // You'll need to provide this
+define('DISCORD_CLIENT_SECRET', 'Oy5sgCK4IF4gb1GQpbMovUgtImc04AaN'); // You'll need to provide this
 
 // Site Configuration
-define('SITE_URL', 'https://nexihub.uk');
+$is_local = ($_SERVER['HTTP_HOST'] === 'localhost:8000' || $_SERVER['HTTP_HOST'] === '127.0.0.1:8000');
+define('SITE_URL', $is_local ? 'http://localhost:8000' : 'https://nexihub.uk');
 define('SITE_NAME', 'Nexi Hub');
+define('IS_LOCAL_DEV', $is_local);
+$discord_redirect = $is_local ? 'http://localhost:8000/staff/discord-callback' : 'https://nexihub.uk/staff/discord-callback';
+define('DISCORD_REDIRECT_URI', $discord_redirect);
 
 // Session Configuration
 ini_set('session.cookie_httponly', 1);
@@ -59,6 +62,10 @@ function verifyPassword($password, $hash) {
 }
 
 function redirectTo($url) {
+    // If it's a relative URL starting with /, prepend the site URL
+    if (strpos($url, '/') === 0) {
+        $url = SITE_URL . $url;
+    }
     header("Location: " . $url);
     exit();
 }

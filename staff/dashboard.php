@@ -1,5 +1,5 @@
 <?php
-require_once '../config/config.php';
+require_once __DIR__ . '/../config/config.php';
 
 requireAuth();
 
@@ -16,7 +16,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$_SESSION['session_token'] ?? '', $_SESSION['staff_id']]);
 $staff = $stmt->fetch();
 
-include '../includes/header.php';
+include __DIR__ . '/../includes/header.php';
 ?>
 
 <style>
@@ -483,4 +483,4 @@ include '../includes/header.php';
     </div>
 </div>
 
-<?php include '../includes/footer.php'; ?>
+<?php include __DIR__ . '/../includes/footer.php'; ?>

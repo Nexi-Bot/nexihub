@@ -1,5 +1,5 @@
 <?php
-require_once '../config/config.php';
+require_once __DIR__ . '/../config/config.php';
 
 $page_title = "Staff Login";
 $page_description = "Secure staff login portal for Nexi Hub team members";
@@ -23,7 +23,7 @@ if (isset($_SESSION['staff_id'])) {
     }
 }
 
-include '../includes/header.php';
+include __DIR__ . '/../includes/header.php';
 ?>
 
 <style>
@@ -460,4 +460,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <?php endif; ?>
 
-<?php include '../includes/footer.php'; ?>
+<?php include __DIR__ . '/../includes/footer.php'; ?>
