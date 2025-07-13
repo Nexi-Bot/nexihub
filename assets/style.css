@@ -743,236 +743,595 @@
     fill: currentColor;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .header-content {
-        flex-direction: column;
-        gap: 1rem;
-        padding: 1rem 0;
-    }
-
-    .nav-list {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 1rem;
-    }
-
-    .hero-title {
-        font-size: 2.5rem;
-    }
-
-    .hero-subtitle {
-        font-size: 1.2rem;
-    }
-
-    .hero-actions {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .products-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .content-grid {
-        grid-template-columns: 1fr;
-        text-align: center;
-    }
-
-    .footer-content {
-        grid-template-columns: 1fr;
-        text-align: center;
-    }
-
-    .footer-stats {
-        justify-content: center;
-    }
-
-    .footer-bottom-content {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.5rem;
-    }
-    
-    .platforms-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .platform-card.featured {
-        transform: none;
-    }
-    
-    .platform-card.featured:hover {
-        transform: translateY(-8px);
-    }
-    
-    .why-choose-grid {
-        grid-template-columns: 1fr;
-        gap: 3rem;
-        text-align: center;
-    }
-    
-    .visual-stats {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1rem;
-        padding: 2rem 1rem;
-    }
-    
-    .cta-actions {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .cta-title {
-        font-size: 2rem;
-    }
-    
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-    
-    .positions-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .benefits-grid {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .modal-content {
-        width: 95%;
-        margin: 5% auto;
-        max-height: 95vh;
-    }
-    
-    .form-actions {
-        flex-direction: column-reverse;
-    }
-    
-    .form-actions .btn {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .section-title {
-        font-size: 2rem;
-    }
-    
-    .category-title {
-        font-size: 1.5rem;
-    }
+/* Legal Page Enhancements */
+.legal-navigation {
+    position: sticky;
+    top: 20px;
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    z-index: 100;
 }
 
-@media (max-width: 480px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .visual-stats {
-        grid-template-columns: 1fr;
-    }
-    
-    .position-card {
-        padding: 1.5rem;
-    }
-    
-    .benefit-item {
-        padding: 1rem;
-    }
-    
-    .modal-header {
-        padding: 1.5rem 1.5rem 1rem;
-    }
-    
-    #applicationForm {
-        padding: 1.5rem;
-    }
-    
-    .hero-title {
-        font-size: 2rem;
-    }
-}
-
-/* Mobile responsiveness for centered grids */
-@media (max-width: 768px) {
-    .positions-grid,
-    .benefits-grid {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .position-card,
-    .benefit-card {
-        width: 100%;
-        max-width: 400px;
-    }
-}
-
-/* Careers Page Specific Overrides */
-.careers-hero .hero-content {
-    text-align: center;
-    margin: 0 auto;
-}
-
-.careers-content .content-grid {
-    text-align: center;
-    justify-items: center;
-}
-
-.careers-content .content-text {
-    text-align: center;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.careers-benefits {
+.legal-nav-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
     text-align: center;
 }
 
-.careers-benefits .benefits-list {
+.legal-nav-links {
+    display: flex;
     justify-content: center;
-    max-width: 1000px;
-    margin: 2rem auto;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 
-.section-subtitle {
+.legal-nav-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: var(--background-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.legal-nav-link:hover,
+.legal-nav-link.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.legal-nav-link svg {
+    width: 16px;
+    height: 16px;
+    margin-right: 0.5rem;
+}
+
+.content-text {
+    max-width: 900px;
+    margin: 0 auto;
+    line-height: 1.8;
+}
+
+.content-text h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 2.5rem 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--primary-color);
+    position: relative;
+}
+
+.content-text h3::before {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: var(--secondary-color);
+}
+
+.content-text h4 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 2rem 0 1rem 0;
+    padding-left: 1rem;
+    border-left: 3px solid var(--primary-color);
+}
+
+.content-text p {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
+.content-text ul {
+    margin: 1rem 0 1.5rem 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+.content-text li {
+    position: relative;
+    padding: 0.5rem 0 0.5rem 2rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.content-text li:last-child {
+    border-bottom: none;
+}
+
+.content-text li::before {
+    content: '▶';
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-size: 0.8rem;
+    top: 0.7rem;
+}
+
+.content-text strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Company Info Box */
+.company-info {
+    background: linear-gradient(135deg, var(--background-light), var(--background-dark));
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
     text-align: center;
-    max-width: 700px;
-    margin: 0 auto 3rem;
+    margin: 2rem auto;
+    box-shadow: 0 8px 25px var(--shadow-medium);
+    position: relative;
+    overflow: hidden;
 }
 
-/* Volunteer notice styling */
-.volunteer-notice {
-    background: linear-gradient(135deg, rgba(230, 79, 33, 0.1), rgba(230, 79, 33, 0.05));
-    border: 1px solid rgba(230, 79, 33, 0.3);
+.company-info::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+}
+
+.company-info strong {
+    display: block;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.company-info br + strong {
+    margin-top: 1rem;
+}
+
+/* Legal Section Styling */
+.legal-section {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 3rem;
+    margin: 2rem 0;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.legal-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border-radius: 20px 20px 0 0;
+}
+
+.legal-section:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 35px var(--shadow-medium);
+    border-color: var(--primary-color);
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-color) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Enhanced Product Cards for Legal Overview */
+.legal-overview .product-card {
+    height: 100%;
+    transition: all 0.4s ease;
+    background: linear-gradient(135deg, var(--background-light) 0%, var(--background-dark) 100%);
+}
+
+.legal-overview .product-card:hover {
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 0 25px 50px var(--shadow-heavy);
+}
+
+.legal-overview .product-icon {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    box-shadow: 0 8px 25px var(--shadow-light);
+}
+
+.legal-overview .product-title {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+}
+
+.legal-overview .product-description {
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+.legal-overview .product-link {
+    font-size: 1.1rem;
+    padding: 0.5rem 0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.legal-overview .product-link:hover {
+    background: rgba(230, 79, 33, 0.1);
+    padding: 0.5rem 1rem;
+}
+
+/* Document Version Info */
+.document-version {
+    background: var(--background-dark);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 1.5rem;
-    margin: 2rem auto 0;
-    max-width: 800px;
+    text-align: center;
+    margin: 3rem auto 0;
+    max-width: 400px;
+}
+
+.document-version strong {
+    color: var(--primary-color);
+}
+
+/* Enhanced Application Form Styling */
+.application-form {
+    background: linear-gradient(135deg, var(--background-light) 0%, var(--background-dark) 100%);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 3rem;
+    margin: 2rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.application-form::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+}
+
+.application-form h2 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.application-form .form-subtitle {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.application-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.application-form .form-group {
+    margin-bottom: 2rem;
+}
+
+.application-form .form-group label {
+    display: block;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1rem;
+    position: relative;
+}
+
+.application-form .form-group label.required::after {
+    content: ' *';
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.application-form .form-group input,
+.application-form .form-group select,
+.application-form .form-group textarea {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    background: var(--background-dark);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.application-form .form-group input:focus,
+.application-form .form-group select:focus,
+.application-form .form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(230, 79, 33, 0.1);
+    transform: translateY(-2px);
+}
+
+.application-form .form-group select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.25rem;
+    padding-right: 3rem;
+}
+
+.application-form .form-group textarea {
+    resize: vertical;
+    min-height: 140px;
+    line-height: 1.6;
+}
+
+.application-form .form-group input::placeholder,
+.application-form .form-group textarea::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+/* Checkbox Styling */
+.checkbox-group {
     display: flex;
     align-items: flex-start;
     gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(230, 79, 33, 0.05);
+    border: 1px solid rgba(230, 79, 33, 0.2);
+    border-radius: 12px;
+    transition: all 0.3s ease;
 }
 
-.volunteer-notice svg {
-    width: 24px;
-    height: 24px;
-    color: var(--primary-color);
+.checkbox-group:hover {
+    background: rgba(230, 79, 33, 0.08);
+    border-color: rgba(230, 79, 33, 0.3);
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary-color);
+    margin: 0;
+    cursor: pointer;
     flex-shrink: 0;
     margin-top: 0.125rem;
 }
 
-.volunteer-notice p {
-    margin: 0;
+.checkbox-group label {
+    cursor: pointer;
     color: var(--text-primary);
+    line-height: 1.6;
+    font-size: 0.95rem;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.checkbox-group label strong {
+    color: var(--primary-color);
+}
+
+/* Submit Button Enhanced */
+.form-submit-section {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.submit-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    padding: 1.25rem 3rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(230, 79, 33, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.submit-btn:hover::before {
+    left: 100%;
+}
+
+.submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(230, 79, 33, 0.4);
+}
+
+.submit-btn:disabled {
+    background: var(--text-secondary);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.submit-btn:disabled::before {
+    display: none;
+}
+
+/* Form Helper Text */
+.form-helper {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
     line-height: 1.5;
 }
 
-.volunteer-notice strong {
-    color: var(--primary-color);
+.form-helper.error {
+    color: #ef4444;
+}
+
+.form-helper.success {
+    color: #22c55e;
+}
+
+/* Form Progress Indicator */
+.form-progress {
+    background: var(--background-dark);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-color);
+}
+
+.form-progress h4 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.progress-bar {
+    background: var(--border-color);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    height: 100%;
+    transition: width 0.3s ease;
+    border-radius: 4px;
+}
+
+/* Enhanced Modal for Application Form */
+.modal.application-modal .modal-content {
+    max-width: 800px;
+    width: 95%;
+}
+
+.modal.application-modal .modal-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 20px 20px 0 0;
+    border-bottom: none;
+}
+
+.modal.application-modal .modal-header h2 {
+    color: white;
+}
+
+.modal.application-modal .modal-close {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.modal.application-modal .modal-close:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive Design for Application Form */
+@media (max-width: 768px) {
+    .application-form {
+        padding: 2rem 1.5rem;
+    }
+    
+    .application-form .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .application-form h2 {
+        font-size: 1.75rem;
+    }
+    
+    .checkbox-group {
+        padding: 1rem;
+    }
+    
+    .submit-btn {
+        padding: 1rem 2rem;
+        font-size: 1rem;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .application-form {
+        padding: 1.5rem 1rem;
+        margin: 1rem 0;
+        border-radius: 16px;
+    }
+    
+    .application-form .form-group input,
+    .application-form .form-group select,
+    .application-form .form-group textarea {
+        padding: 0.875rem 1rem;
+    }
+}
+
+/* Loading States */
+.form-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.form-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 32px;
+    height: 32px;
+    margin: -16px 0 0 -16px;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }

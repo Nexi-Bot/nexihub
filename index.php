@@ -1,4 +1,23 @@
 <?php
+// Simple routing for clean URLs
+$request_uri = $_SERVER['REQUEST_URI'];
+$path = parse_url($request_uri, PHP_URL_PATH);
+$route = trim($path, '/');
+
+// Handle routing
+if (!empty($route)) {
+    $file = $route . '.php';
+    if (file_exists($file)) {
+        include $file;
+        exit;
+    } else {
+        // Page not found, show 404 or redirect to home
+        header("HTTP/1.0 404 Not Found");
+        // Fall through to show home page
+    }
+}
+
+// Default home page content
 $page_title = "Home";
 $page_description = "Nexi Hub - Build. Automate. Scale. The governing company behind Nexi Web, Nexi Bot, and Nexi Pulse.";
 include 'includes/header.php';
