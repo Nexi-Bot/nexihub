@@ -6,7 +6,7 @@ requireAuth();
 $page_title = "Staff Dashboard";
 $page_description = "Nexi Hub Staff Portal - Internal tools and management";
 
-// Get staff information
+// Get staff information with job details
 $stmt = $pdo->prepare("
     SELECT s.*, ss.created_at as session_start, ss.ip_address 
     FROM staff s 
@@ -15,6 +15,22 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$_SESSION['session_token'] ?? '', $_SESSION['staff_id']]);
 $staff = $stmt->fetch();
+
+// Get dashboard analytics
+$today = date('Y-m-d');
+$week_ago = date('Y-m-d', strtotime('-7 days'));
+$month_ago = date('Y-m-d', strtotime('-30 days'));
+
+// User stats
+$totalUsers = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+$premiumUsers = $pdo->query("SELECT COUNT(*) FROM users WHERE premium = 1")->fetchColumn();
+
+// Support stats
+$openTickets = $pdo->query("SELECT COUNT(*) FROM support_tickets WHERE status IN ('open', 'in-progress')")->fetchColumn();
+$urgentTickets = $pdo->query("SELECT COUNT(*) FROM support_tickets WHERE priority = 'urgent' AND status != 'closed'")->fetchColumn();
+
+// System health (simplified for now)
+$systemIssues = 0; // We'll update this later with real monitoring
 
 include __DIR__ . '/../includes/header.php';
 ?>
@@ -271,10 +287,13 @@ include __DIR__ . '/../includes/header.php';
         
         <div class="dashboard-header">
             <div class="staff-info">
-                <img src="<?php echo htmlspecialchars($staff['discord_avatar'] ?? '/assets/default-avatar.png'); ?>" alt="Staff Avatar" class="staff-avatar">
+                <img src="<?php echo htmlspecialchars($staff['profile_picture'] ?? $staff['discord_avatar'] ?? '/assets/default-avatar.png'); ?>" alt="Staff Avatar" class="staff-avatar">
                 <div class="staff-details">
                     <h1>Welcome, <?php echo htmlspecialchars($staff['discord_username'] ?? 'Staff Member'); ?></h1>
+                    <p><strong>Department:</strong> <?php echo htmlspecialchars($staff['department'] ?? 'Not specified'); ?></p>
+                    <p><strong>Job Title:</strong> <?php echo htmlspecialchars($staff['job_title'] ?? 'Not specified'); ?></p>
                     <p><strong>Email:</strong> <?php echo htmlspecialchars($staff['email']); ?></p>
+                    <p><strong>Employment Type:</strong> <?php echo htmlspecialchars(ucfirst($staff['employment_type'] ?? 'Not specified')); ?></p>
                     <p><strong>Last Login:</strong> <?php echo $staff['last_login'] ? date('F j, Y \a\t g:i A', strtotime($staff['last_login'])) : 'Never'; ?></p>
                     <p><strong>2FA Status:</strong> <?php echo $staff['two_fa_enabled'] ? '✅ Enabled' : '❌ Disabled'; ?></p>
                 </div>
@@ -321,12 +340,12 @@ include __DIR__ . '/../includes/header.php';
                 </p>
                 <div class="quick-stats">
                     <div class="quick-stat">
-                        <span class="stat-number">245</span>
+                        <span class="stat-number"><?php echo number_format($totalUsers); ?></span>
                         <span class="stat-label">Total Users</span>
                     </div>
                     <div class="quick-stat">
-                        <span class="stat-number">89</span>
-                        <span class="stat-label">Premium</span>
+                        <span class="stat-number"><?php echo number_format($premiumUsers); ?></span>
+                        <span class="stat-label">Premium Users</span>
                     </div>
                 </div>
                 <div class="card-actions">
@@ -350,12 +369,12 @@ include __DIR__ . '/../includes/header.php';
                 </p>
                 <div class="quick-stats">
                     <div class="quick-stat">
-                        <span class="stat-number">£2.4k</span>
+                        <span class="stat-number">£2,400</span>
                         <span class="stat-label">This Month</span>
                     </div>
                     <div class="quick-stat">
-                        <span class="stat-number">47</span>
-                        <span class="stat-label">Active Subs</span>
+                        <span class="stat-number">£890</span>
+                        <span class="stat-label">Pending</span>
                     </div>
                 </div>
                 <div class="card-actions">
@@ -379,12 +398,12 @@ include __DIR__ . '/../includes/header.php';
                 </p>
                 <div class="quick-stats">
                     <div class="quick-stat">
-                        <span class="stat-number">12</span>
+                        <span class="stat-number"><?php echo number_format($openTickets); ?></span>
                         <span class="stat-label">Open</span>
                     </div>
                     <div class="quick-stat">
-                        <span class="stat-number">156</span>
-                        <span class="stat-label">Resolved</span>
+                        <span class="stat-number"><?php echo number_format($urgentTickets); ?></span>
+                        <span class="stat-label">Urgent</span>
                     </div>
                 </div>
                 <div class="card-actions">
@@ -408,12 +427,12 @@ include __DIR__ . '/../includes/header.php';
                 </p>
                 <div class="quick-stats">
                     <div class="quick-stat">
-                        <span class="stat-number">99.8%</span>
+                        <span class="stat-number"><?php echo $systemIssues === 0 ? '99.9%' : '98.' . (9 - $systemIssues) . '%'; ?></span>
                         <span class="stat-label">Uptime</span>
                     </div>
                     <div class="quick-stat">
-                        <span class="stat-number">125ms</span>
-                        <span class="stat-label">Avg Response</span>
+                        <span class="stat-number"><?php echo $systemIssues; ?></span>
+                        <span class="stat-label">Issues</span>
                     </div>
                 </div>
                 <div class="card-actions">

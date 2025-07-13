@@ -204,6 +204,26 @@ include 'includes/header.php';
                     </div>
                 </div>
             </div>
+            
+            <div class="team-member">
+                <div class="member-photo">
+                    <img src="assets/images/maisie.jpg" alt="Maisie" class="member-image">
+                </div>
+                <div class="member-info">
+                    <h3 class="member-name">Maisie</h3>
+                    <p class="member-title">Internal Communications Manager</p>
+                    <p class="member-description">
+                        Maisie ensures clear and effective communication across all Nexi Hub teams. She develops engagement 
+                        strategies for our global workforce, manages internal messaging, and fosters a connected company culture 
+                        that spans continents and time zones.
+                    </p>
+                    <div class="member-expertise">
+                        <span class="expertise-tag">Internal Communications</span>
+                        <span class="expertise-tag">Employee Engagement</span>
+                        <span class="expertise-tag">Global Team Coordination</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>

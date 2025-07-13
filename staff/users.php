@@ -15,39 +15,71 @@ if ($_POST && $action) {
     switch($action) {
         case 'update_user':
             $userId = $_POST['user_id'];
-            $email = $_POST['email'];
-            $subscription = $_POST['subscription'];
-            $status = $_POST['status'];
+            $premium = $_POST['premium'] ?? 0;
+            $premium_status = $_POST['premium_status'] ?? 'cancelled';
             
-            // In a real app, you'd update the user in the database
-            $message = "User updated successfully!";
+            $stmt = $pdo->prepare("UPDATE users SET premium = ?, premium_status = ? WHERE id = ?");
+            if ($stmt->execute([$premium, $premium_status, $userId])) {
+                $message = "User updated successfully!";
+            } else {
+                $message = "Error updating user.";
+            }
             break;
             
         case 'suspend_user':
-            // In a real app, you'd suspend the user
-            $message = "User suspended successfully!";
+            $stmt = $pdo->prepare("UPDATE users SET premium_status = 'cancelled' WHERE id = ?");
+            if ($stmt->execute([$userId])) {
+                $message = "User suspended successfully!";
+            } else {
+                $message = "Error suspending user.";
+            }
             break;
             
         case 'delete_user':
-            // In a real app, you'd delete the user
-            $message = "User deleted successfully!";
+            $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
+            if ($stmt->execute([$userId])) {
+                $message = "User deleted successfully!";
+            } else {
+                $message = "Error deleting user.";
+            }
             break;
     }
 }
 
-// Sample user data (in a real app, this would come from your database)
-$users = [
-    ['id' => 1, 'email' => 'john@example.com', 'username' => 'john_doe', 'subscription' => 'Premium', 'status' => 'Active', 'joined' => '2023-10-15', 'last_login' => '2024-01-15 14:30:00'],
-    ['id' => 2, 'email' => 'sarah@example.com', 'username' => 'sarah_smith', 'subscription' => 'Free', 'status' => 'Active', 'joined' => '2023-11-22', 'last_login' => '2024-01-14 09:15:00'],
-    ['id' => 3, 'email' => 'mike@example.com', 'username' => 'mike_jones', 'subscription' => 'Premium', 'status' => 'Suspended', 'joined' => '2023-09-03', 'last_login' => '2024-01-10 16:45:00'],
-    ['id' => 4, 'email' => 'emma@example.com', 'username' => 'emma_wilson', 'subscription' => 'Business', 'status' => 'Active', 'joined' => '2024-01-01', 'last_login' => '2024-01-15 11:20:00'],
-    ['id' => 5, 'email' => 'alex@example.com', 'username' => 'alex_brown', 'subscription' => 'Free', 'status' => 'Active', 'joined' => '2023-12-10', 'last_login' => '2024-01-13 19:30:00'],
-];
+// Get users from database
+$whereConditions = [];
+$params = [];
 
 // Filter and search
 $search = $_GET['search'] ?? '';
 $filterStatus = $_GET['status'] ?? '';
 $filterSubscription = $_GET['subscription'] ?? '';
+
+if ($search) {
+    $whereConditions[] = "(username LIKE ? OR user_id LIKE ?)";
+    $params[] = "%$search%";
+    $params[] = "%$search%";
+}
+
+if ($filterStatus) {
+    $whereConditions[] = "premium_status = ?";
+    $params[] = $filterStatus;
+}
+
+if ($filterSubscription) {
+    if ($filterSubscription === 'premium') {
+        $whereConditions[] = "premium = 1";
+    } else {
+        $whereConditions[] = "premium = 0";
+    }
+}
+
+$whereClause = $whereConditions ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
+
+$sql = "SELECT * FROM users $whereClause ORDER BY created_at DESC";
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$users = $stmt->fetchAll();
 
 if ($search || $filterStatus || $filterSubscription) {
     $users = array_filter($users, function($user) use ($search, $filterStatus, $filterSubscription) {
@@ -400,7 +432,7 @@ include __DIR__ . '/../includes/header.php';
                 <thead>
                     <tr>
                         <th>User</th>
-                        <th>Email</th>
+                        <th>User ID</th>
                         <th>Subscription</th>
                         <th>Status</th>
                         <th>Joined</th>
@@ -415,23 +447,23 @@ include __DIR__ . '/../includes/header.php';
                                 <strong><?php echo htmlspecialchars($user['username']); ?></strong><br>
                                 <small>ID: <?php echo $user['id']; ?></small>
                             </td>
-                            <td><?php echo htmlspecialchars($user['email']); ?></td>
+                            <td><?php echo htmlspecialchars($user['user_id'] ?? 'N/A'); ?></td>
                             <td>
-                                <span class="subscription-badge subscription-<?php echo strtolower($user['subscription']); ?>">
-                                    <?php echo $user['subscription']; ?>
+                                <span class="subscription-badge subscription-<?php echo $user['premium'] ? 'premium' : 'free'; ?>">
+                                    <?php echo $user['premium'] ? 'Premium' : 'Free'; ?>
                                 </span>
                             </td>
                             <td>
-                                <span class="status-badge status-<?php echo strtolower($user['status']); ?>">
-                                    <?php echo $user['status']; ?>
+                                <span class="status-badge status-<?php echo strtolower($user['premium_status']); ?>">
+                                    <?php echo ucfirst($user['premium_status']); ?>
                                 </span>
                             </td>
-                            <td><?php echo date('M j, Y', strtotime($user['joined'])); ?></td>
-                            <td><?php echo date('M j, Y g:i A', strtotime($user['last_login'])); ?></td>
+                            <td><?php echo date('M j, Y', strtotime($user['created_at'])); ?></td>
+                            <td><?php echo $user['updated_at'] ? date('M j, Y g:i A', strtotime($user['updated_at'])) : 'Never'; ?></td>
                             <td>
                                 <div class="action-buttons">
                                     <a href="?action=edit&id=<?php echo $user['id']; ?>" class="action-btn edit">Edit</a>
-                                    <?php if ($user['status'] === 'Active'): ?>
+                                    <?php if ($user['premium_status'] === 'active'): ?>
                                         <button onclick="suspendUser(<?php echo $user['id']; ?>)" class="action-btn suspend">Suspend</button>
                                     <?php endif; ?>
                                     <button onclick="deleteUser(<?php echo $user['id']; ?>)" class="action-btn delete">Delete</button>

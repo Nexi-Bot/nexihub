@@ -1,5 +1,11 @@
 RewriteEngine On
 
+# Custom error pages
+ErrorDocument 404 /404.php
+ErrorDocument 403 /403.php
+ErrorDocument 500 /500.php
+ErrorDocument 503 /503.php
+
 # Staff portal routing - handle before general routing
 RewriteRule ^staff/login/?$ staff/login.php [L]
 RewriteRule ^staff/dashboard/?$ staff/dashboard.php [L]
@@ -9,6 +15,12 @@ RewriteRule ^staff/discord-callback/?$ staff/discord-callback.php [L]
 RewriteRule ^staff/email-auth/?$ staff/email-auth.php [L]
 RewriteRule ^staff/two-fa-auth/?$ staff/two-fa-auth.php [L]
 RewriteRule ^staff/forgot-password/?$ staff/forgot-password.php [L]
+RewriteRule ^staff/users/?$ staff/users.php [L]
+RewriteRule ^staff/billing/?$ staff/billing.php [L]
+RewriteRule ^staff/support/?$ staff/support.php [L]
+RewriteRule ^staff/system/?$ staff/system.php [L]
+RewriteRule ^staff/analytics/?$ staff/analytics.php [L]
+RewriteRule ^staff/team/?$ staff/team.php [L]
 
 # Main site routing
 RewriteRule ^about/?$ about.php [L]

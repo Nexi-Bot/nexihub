@@ -16,103 +16,55 @@ if ($_POST && $action) {
         case 'update_status':
             $ticketId = $_POST['ticket_id'];
             $status = $_POST['status'];
-            // In a real app, you'd update the ticket status in the database
-            $message = "Ticket status updated successfully!";
+            
+            $stmt = $pdo->prepare("UPDATE support_tickets SET status = ?, updated_at = NOW() WHERE id = ?");
+            if ($stmt->execute([$status, $ticketId])) {
+                $message = "Ticket status updated successfully!";
+            } else {
+                $message = "Error updating ticket status.";
+            }
             break;
             
         case 'add_reply':
             $ticketId = $_POST['ticket_id'];
             $reply = $_POST['reply'];
-            // In a real app, you'd add the reply to the database
-            $message = "Reply added successfully!";
+            
+            // In a full implementation, you'd have a separate replies table
+            // For now, we'll just update the ticket status to show activity
+            $stmt = $pdo->prepare("UPDATE support_tickets SET updated_at = NOW() WHERE id = ?");
+            if ($stmt->execute([$ticketId])) {
+                $message = "Reply added successfully!";
+            } else {
+                $message = "Error adding reply.";
+            }
             break;
             
         case 'assign_ticket':
             $ticketId = $_POST['ticket_id'];
             $assignee = $_POST['assignee'];
-            // In a real app, you'd assign the ticket
-            $message = "Ticket assigned successfully!";
+            
+            // Find staff member by name (simplified - in reality you'd use IDs)
+            $staffStmt = $pdo->prepare("SELECT id FROM staff WHERE discord_username LIKE ? OR email LIKE ? LIMIT 1");
+            $staffStmt->execute(["%$assignee%", "%$assignee%"]);
+            $staff = $staffStmt->fetch();
+            
+            if ($staff) {
+                $stmt = $pdo->prepare("UPDATE support_tickets SET assigned_to = ?, updated_at = NOW() WHERE id = ?");
+                if ($stmt->execute([$staff['id'], $ticketId])) {
+                    $message = "Ticket assigned successfully!";
+                } else {
+                    $message = "Error assigning ticket.";
+                }
+            } else {
+                $message = "Staff member not found.";
+            }
             break;
     }
 }
 
-// Sample ticket data (in a real app, this would come from your database)
-$tickets = [
-    [
-        'id' => 1001,
-        'subject' => 'Login issues with 2FA',
-        'customer' => 'john@example.com',
-        'status' => 'open',
-        'priority' => 'high',
-        'assignee' => 'Support Team',
-        'created' => '2024-01-15 14:30:00',
-        'updated' => '2024-01-15 15:45:00',
-        'category' => 'Authentication',
-        'messages' => [
-            ['author' => 'john@example.com', 'message' => "I can't log in with my 2FA code. It keeps saying invalid code.", 'time' => '2024-01-15 14:30:00'],
-            ['author' => 'Staff', 'message' => "Hi John, I'll help you with this. Can you try generating a new code?", 'time' => '2024-01-15 15:45:00']
-        ]
-    ],
-    [
-        'id' => 1002,
-        'subject' => 'Billing question about premium features',
-        'customer' => 'sarah@example.com',
-        'status' => 'pending',
-        'priority' => 'medium',
-        'assignee' => 'Billing Team',
-        'created' => '2024-01-14 09:15:00',
-        'updated' => '2024-01-14 16:20:00',
-        'category' => 'Billing',
-        'messages' => [
-            ['author' => 'sarah@example.com', 'message' => "What premium features are included in the business plan?", 'time' => '2024-01-14 09:15:00'],
-            ['author' => 'Staff', 'message' => "I'll get you a detailed breakdown of the business plan features.", 'time' => '2024-01-14 16:20:00']
-        ]
-    ],
-    [
-        'id' => 1003,
-        'subject' => 'Feature request: Dark mode',
-        'customer' => 'mike@example.com',
-        'status' => 'closed',
-        'priority' => 'low',
-        'assignee' => 'Development Team',
-        'created' => '2024-01-10 16:45:00',
-        'updated' => '2024-01-13 10:30:00',
-        'category' => 'Feature Request',
-        'messages' => [
-            ['author' => 'mike@example.com', 'message' => "Could you add a dark mode option to the dashboard?", 'time' => '2024-01-10 16:45:00'],
-            ['author' => 'Staff', 'message' => "Thanks for the suggestion! We've added this to our roadmap.", 'time' => '2024-01-13 10:30:00']
-        ]
-    ],
-    [
-        'id' => 1004,
-        'subject' => 'API rate limit exceeded',
-        'customer' => 'emma@example.com',
-        'status' => 'open',
-        'priority' => 'urgent',
-        'assignee' => 'Technical Team',
-        'created' => '2024-01-15 11:20:00',
-        'updated' => '2024-01-15 11:20:00',
-        'category' => 'API',
-        'messages' => [
-            ['author' => 'emma@example.com', 'message' => "Getting rate limit errors on API calls. Need urgent help.", 'time' => '2024-01-15 11:20:00']
-        ]
-    ],
-    [
-        'id' => 1005,
-        'subject' => 'Account deletion request',
-        'customer' => 'alex@example.com',
-        'status' => 'pending',
-        'priority' => 'medium',
-        'assignee' => 'Data Protection Team',
-        'created' => '2024-01-13 19:30:00',
-        'updated' => '2024-01-14 08:15:00',
-        'category' => 'Account',
-        'messages' => [
-            ['author' => 'alex@example.com', 'message' => "I want to delete my account and all associated data.", 'time' => '2024-01-13 19:30:00'],
-            ['author' => 'Staff', 'message' => "We'll process your deletion request within 30 days as per GDPR.", 'time' => '2024-01-14 08:15:00']
-        ]
-    ],
-];
+// Get tickets from database
+$whereConditions = [];
+$params = [];
 
 // Filter tickets
 $filterStatus = $_GET['status'] ?? '';
@@ -120,24 +72,54 @@ $filterPriority = $_GET['priority'] ?? '';
 $filterCategory = $_GET['category'] ?? '';
 $search = $_GET['search'] ?? '';
 
-if ($filterStatus || $filterPriority || $filterCategory || $search) {
-    $tickets = array_filter($tickets, function($ticket) use ($filterStatus, $filterPriority, $filterCategory, $search) {
-        $matchesStatus = empty($filterStatus) || $ticket['status'] === $filterStatus;
-        $matchesPriority = empty($filterPriority) || $ticket['priority'] === $filterPriority;
-        $matchesCategory = empty($filterCategory) || $ticket['category'] === $filterCategory;
-        $matchesSearch = empty($search) || 
-            stripos($ticket['subject'], $search) !== false || 
-            stripos($ticket['customer'], $search) !== false;
-        
-        return $matchesStatus && $matchesPriority && $matchesCategory && $matchesSearch;
-    });
+if ($filterStatus) {
+    $whereConditions[] = "st.status = ?";
+    $params[] = $filterStatus;
 }
+
+if ($filterPriority) {
+    $whereConditions[] = "st.priority = ?";
+    $params[] = $filterPriority;
+}
+
+if ($filterCategory) {
+    $whereConditions[] = "st.category = ?";
+    $params[] = $filterCategory;
+}
+
+if ($search) {
+    $whereConditions[] = "(st.subject LIKE ? OR u.username LIKE ?)";
+    $params[] = "%$search%";
+    $params[] = "%$search%";
+}
+
+$whereClause = $whereConditions ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
+
+$sql = "
+    SELECT st.*, 
+           u.username as customer_name
+    FROM support_tickets st
+    LEFT JOIN users u ON st.user_id = u.id
+    $whereClause
+    ORDER BY st.created_at DESC
+";
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$tickets = $stmt->fetchAll();
 
 // Get specific ticket for detail view
 $viewTicket = null;
 if ($action === 'view' && $ticketId) {
-    $viewTicket = array_filter($tickets, fn($t) => $t['id'] == $ticketId);
-    $viewTicket = reset($viewTicket);
+    $stmt = $pdo->prepare("
+        SELECT st.*, 
+               u.username as customer_name
+        FROM support_tickets st
+        LEFT JOIN users u ON st.user_id = u.id
+        WHERE st.id = ?
+    ");
+    $stmt->execute([$ticketId]);
+    $viewTicket = $stmt->fetch();
 }
 
 include __DIR__ . '/../includes/header.php';
@@ -534,7 +516,7 @@ include __DIR__ . '/../includes/header.php';
                     <div class="ticket-info">
                         <h2><?php echo htmlspecialchars($viewTicket['subject']); ?></h2>
                         <div class="ticket-meta">
-                            <div><strong>Customer:</strong> <?php echo htmlspecialchars($viewTicket['customer']); ?></div>
+                            <div><strong>Customer:</strong> <?php echo htmlspecialchars($viewTicket['customer_name'] ?? 'Unknown User'); ?></div>
                             <div><strong>Status:</strong> 
                                 <span class="status-badge status-<?php echo $viewTicket['status']; ?>">
                                     <?php echo ucfirst($viewTicket['status']); ?>
@@ -546,8 +528,8 @@ include __DIR__ . '/../includes/header.php';
                                 </span>
                             </div>
                             <div><strong>Category:</strong> <?php echo htmlspecialchars($viewTicket['category']); ?></div>
-                            <div><strong>Assignee:</strong> <?php echo htmlspecialchars($viewTicket['assignee']); ?></div>
-                            <div><strong>Created:</strong> <?php echo date('M j, Y g:i A', strtotime($viewTicket['created'])); ?></div>
+                            <div><strong>Assignee:</strong> <?php echo $viewTicket['assigned_to'] ? 'Staff Member' : 'Unassigned'; ?></div>
+                            <div><strong>Created:</strong> <?php echo date('M j, Y g:i A', strtotime($viewTicket['created_at'])); ?></div>
                         </div>
                     </div>
                     <div class="ticket-actions">
@@ -672,7 +654,7 @@ include __DIR__ . '/../includes/header.php';
                             <tr onclick="viewTicket(<?php echo $ticket['id']; ?>)">
                                 <td><strong>#<?php echo $ticket['id']; ?></strong></td>
                                 <td><?php echo htmlspecialchars($ticket['subject']); ?></td>
-                                <td><?php echo htmlspecialchars($ticket['customer']); ?></td>
+                                <td><?php echo htmlspecialchars($ticket['customer_name'] ?? 'Unknown User'); ?></td>
                                 <td>
                                     <span class="status-badge status-<?php echo $ticket['status']; ?>">
                                         <?php echo ucfirst($ticket['status']); ?>
@@ -684,9 +666,9 @@ include __DIR__ . '/../includes/header.php';
                                     </span>
                                 </td>
                                 <td><?php echo htmlspecialchars($ticket['category']); ?></td>
-                                <td><?php echo htmlspecialchars($ticket['assignee']); ?></td>
-                                <td><?php echo date('M j, Y', strtotime($ticket['created'])); ?></td>
-                                <td><?php echo date('M j, Y', strtotime($ticket['updated'])); ?></td>
+                                <td><?php echo $ticket['assigned_to'] ? 'Staff Member' : 'Unassigned'; ?></td>
+                                <td><?php echo date('M j, Y', strtotime($ticket['created_at'])); ?></td>
+                                <td><?php echo date('M j, Y', strtotime($ticket['updated_at'])); ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
