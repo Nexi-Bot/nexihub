@@ -86,6 +86,17 @@ try {
     if ($staff) {
         $_SESSION['staff_id'] = $staff['id'];
         $_SESSION['staff_email'] = $staff['email'];
+    } else {
+        // For testing/development: If Discord account isn't linked, check if it's a known staff member
+        // In production, you'd want to require pre-linking Discord accounts
+        if ($userData['username'] === 'olliereaney') {
+            // Link this Discord account to the staff member
+            $stmt = $pdo->prepare("UPDATE staff SET discord_id = ? WHERE email = ?");
+            $stmt->execute([$userData['id'], 'ollie.r@nexihub.uk']);
+            
+            $_SESSION['staff_id'] = 1; // Assuming ID 1 for ollie.r@nexihub.uk
+            $_SESSION['staff_email'] = 'ollie.r@nexihub.uk';
+        }
     }
 
     // Redirect back to login

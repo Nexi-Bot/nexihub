@@ -48,7 +48,7 @@ try {
     // Check if 2FA is enabled
     if (!$staff['two_fa_enabled']) {
         // Generate new 2FA secret
-        require_once '../vendor/phpgangsta/googleauthenticator/PHPGangsta/GoogleAuthenticator.php';
+        require_once __DIR__ . '/../vendor/phpgangsta/googleauthenticator/PHPGangsta/GoogleAuthenticator.php';
         $ga = new PHPGangsta_GoogleAuthenticator();
         $secret = $ga->createSecret();
         

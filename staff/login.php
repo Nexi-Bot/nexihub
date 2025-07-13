@@ -12,15 +12,85 @@ if (isLoggedIn()) {
 $error = $_SESSION['auth_error'] ?? '';
 unset($_SESSION['auth_error']);
 
+// For testing purposes, add a way to simulate Discord auth
+if (IS_LOCAL_DEV && isset($_GET['simulate_discord'])) {
+    $_SESSION['discord_id'] = '123456789';
+    $_SESSION['discord_username'] = 'olliereaney';
+    $_SESSION['discord_avatar'] = 'https://cdn.discordapp.com/embed/avatars/0.png';
+    $_SESSION['discord_verified'] = true;
+    $_SESSION['staff_id'] = 1;
+    $_SESSION['staff_email'] = 'ollie.r@nexihub.uk';
+    header('Location: /staff/login');
+    exit();
+}
+
 $step = 'discord'; // discord, email, two_fa
 
 // Check current authentication step
-if (isset($_SESSION['staff_id'])) {
+if (isset($_SESSION['discord_verified']) && $_SESSION['discord_verified']) {
     if (!isset($_SESSION['email_verified']) || !$_SESSION['email_verified']) {
         $step = 'email';
     } elseif (!isset($_SESSION['two_fa_verified']) || !$_SESSION['two_fa_verified']) {
         $step = 'two_fa';
     }
+}
+
+// For testing purposes, simulate 2FA setup if needed
+if (IS_LOCAL_DEV && isset($_GET['setup_2fa']) && $step === 'two_fa') {
+    require_once __DIR__ . '/../vendor/phpgangsta/googleauthenticator/PHPGangsta/GoogleAuthenticator.php';
+    $ga = new PHPGangsta_GoogleAuthenticator();
+    $secret = $ga->createSecret();
+    
+    $_SESSION['temp_2fa_secret'] = $secret;
+    $_SESSION['setup_2fa'] = true;
+    header('Location: /staff/login');
+    exit();
+}
+
+// Auto-detect if 2FA setup is needed
+if ($step === 'two_fa' && !isset($_SESSION['setup_2fa']) && !isset($_SESSION['temp_2fa_secret'])) {
+    // Check if user has 2FA enabled in database
+    if (isset($_SESSION['staff_id'])) {
+        try {
+            // Use global $pdo from config
+            global $pdo;
+            $stmt = $pdo->prepare('SELECT two_fa_enabled FROM staff WHERE id = ?');
+            $stmt->execute([$_SESSION['staff_id']]);
+            $staff = $stmt->fetch();
+            
+            if ($staff && !$staff['two_fa_enabled']) {
+                // User doesn't have 2FA enabled, set up new 2FA
+                require_once __DIR__ . '/../vendor/phpgangsta/googleauthenticator/PHPGangsta/GoogleAuthenticator.php';
+                $ga = new PHPGangsta_GoogleAuthenticator();
+                $secret = $ga->createSecret();
+                
+                $_SESSION['temp_2fa_secret'] = $secret;
+                $_SESSION['setup_2fa'] = true;
+            }
+        } catch (Exception $e) {
+            error_log("2FA setup check error: " . $e->getMessage());
+            // If database check fails, default to setting up 2FA
+            require_once __DIR__ . '/../vendor/phpgangsta/googleauthenticator/PHPGangsta/GoogleAuthenticator.php';
+            $ga = new PHPGangsta_GoogleAuthenticator();
+            $secret = $ga->createSecret();
+            
+            $_SESSION['temp_2fa_secret'] = $secret;
+            $_SESSION['setup_2fa'] = true;
+        }
+    }
+}
+
+// Debug: Show current session state (remove this in production)
+if (IS_LOCAL_DEV) {
+    echo "<!-- DEBUG SESSION STATE:\n";
+    echo "staff_id: " . (isset($_SESSION['staff_id']) ? $_SESSION['staff_id'] : 'not set') . "\n";
+    echo "discord_verified: " . (isset($_SESSION['discord_verified']) ? ($_SESSION['discord_verified'] ? 'true' : 'false') : 'not set') . "\n";
+    echo "email_verified: " . (isset($_SESSION['email_verified']) ? ($_SESSION['email_verified'] ? 'true' : 'false') : 'not set') . "\n";
+    echo "two_fa_verified: " . (isset($_SESSION['two_fa_verified']) ? ($_SESSION['two_fa_verified'] ? 'true' : 'false') : 'not set') . "\n";
+    echo "setup_2fa: " . (isset($_SESSION['setup_2fa']) ? ($_SESSION['setup_2fa'] ? 'true' : 'false') : 'not set') . "\n";
+    echo "temp_2fa_secret: " . (isset($_SESSION['temp_2fa_secret']) ? 'set' : 'not set') . "\n";
+    echo "Current step: " . $step . "\n";
+    echo "-->\n";
 }
 
 include __DIR__ . '/../includes/header.php';
@@ -359,11 +429,6 @@ include __DIR__ . '/../includes/header.php';
                         <p>Discord verification complete</p>
                     </div>
                 </div>
-                <script>
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
-                </script>
             <?php else: ?>
                 <h3 style="color: var(--text-primary); margin-bottom: 1rem; font-size: 1.2rem;">Step 1: Discord Verification</h3>
                 <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;">

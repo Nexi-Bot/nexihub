@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
-require_once '../vendor/phpgangsta/googleauthenticator/PHPGangsta/GoogleAuthenticator.php';
+require_once __DIR__ . '/../vendor/phpgangsta/googleauthenticator/PHPGangsta/GoogleAuthenticator.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     redirectTo('/staff/login');

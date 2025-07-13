@@ -15,7 +15,7 @@ define('DISCORD_CLIENT_ID', '1394054979811282955'); // You'll need to provide th
 define('DISCORD_CLIENT_SECRET', 'Oy5sgCK4IF4gb1GQpbMovUgtImc04AaN'); // You'll need to provide this
 
 // Site Configuration
-$is_local = ($_SERVER['HTTP_HOST'] === 'localhost:8000' || $_SERVER['HTTP_HOST'] === '127.0.0.1:8000');
+$is_local = (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] === 'localhost:8000' || $_SERVER['HTTP_HOST'] === '127.0.0.1:8000'));
 define('SITE_URL', $is_local ? 'http://localhost:8000' : 'https://nexihub.uk');
 define('SITE_NAME', 'Nexi Hub');
 define('IS_LOCAL_DEV', $is_local);
@@ -24,7 +24,7 @@ define('DISCORD_REDIRECT_URI', $discord_redirect);
 
 // Session Configuration
 ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1);
+ini_set('session.cookie_secure', $is_local ? 0 : 1); // Only require HTTPS in production
 ini_set('session.use_only_cookies', 1);
 
 if (!session_id()) {
