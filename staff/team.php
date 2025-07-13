@@ -35,68 +35,112 @@ if ($_POST && $action) {
     }
 }
 
-// Sample staff data (in a real app, this would come from your database)
+// Real staff data from team page
 $staffMembers = [
     [
         'id' => 1,
         'email' => 'ollie.r@nexihub.uk',
         'discord_username' => 'Ollie',
-        'discord_avatar' => 'https://cdn.discordapp.com/avatars/123456789/avatar.png',
-        'role' => 'Administrator',
+        'discord_avatar' => '/assets/images/Ollie.jpg',
+        'role' => 'Chief Executive Officer & Founder',
+        'department' => 'Executive Leadership',
         'status' => 'active',
         'last_login' => '2024-01-15 16:30:00',
-        'created' => '2023-01-01 10:00:00',
+        'created' => '2020-01-01 10:00:00',
         'two_fa_enabled' => true,
         'permissions' => ['user_management', 'billing', 'support', 'system', 'analytics', 'staff_management']
     ],
     [
         'id' => 2,
-        'email' => 'sarah.m@nexihub.uk',
-        'discord_username' => 'Sarah',
-        'discord_avatar' => 'https://cdn.discordapp.com/avatars/987654321/avatar.png',
-        'role' => 'Support Manager',
+        'email' => 'benjamin@nexihub.uk',
+        'discord_username' => 'Benjamin',
+        'discord_avatar' => '/assets/images/Benjamin.jpg',
+        'role' => 'Managing Director',
+        'department' => 'Executive Leadership',
         'status' => 'active',
         'last_login' => '2024-01-15 14:20:00',
-        'created' => '2023-03-15 09:30:00',
+        'created' => '2020-02-01 09:30:00',
         'two_fa_enabled' => true,
-        'permissions' => ['support', 'user_management']
+        'permissions' => ['user_management', 'billing', 'support', 'system', 'analytics', 'staff_management']
     ],
     [
         'id' => 3,
-        'email' => 'mike.j@nexihub.uk',
-        'discord_username' => 'Mike',
-        'discord_avatar' => 'https://cdn.discordapp.com/avatars/456789123/avatar.png',
-        'role' => 'Developer',
+        'email' => 'paige@nexihub.uk',
+        'discord_username' => 'Paige',
+        'discord_avatar' => '/assets/images/Paige.jpg',
+        'role' => 'Chief Innovation Officer',
+        'department' => 'Executive Leadership',
         'status' => 'active',
         'last_login' => '2024-01-15 12:45:00',
-        'created' => '2023-05-20 14:15:00',
-        'two_fa_enabled' => false,
-        'permissions' => ['system', 'analytics']
+        'created' => '2020-03-01 14:15:00',
+        'two_fa_enabled' => true,
+        'permissions' => ['system', 'analytics', 'staff_management']
     ],
     [
         'id' => 4,
-        'email' => 'emma.w@nexihub.uk',
-        'discord_username' => 'Emma',
-        'discord_avatar' => 'https://cdn.discordapp.com/avatars/789123456/avatar.png',
-        'role' => 'Billing Specialist',
+        'email' => 'chukwumam@nexihub.uk',
+        'discord_username' => 'Chukwumam',
+        'discord_avatar' => '/assets/images/Chukwumam.jpg',
+        'role' => 'Deputy Managing Director & Development Lead',
+        'department' => 'Senior Leadership',
         'status' => 'active',
         'last_login' => '2024-01-14 16:10:00',
-        'created' => '2023-07-10 11:00:00',
+        'created' => '2020-04-01 11:00:00',
         'two_fa_enabled' => true,
-        'permissions' => ['billing', 'user_management']
+        'permissions' => ['system', 'analytics', 'staff_management', 'user_management']
     ],
     [
         'id' => 5,
-        'email' => 'alex.b@nexihub.uk',
-        'discord_username' => 'Alex',
-        'discord_avatar' => 'https://cdn.discordapp.com/avatars/321654987/avatar.png',
-        'role' => 'Junior Support',
-        'status' => 'inactive',
-        'last_login' => '2024-01-10 09:30:00',
-        'created' => '2023-09-05 13:20:00',
-        'two_fa_enabled' => false,
-        'permissions' => ['support']
+        'email' => 'sam@nexihub.uk',
+        'discord_username' => 'Sam',
+        'discord_avatar' => '/assets/images/Sam.gif',
+        'role' => 'Chief Operating Officer',
+        'department' => 'Senior Leadership',
+        'status' => 'active',
+        'last_login' => '2024-01-14 15:30:00',
+        'created' => '2020-05-01 13:20:00',
+        'two_fa_enabled' => true,
+        'permissions' => ['user_management', 'support', 'analytics', 'staff_management']
     ],
+    [
+        'id' => 6,
+        'email' => 'christopher@nexihub.uk',
+        'discord_username' => 'Christopher',
+        'discord_avatar' => '/assets/images/Christopher.jpg',
+        'role' => 'Chief Financial Officer',
+        'department' => 'Senior Leadership',
+        'status' => 'active',
+        'last_login' => '2024-01-14 10:45:00',
+        'created' => '2020-06-01 09:15:00',
+        'two_fa_enabled' => true,
+        'permissions' => ['billing', 'analytics', 'user_management']
+    ],
+    [
+        'id' => 7,
+        'email' => 'barbara@nexihub.uk',
+        'discord_username' => 'Barbara',
+        'discord_avatar' => '/assets/images/Barbara.jpg',
+        'role' => 'Chief Legal Officer',
+        'department' => 'Senior Leadership',
+        'status' => 'active',
+        'last_login' => '2024-01-13 14:20:00',
+        'created' => '2020-07-01 11:30:00',
+        'two_fa_enabled' => true,
+        'permissions' => ['user_management', 'staff_management']
+    ],
+    [
+        'id' => 8,
+        'email' => 'maisie@nexihub.uk',
+        'discord_username' => 'Maisie',
+        'discord_avatar' => '/assets/images/maisie.jpg',
+        'role' => 'Internal Communications Manager',
+        'department' => 'Corporate Functions',
+        'status' => 'active',
+        'last_login' => '2024-01-15 09:15:00',
+        'created' => '2023-01-15 10:00:00',
+        'two_fa_enabled' => true,
+        'permissions' => ['staff_management', 'user_management']
+    ]
 ];
 
 $availablePermissions = [
@@ -610,6 +654,7 @@ include __DIR__ . '/../includes/header.php';
                             <h3><?php echo htmlspecialchars($staff['discord_username']); ?></h3>
                             <p><?php echo htmlspecialchars($staff['email']); ?></p>
                             <p><strong><?php echo htmlspecialchars($staff['role']); ?></strong></p>
+                            <p><em><?php echo htmlspecialchars($staff['department'] ?? 'Not specified'); ?></em></p>
                         </div>
                     </div>
                     

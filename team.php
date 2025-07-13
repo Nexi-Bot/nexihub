@@ -204,26 +204,6 @@ include 'includes/header.php';
                     </div>
                 </div>
             </div>
-            
-            <div class="team-member">
-                <div class="member-photo">
-                    <img src="assets/images/maisie.jpg" alt="Maisie" class="member-image">
-                </div>
-                <div class="member-info">
-                    <h3 class="member-name">Maisie</h3>
-                    <p class="member-title">Internal Communications Manager</p>
-                    <p class="member-description">
-                        Maisie ensures clear and effective communication across all Nexi Hub teams. She develops engagement 
-                        strategies for our global workforce, manages internal messaging, and fosters a connected company culture 
-                        that spans continents and time zones.
-                    </p>
-                    <div class="member-expertise">
-                        <span class="expertise-tag">Internal Communications</span>
-                        <span class="expertise-tag">Employee Engagement</span>
-                        <span class="expertise-tag">Global Team Coordination</span>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </section>
@@ -334,23 +314,22 @@ include 'includes/header.php';
         </p>
         
         <div class="team-grid">
-            <div class="team-member vacant">
+            <div class="team-member">
                 <div class="member-photo">
-                    <div class="photo-placeholder vacant-placeholder">
-                        <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
-                            <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2M4 18v-6h3v7c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-7h3v6h13v2H4v-2z"/>
-                        </svg>
-                    </div>
+                    <img src="assets/images/maisie.jpg" alt="Maisie" class="member-image">
                 </div>
                 <div class="member-info">
-                    <h3 class="member-name">Vacant</h3>
-                    <p class="member-title">Head of Human Resources</p>
+                    <h3 class="member-name">Maisie</h3>
+                    <p class="member-title">Internal Communications Manager</p>
                     <p class="member-description">
-                        Strategic HR leadership focused on talent management, organizational development, and creating 
-                        an exceptional employee experience across all Nexi Hub platforms.
+                        Maisie ensures clear and effective communication across all Nexi Hub teams. She develops engagement 
+                        strategies for our global workforce, manages internal messaging, and fosters a connected company culture 
+                        that spans continents and time zones.
                     </p>
-                    <div class="member-status">
-                        <span class="status-badge vacant">Position Available</span>
+                    <div class="member-expertise">
+                        <span class="expertise-tag">Internal Communications</span>
+                        <span class="expertise-tag">Employee Engagement</span>
+                        <span class="expertise-tag">Global Team Coordination</span>
                     </div>
                 </div>
             </div>
