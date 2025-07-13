@@ -320,16 +320,16 @@ include 'includes/header.php';
                 </div>
                 <div class="member-info">
                     <h3 class="member-name">Maisie</h3>
-                    <p class="member-title">Head of Human Resources</p>
+                    <p class="member-title">Internal Communications Manager</p>
                     <p class="member-description">
-                        Maisie leads our Human Resources department, overseeing talent acquisition, employee development, 
-                        and workplace culture. She ensures our global team has the support and resources needed to thrive 
-                        while maintaining Nexi Hub's core values across all operations.
+                        Maisie manages our internal communications, ensuring seamless information flow across our global team. 
+                        She coordinates team updates, facilitates cross-department collaboration, and maintains our internal 
+                        knowledge systems while fostering a connected and informed workplace culture.
                     </p>
                     <div class="member-expertise">
-                        <span class="expertise-tag">Human Resources</span>
-                        <span class="expertise-tag">Talent Management</span>
-                        <span class="expertise-tag">Employee Development</span>
+                        <span class="expertise-tag">Internal Communications</span>
+                        <span class="expertise-tag">Team Coordination</span>
+                        <span class="expertise-tag">Information Management</span>
                     </div>
                 </div>
             </div>

@@ -268,7 +268,7 @@ $staffMembers = [
         'discord_username' => 'maisiejohnson',
         'discord_id' => '890123456789012345',
         'discord_avatar' => '/assets/images/maisie.jpg',
-        'role' => 'Head of Human Resources',
+        'role' => 'Internal Communications Manager',
         'department' => 'Corporate Functions',
         'manager' => 'Benjamin Clarke',
         'nexi_email' => 'maisie@nexihub.uk',
@@ -346,6 +346,7 @@ include __DIR__ . '/../includes/header.php';
     margin-bottom: 2rem;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .page-header::before {
@@ -367,9 +368,20 @@ include __DIR__ . '/../includes/header.php';
 
 .header-title {
     color: var(--text-primary);
-    font-size: 2rem;
-    font-weight: 700;
+    font-size: 2.5rem;
+    font-weight: 800;
     margin: 0;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.header-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
 }
 
 .header-actions {
@@ -379,19 +391,20 @@ include __DIR__ . '/../includes/header.php';
 
 .invite-btn {
     padding: 0.75rem 1.5rem;
-    background: var(--primary-color);
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
     color: white;
     text-decoration: none;
-    border-radius: 10px;
+    border-radius: 12px;
     font-weight: 600;
     transition: all 0.3s ease;
     border: none;
     cursor: pointer;
+    box-shadow: 0 4px 15px rgba(230, 79, 33, 0.3);
 }
 
 .invite-btn:hover {
-    background: var(--secondary-color);
     transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(230, 79, 33, 0.4);
 }
 
 .back-btn {
@@ -399,7 +412,7 @@ include __DIR__ . '/../includes/header.php';
     background: var(--background-dark);
     color: var(--text-secondary);
     text-decoration: none;
-    border-radius: 10px;
+    border-radius: 12px;
     font-weight: 600;
     border: 1px solid var(--border-color);
     transition: all 0.3s ease;
@@ -409,51 +422,77 @@ include __DIR__ . '/../includes/header.php';
     color: var(--text-primary);
     border-color: var(--primary-color);
     transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem;
     margin-bottom: 2rem;
 }
 
 .stat-card {
     background: var(--background-dark);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 1.5rem;
+    border-radius: 16px;
+    padding: 2rem;
     text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    border-color: var(--primary-color);
 }
 
 .stat-number {
     display: block;
-    font-size: 1.8rem;
+    font-size: 2.2rem;
     font-weight: 800;
-    color: var(--primary-color);
-    margin-bottom: 0.25rem;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
 }
 
 .stat-label {
     color: var(--text-secondary);
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .staff-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 2rem;
 }
 
 .staff-card {
     background: var(--background-light);
     border: 1px solid var(--border-color);
-    border-radius: 20px;
-    padding: 2rem;
+    border-radius: 24px;
+    padding: 2.5rem;
     position: relative;
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.4s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .staff-card::before {
@@ -466,37 +505,76 @@ include __DIR__ . '/../includes/header.php';
     background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
 }
 
+.staff-card::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(230, 79, 33, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    transition: all 0.4s ease;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+}
+
 .staff-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
     border-color: var(--primary-color);
+}
+
+.staff-card:hover::after {
+    width: 300px;
+    height: 300px;
 }
 
 .staff-header {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 2;
 }
 
 .staff-avatar {
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     border: 3px solid var(--primary-color);
+    object-fit: cover;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(230, 79, 33, 0.3);
+}
+
+.staff-card:hover .staff-avatar {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(230, 79, 33, 0.4);
+}
+
+.staff-info {
+    position: relative;
+    z-index: 2;
 }
 
 .staff-info h3 {
     color: var(--text-primary);
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     font-weight: 700;
-    margin: 0 0 0.25rem 0;
+    margin: 0 0 0.5rem 0;
 }
 
 .staff-info p {
     color: var(--text-secondary);
-    margin: 0.1rem 0;
+    margin: 0.2rem 0;
     font-size: 0.9rem;
+}
+
+.staff-info .preferred-name {
+    color: var(--primary-color);
+    font-weight: 600;
 }
 
 .staff-status {
@@ -539,88 +617,180 @@ include __DIR__ . '/../includes/header.php';
 .detail-section {
     background: var(--background-dark);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1rem;
+    border-radius: 12px;
+    padding: 1.5rem;
     margin-bottom: 1rem;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.detail-section:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .detail-section-title {
     color: var(--primary-color);
     font-weight: 700;
-    font-size: 0.9rem;
-    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    margin-bottom: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.detail-section-title::before {
+    content: '';
+    width: 4px;
+    height: 16px;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    border-radius: 2px;
 }
 
 .detail-item {
     color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
 }
 
 .detail-label {
     font-weight: 600;
     color: var(--text-primary);
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.85rem;
 }
 
 .permissions-list {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 2;
 }
 
 .permissions-title {
     color: var(--text-primary);
-    font-weight: 600;
-    margin-bottom: 0.75rem;
-    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.permissions-title::before {
+    content: '🔐';
+    font-size: 1.2rem;
 }
 
 .permission-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.75rem;
 }
 
 .permission-tag {
-    padding: 0.25rem 0.75rem;
+    padding: 0.4rem 1rem;
     background: var(--background-dark);
     border: 1px solid var(--border-color);
     border-radius: 20px;
     font-size: 0.8rem;
     color: var(--text-secondary);
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.permission-tag::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(230, 79, 33, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.permission-tag:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+.permission-tag:hover::before {
+    left: 100%;
 }
 
 .staff-actions {
     display: flex;
     gap: 0.75rem;
     flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+    margin-top: 1rem;
 }
 
 .action-btn {
-    padding: 0.5rem 1rem;
+    padding: 0.6rem 1.2rem;
     border: none;
-    border-radius: 8px;
-    font-size: 0.8rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.action-btn:hover::before {
+    left: 100%;
 }
 
 .action-btn.edit {
-    background: var(--primary-color);
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
     color: white;
+    box-shadow: 0 4px 15px rgba(230, 79, 33, 0.3);
+}
+
+.action-btn.edit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(230, 79, 33, 0.4);
 }
 
 .action-btn.documents {
-    background: #6366f1;
+    background: linear-gradient(45deg, #6366f1, #8b5cf6);
     color: white;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
 }
 
-.action-btn.deactivate {
-    background: rgba(239, 68, 68, 0.9);
-    color: white;
+.action-btn.documents:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
 }
 
 .action-btn.permissions {
@@ -629,9 +799,22 @@ include __DIR__ . '/../includes/header.php';
     border: 1px solid var(--border-color);
 }
 
-.action-btn:hover {
+.action-btn.permissions:hover {
+    color: var(--text-primary);
+    border-color: var(--primary-color);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn.deactivate {
+    background: linear-gradient(45deg, #ef4444, #dc2626);
+    color: white;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+.action-btn.deactivate:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
 }
 
 .message {
@@ -851,21 +1034,73 @@ include __DIR__ . '/../includes/header.php';
 @media (max-width: 768px) {
     .staff-grid {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
     
     .header-content {
         flex-direction: column;
-        gap: 1rem;
+        gap: 1.5rem;
+        text-align: center;
     }
     
     .header-actions {
         width: 100%;
-        justify-content: space-between;
+        justify-content: center;
+        flex-wrap: wrap;
     }
     
     .modal-content {
         width: 95%;
         padding: 1.5rem;
+        margin: 1rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .staff-card {
+        padding: 2rem;
+    }
+    
+    .staff-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .staff-actions {
+        justify-content: center;
+    }
+    
+    .action-btn {
+        flex: 1;
+        min-width: 120px;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-title {
+        font-size: 2rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-card {
+        padding: 1.5rem;
+    }
+    
+    .staff-card {
+        padding: 1.5rem;
+    }
+    
+    .action-btn {
+        padding: 0.7rem 1rem;
+        font-size: 0.8rem;
     }
 }
 </style>
@@ -874,7 +1109,10 @@ include __DIR__ . '/../includes/header.php';
     <div class="container">
         <div class="page-header">
             <div class="header-content">
-                <h1 class="header-title">Staff Management</h1>
+                <div>
+                    <h1 class="header-title">Staff Management</h1>
+                    <p class="header-subtitle">Manage team members, permissions, and administrative functions</p>
+                </div>
                 <div class="header-actions">
                     <button onclick="openInviteModal()" class="invite-btn">+ Invite Staff</button>
                     <a href="/staff/dashboard" class="back-btn">← Back to Dashboard</a>
