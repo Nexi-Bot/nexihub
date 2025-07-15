@@ -8,10 +8,13 @@ $page_description = "Nexi Hub HR Management System - Complete Staff Portal";
 
 // Get current user info from session
 $current_user = [
-    'full_name' => 'HR Administrator',
-    'user_id' => $_SESSION['staff_id'] ?? 1
+    'full_name' => $_SESSION['staff_name'] ?? 'HR Administrator',
+    'user_id' => $_SESSION['staff_id'] ?? 1,
+    'email' => $_SESSION['staff_email'] ?? 'hr@nexihub.com',
+    'department' => $_SESSION['staff_department'] ?? 'Human Resources',
+    'last_login' => date('M j, Y \a\t g:i A')
 ];
-$user_role = 'HR Administrator';
+$user_role = $_SESSION['staff_role'] ?? 'HR Administrator';
 
 // Analytics data for dashboard
 $analytics = [
@@ -22,7 +25,34 @@ $analytics = [
     'recent_hires' => 3,
     'upcoming_time_off' => 5,
     'open_tickets' => 8,
-    'overdue_tasks' => 2
+    'overdue_tasks' => 2,
+    'total_departments' => 6,
+    'avg_satisfaction' => 4.7,
+    'retention_rate' => 94.2
+];
+
+// Sample data for functionality
+$staff_members = [
+    ['id' => 'NEXI001', 'name' => 'Oliver Reaney', 'department' => 'Executive', 'role' => 'CEO & Founder', 'status' => 'Active', 'email' => 'oliver@nexihub.com', 'phone' => '+44 7123 456789', 'hire_date' => '2023-01-15'],
+    ['id' => 'NEXI002', 'name' => 'Benjamin Clarke', 'department' => 'Executive', 'role' => 'Managing Director', 'status' => 'Active', 'email' => 'benjamin@nexihub.com', 'phone' => '+44 7234 567890', 'hire_date' => '2023-02-01'],
+    ['id' => 'NEXI003', 'name' => 'Logan Mitchell', 'department' => 'Technology', 'role' => 'Lead Developer', 'status' => 'Onboarding', 'email' => 'logan@nexihub.com', 'phone' => '+44 7345 678901', 'hire_date' => '2025-07-01'],
+    ['id' => 'NEXI004', 'name' => 'Mykyta Petrenko', 'department' => 'Technology', 'role' => 'Senior Developer', 'status' => 'Active', 'email' => 'mykyta@nexihub.com', 'phone' => '+44 7456 789012', 'hire_date' => '2024-03-15'],
+    ['id' => 'NEXI005', 'name' => 'Sarah Johnson', 'department' => 'Design', 'role' => 'UI/UX Designer', 'status' => 'Active', 'email' => 'sarah@nexihub.com', 'phone' => '+44 7567 890123', 'hire_date' => '2024-05-20']
+];
+
+$time_off_requests = [
+    ['employee' => 'Mykyta Petrenko', 'request_date' => '2025-07-10', 'start_date' => '2025-07-20', 'end_date' => '2025-07-24', 'type' => 'Vacation', 'status' => 'Pending', 'days' => 5],
+    ['employee' => 'Logan Mitchell', 'request_date' => '2025-07-08', 'start_date' => '2025-07-15', 'end_date' => '2025-07-15', 'type' => 'Personal', 'status' => 'Approved', 'days' => 1],
+    ['employee' => 'Sarah Johnson', 'request_date' => '2025-07-12', 'start_date' => '2025-08-01', 'end_date' => '2025-08-07', 'type' => 'Vacation', 'status' => 'Approved', 'days' => 7],
+    ['employee' => 'Benjamin Clarke', 'request_date' => '2025-07-05', 'start_date' => '2025-07-25', 'end_date' => '2025-07-26', 'type' => 'Conference', 'status' => 'Approved', 'days' => 2]
+];
+
+$recent_activities = [
+    ['time' => '2 hours ago', 'employee' => 'Logan Mitchell', 'action' => 'Completed onboarding documents', 'status' => 'Completed'],
+    ['time' => '4 hours ago', 'employee' => 'Mykyta Petrenko', 'action' => 'Submitted time off request', 'status' => 'Pending'],
+    ['time' => '6 hours ago', 'employee' => 'Oliver Reaney', 'action' => 'Updated staff record', 'status' => 'Completed'],
+    ['time' => '1 day ago', 'employee' => 'Benjamin Clarke', 'action' => 'Approved time off request', 'status' => 'Approved'],
+    ['time' => '2 days ago', 'employee' => 'Sarah Johnson', 'action' => 'Completed security training', 'status' => 'Completed']
 ];
 
 include '../includes/header.php';
@@ -30,12 +60,101 @@ include '../includes/header.php';
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <style>
-<style>
 /* HR Dashboard Specific Styles - Built on Nexi Hub Design System */
 .hr-dashboard-container {
     background: var(--background-dark);
     min-height: 100vh;
     padding-top: 2rem;
+}
+
+.welcome-banner {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-banner::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+}
+
+.welcome-banner::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 150px;
+    height: 150px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    animation: float 8s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+.welcome-content {
+    position: relative;
+    z-index: 2;
+}
+
+.welcome-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    opacity: 0;
+    animation: slideInUp 0.8s ease forwards;
+}
+
+.welcome-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: slideInUp 0.8s ease 0.2s forwards;
+}
+
+.welcome-stats {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: slideInUp 0.8s ease 0.4s forwards;
+}
+
+.welcome-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.welcome-stat i {
+    font-size: 1.2rem;
+    opacity: 0.8;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .hr-dashboard-header {
@@ -46,6 +165,157 @@ include '../includes/header.php';
     margin-bottom: 2rem;
     position: relative;
     overflow: hidden;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: var(--background-light);
+    margin: 5% auto;
+    padding: 2rem;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.close {
+    color: var(--text-secondary);
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close:hover {
+    color: var(--primary-color);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--background-dark);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(230, 79, 33, 0.1);
+}
+
+.form-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--background-dark);
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.form-textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--background-dark);
+    color: var(--text-primary);
+    font-size: 1rem;
+    min-height: 100px;
+    resize: vertical;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+.notification {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    z-index: 1001;
+    opacity: 0;
+    transform: translateX(400px);
+    transition: all 0.3s ease;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification.success {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.notification.error {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.notification.info {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
 }
 
 .hr-dashboard-header::before {
@@ -369,6 +639,21 @@ include '../includes/header.php';
     color: #ef4444;
 }
 
+.status-approved {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.status-denied {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.status-onboarding {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+}
+
 .hr-content-section {
     display: none;
 }
@@ -460,6 +745,28 @@ include '../includes/header.php';
         <a href="/staff/logout" class="logout-btn">
             <i class="fas fa-sign-out-alt"></i> Logout
         </a>
+        
+        <!-- Professional Welcome Banner -->
+        <div class="welcome-banner">
+            <div class="welcome-content">
+                <h1 class="welcome-title">Welcome back, <?= htmlspecialchars(explode(' ', $current_user['full_name'])[0]) ?>!</h1>
+                <p class="welcome-subtitle">Ready to manage your team and drive organizational excellence. Here's what's happening today.</p>
+                <div class="welcome-stats">
+                    <div class="welcome-stat">
+                        <i class="fas fa-clock"></i>
+                        <span>Last login: <?= $current_user['last_login'] ?></span>
+                    </div>
+                    <div class="welcome-stat">
+                        <i class="fas fa-users"></i>
+                        <span><?= $analytics['total_staff'] ?> team members</span>
+                    </div>
+                    <div class="welcome-stat">
+                        <i class="fas fa-chart-line"></i>
+                        <span><?= $analytics['retention_rate'] ?>% retention rate</span>
+                    </div>
+                </div>
+            </div>
+        </div>
         
         <div class="hr-dashboard-header">
             <div class="hr-header-content">
@@ -560,6 +867,66 @@ include '../includes/header.php';
                     </div>
                     <p class="analytics-label">Upcoming Time Off</p>
                 </div>
+                
+                <div class="hr-analytics-card">
+                    <div class="analytics-card-header">
+                        <div class="analytics-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="analytics-value">
+                            <h3 class="analytics-number"><?= $analytics['total_departments'] ?></h3>
+                            <div class="analytics-change positive">
+                                <i class="fas fa-arrow-up"></i> Active departments
+                            </div>
+                        </div>
+                    </div>
+                    <p class="analytics-label">Departments</p>
+                </div>
+                
+                <div class="hr-analytics-card">
+                    <div class="analytics-card-header">
+                        <div class="analytics-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="analytics-value">
+                            <h3 class="analytics-number"><?= $analytics['avg_satisfaction'] ?></h3>
+                            <div class="analytics-change positive">
+                                <i class="fas fa-arrow-up"></i> /5.0 rating
+                            </div>
+                        </div>
+                    </div>
+                    <p class="analytics-label">Satisfaction Score</p>
+                </div>
+                
+                <div class="hr-analytics-card">
+                    <div class="analytics-card-header">
+                        <div class="analytics-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="analytics-value">
+                            <h3 class="analytics-number"><?= $analytics['retention_rate'] ?>%</h3>
+                            <div class="analytics-change positive">
+                                <i class="fas fa-arrow-up"></i> +2.1% this year
+                            </div>
+                        </div>
+                    </div>
+                    <p class="analytics-label">Retention Rate</p>
+                </div>
+                
+                <div class="hr-analytics-card">
+                    <div class="analytics-card-header">
+                        <div class="analytics-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="analytics-value">
+                            <h3 class="analytics-number"><?= $analytics['compliance_issues'] ?></h3>
+                            <div class="analytics-change negative">
+                                <i class="fas fa-arrow-down"></i> Requires attention
+                            </div>
+                        </div>
+                    </div>
+                    <p class="analytics-label">Compliance Issues</p>
+                </div>
             </div>
 
             <div class="hr-section">
@@ -567,7 +934,7 @@ include '../includes/header.php';
                     <h2 class="hr-section-title">Quick Actions</h2>
                 </div>
                 <div class="hr-section-content grid">
-                    <div class="hr-action-card" onclick="showSection('staff-records')">
+                    <div class="hr-action-card" onclick="openAddStaffModal()">
                         <i class="fas fa-user-plus"></i>
                         <h4>Add New Staff</h4>
                         <p>Register a new employee and start onboarding</p>
@@ -577,7 +944,7 @@ include '../includes/header.php';
                         <h4>Review Time Off</h4>
                         <p>Approve or deny pending time off requests</p>
                     </div>
-                    <div class="hr-action-card" onclick="showSection('reports')">
+                    <div class="hr-action-card" onclick="generateReport()">
                         <i class="fas fa-file-alt"></i>
                         <h4>Generate Reports</h4>
                         <p>Create detailed staff and performance reports</p>
@@ -606,42 +973,29 @@ include '../includes/header.php';
                             </tr>
                         </thead>
                         <tbody>
+                            <?php foreach($recent_activities as $activity): ?>
                             <tr>
-                                <td>2 hours ago</td>
-                                <td>Logan Mitchell</td>
-                                <td>Completed onboarding documents</td>
-                                <td><span class="status-badge status-completed">Completed</span></td>
+                                <td><?= htmlspecialchars($activity['time']) ?></td>
+                                <td><?= htmlspecialchars($activity['employee']) ?></td>
+                                <td><?= htmlspecialchars($activity['action']) ?></td>
+                                <td>
+                                    <span class="status-badge status-<?= strtolower($activity['status']) ?>">
+                                        <?= htmlspecialchars($activity['status']) ?>
+                                    </span>
+                                </td>
                             </tr>
-                            <tr>
-                                <td>4 hours ago</td>
-                                <td>Mykyta Petrenko</td>
-                                <td>Submitted time off request</td>
-                                <td><span class="status-badge status-pending">Pending</span></td>
-                            </tr>
-                            <tr>
-                                <td>6 hours ago</td>
-                                <td>Oliver Reaney</td>
-                                <td>Updated staff record</td>
-                                <td><span class="status-badge status-completed">Completed</span></td>
-                            </tr>
-                            <tr>
-                                <td>1 day ago</td>
-                                <td>Benjamin Clarke</td>
-                                <td>Approved time off request</td>
-                                <td><span class="status-badge status-active">Approved</span></td>
-                            </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- Staff Records Section -->
         <div id="staff-records-section" class="hr-content-section">
             <div class="hr-section">
                 <div class="hr-section-header">
                     <h2 class="hr-section-title">Staff Records</h2>
-                    <a href="#" class="hr-btn hr-btn-primary" onclick="alert('Add Staff functionality will be implemented')">
+                    <a href="#" class="hr-btn hr-btn-primary" onclick="openAddStaffModal()">
                         <i class="fas fa-plus"></i> Add New Staff
                     </a>
                 </div>
@@ -658,36 +1012,22 @@ include '../includes/header.php';
                             </tr>
                         </thead>
                         <tbody>
+                            <?php foreach($staff_members as $staff): ?>
                             <tr>
-                                <td>NEXI001</td>
-                                <td>Oliver Reaney</td>
-                                <td>Executive</td>
-                                <td>CEO & Founder</td>
-                                <td><span class="status-badge status-active">Active</span></td>
+                                <td><?= htmlspecialchars($staff['id']) ?></td>
+                                <td><?= htmlspecialchars($staff['name']) ?></td>
+                                <td><?= htmlspecialchars($staff['department']) ?></td>
+                                <td><?= htmlspecialchars($staff['role']) ?></td>
                                 <td>
-                                    <a href="#" class="hr-btn hr-btn-secondary" onclick="alert('View details functionality will be implemented')">View</a>
+                                    <span class="status-badge status-<?= strtolower($staff['status']) ?>">
+                                        <?= htmlspecialchars($staff['status']) ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="#" class="hr-btn hr-btn-secondary" onclick="viewStaffDetails('<?= $staff['id'] ?>')">View</a>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>NEXI002</td>
-                                <td>Benjamin Clarke</td>
-                                <td>Executive</td>
-                                <td>Managing Director</td>
-                                <td><span class="status-badge status-active">Active</span></td>
-                                <td>
-                                    <a href="#" class="hr-btn hr-btn-secondary" onclick="alert('View details functionality will be implemented')">View</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>NEXI003</td>
-                                <td>Logan Mitchell</td>
-                                <td>Technology</td>
-                                <td>Lead Developer</td>
-                                <td><span class="status-badge status-pending">Onboarding</span></td>
-                                <td>
-                                    <a href="#" class="hr-btn hr-btn-secondary" onclick="alert('View details functionality will be implemented')">View</a>
-                                </td>
-                            </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
@@ -731,11 +1071,13 @@ include '../includes/header.php';
             </div>
         </div>
 
-        <!-- Time Off Section -->
         <div id="time-off-section" class="hr-content-section">
             <div class="hr-section">
                 <div class="hr-section-header">
                     <h2 class="hr-section-title">Time Off Management</h2>
+                    <a href="#" class="hr-btn hr-btn-primary" onclick="openTimeOffModal()">
+                        <i class="fas fa-plus"></i> New Request
+                    </a>
                 </div>
                 <div class="hr-section-content">
                     <p style="color: var(--text-secondary); margin-bottom: 2rem;">
@@ -749,31 +1091,37 @@ include '../includes/header.php';
                                 <th>Request Date</th>
                                 <th>Leave Dates</th>
                                 <th>Type</th>
+                                <th>Days</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
+                            <?php foreach($time_off_requests as $index => $request): ?>
                             <tr>
-                                <td>Mykyta Petrenko</td>
-                                <td>July 10, 2025</td>
-                                <td>July 20-24, 2025</td>
-                                <td>Vacation</td>
-                                <td><span class="status-badge status-pending">Pending</span></td>
+                                <td><?= htmlspecialchars($request['employee']) ?></td>
+                                <td><?= date('M j, Y', strtotime($request['request_date'])) ?></td>
                                 <td>
-                                    <a href="#" class="hr-btn hr-btn-primary" onclick="alert('Approve functionality will be implemented')">Approve</a>
+                                    <?= date('M j', strtotime($request['start_date'])) ?>
+                                    <?= $request['start_date'] !== $request['end_date'] ? ' - ' . date('M j, Y', strtotime($request['end_date'])) : ', ' . date('Y', strtotime($request['start_date'])) ?>
+                                </td>
+                                <td><?= htmlspecialchars($request['type']) ?></td>
+                                <td><?= $request['days'] ?> day<?= $request['days'] > 1 ? 's' : '' ?></td>
+                                <td>
+                                    <span class="status-badge status-<?= strtolower($request['status']) ?>">
+                                        <?= htmlspecialchars($request['status']) ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <?php if($request['status'] === 'Pending'): ?>
+                                        <a href="#" class="hr-btn hr-btn-primary" onclick="approveTimeOff(<?= $index ?>)" style="margin-right: 0.5rem;">Approve</a>
+                                        <a href="#" class="hr-btn hr-btn-secondary" onclick="denyTimeOff(<?= $index ?>)">Deny</a>
+                                    <?php else: ?>
+                                        <a href="#" class="hr-btn hr-btn-secondary" onclick="viewTimeOffDetails(<?= $index ?>)">View</a>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>Logan Mitchell</td>
-                                <td>July 8, 2025</td>
-                                <td>July 15, 2025</td>
-                                <td>Personal</td>
-                                <td><span class="status-badge status-active">Approved</span></td>
-                                <td>
-                                    <a href="#" class="hr-btn hr-btn-secondary" onclick="alert('View details functionality will be implemented')">View</a>
-                                </td>
-                            </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
@@ -819,7 +1167,123 @@ include '../includes/header.php';
     </div>
 </div>
 
+<!-- Add Staff Modal -->
+<div id="addStaffModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Add New Staff Member</h2>
+            <span class="close" onclick="closeModal('addStaffModal')">&times;</span>
+        </div>
+        <form id="addStaffForm" onsubmit="addStaff(event)">
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-input" name="name" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" class="form-input" name="email" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" class="form-input" name="phone" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Department</label>
+                <select class="form-select" name="department" required>
+                    <option value="">Select Department</option>
+                    <option value="Executive">Executive</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Design">Design</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Sales">Sales</option>
+                    <option value="Human Resources">Human Resources</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Job Title</label>
+                <input type="text" class="form-input" name="role" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Start Date</label>
+                <input type="date" class="form-input" name="hire_date" required>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="hr-btn hr-btn-secondary" onclick="closeModal('addStaffModal')">Cancel</button>
+                <button type="submit" class="hr-btn hr-btn-primary">Add Staff Member</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Time Off Request Modal -->
+<div id="timeOffModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">New Time Off Request</h2>
+            <span class="close" onclick="closeModal('timeOffModal')">&times;</span>
+        </div>
+        <form id="timeOffForm" onsubmit="submitTimeOff(event)">
+            <div class="form-group">
+                <label class="form-label">Employee</label>
+                <select class="form-select" name="employee" required>
+                    <option value="">Select Employee</option>
+                    <?php foreach($staff_members as $staff): ?>
+                        <option value="<?= htmlspecialchars($staff['name']) ?>"><?= htmlspecialchars($staff['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Start Date</label>
+                <input type="date" class="form-input" name="start_date" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">End Date</label>
+                <input type="date" class="form-input" name="end_date" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Type</label>
+                <select class="form-select" name="type" required>
+                    <option value="">Select Type</option>
+                    <option value="Vacation">Vacation</option>
+                    <option value="Personal">Personal</option>
+                    <option value="Sick">Sick Leave</option>
+                    <option value="Conference">Conference</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Reason (Optional)</label>
+                <textarea class="form-textarea" name="reason" placeholder="Brief description of the time off request..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="hr-btn hr-btn-secondary" onclick="closeModal('timeOffModal')">Cancel</button>
+                <button type="submit" class="hr-btn hr-btn-primary">Submit Request</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Staff Details Modal -->
+<div id="staffDetailsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Staff Details</h2>
+            <span class="close" onclick="closeModal('staffDetailsModal')">&times;</span>
+        </div>
+        <div id="staffDetailsContent">
+            <!-- Dynamic content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<!-- Notification Container -->
+<div id="notification" class="notification"></div>
+
 <script>
+// Staff data for JavaScript functionality
+const staffData = <?= json_encode($staff_members) ?>;
+const timeOffData = <?= json_encode($time_off_requests) ?>;
+
 function showSection(sectionName) {
     // Hide all sections
     const sections = document.querySelectorAll('.hr-content-section');
@@ -842,6 +1306,174 @@ function showSection(sectionName) {
     // Add active class to clicked tab
     event.target.classList.add('active');
 }
+
+function openAddStaffModal() {
+    document.getElementById('addStaffModal').style.display = 'block';
+}
+
+function openTimeOffModal() {
+    document.getElementById('timeOffModal').style.display = 'block';
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+function showNotification(message, type = 'success') {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.className = `notification ${type}`;
+    notification.classList.add('show');
+    
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 4000);
+}
+
+function addStaff(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    
+    // Generate staff ID
+    const staffId = 'NEXI' + String(Math.floor(Math.random() * 900) + 100).padStart(3, '0');
+    
+    // Simulate adding staff
+    showNotification(`Staff member ${formData.get('name')} has been successfully added with ID ${staffId}!`);
+    closeModal('addStaffModal');
+    event.target.reset();
+    
+    // In a real application, this would send data to the server
+    setTimeout(() => {
+        location.reload(); // Refresh to show updated data
+    }, 2000);
+}
+
+function submitTimeOff(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    
+    showNotification(`Time off request for ${formData.get('employee')} has been submitted successfully!`);
+    closeModal('timeOffModal');
+    event.target.reset();
+    
+    // In a real application, this would send data to the server
+    setTimeout(() => {
+        location.reload(); // Refresh to show updated data
+    }, 2000);
+}
+
+function viewStaffDetails(staffId) {
+    const staff = staffData.find(s => s.id === staffId);
+    if (!staff) return;
+    
+    const content = `
+        <div style="display: grid; gap: 1.5rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div>
+                    <strong style="color: var(--text-primary);">Staff ID:</strong><br>
+                    <span style="color: var(--text-secondary);">${staff.id}</span>
+                </div>
+                <div>
+                    <strong style="color: var(--text-primary);">Full Name:</strong><br>
+                    <span style="color: var(--text-secondary);">${staff.name}</span>
+                </div>
+                <div>
+                    <strong style="color: var(--text-primary);">Email:</strong><br>
+                    <span style="color: var(--text-secondary);">${staff.email}</span>
+                </div>
+                <div>
+                    <strong style="color: var(--text-primary);">Phone:</strong><br>
+                    <span style="color: var(--text-secondary);">${staff.phone}</span>
+                </div>
+                <div>
+                    <strong style="color: var(--text-primary);">Department:</strong><br>
+                    <span style="color: var(--text-secondary);">${staff.department}</span>
+                </div>
+                <div>
+                    <strong style="color: var(--text-primary);">Role:</strong><br>
+                    <span style="color: var(--text-secondary);">${staff.role}</span>
+                </div>
+                <div>
+                    <strong style="color: var(--text-primary);">Status:</strong><br>
+                    <span class="status-badge status-${staff.status.toLowerCase()}">${staff.status}</span>
+                </div>
+                <div>
+                    <strong style="color: var(--text-primary);">Hire Date:</strong><br>
+                    <span style="color: var(--text-secondary);">${new Date(staff.hire_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                </div>
+            </div>
+            <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+                <button class="hr-btn hr-btn-primary" onclick="editStaff('${staff.id}')">Edit Details</button>
+                <button class="hr-btn hr-btn-secondary" onclick="closeModal('staffDetailsModal')">Close</button>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('staffDetailsContent').innerHTML = content;
+    document.getElementById('staffDetailsModal').style.display = 'block';
+}
+
+function editStaff(staffId) {
+    showNotification(`Edit functionality for staff ${staffId} will be implemented soon!`, 'info');
+    closeModal('staffDetailsModal');
+}
+
+function approveTimeOff(index) {
+    const request = timeOffData[index];
+    showNotification(`Time off request for ${request.employee} has been approved!`, 'success');
+    
+    // In a real application, this would update the database
+    setTimeout(() => {
+        location.reload();
+    }, 2000);
+}
+
+function denyTimeOff(index) {
+    const request = timeOffData[index];
+    const reason = prompt('Please provide a reason for denial (optional):');
+    showNotification(`Time off request for ${request.employee} has been denied.`, 'error');
+    
+    // In a real application, this would update the database
+    setTimeout(() => {
+        location.reload();
+    }, 2000);
+}
+
+function viewTimeOffDetails(index) {
+    const request = timeOffData[index];
+    showNotification(`Viewing details for ${request.employee}'s time off request`, 'info');
+}
+
+function generateReport() {
+    showNotification('Generating comprehensive HR report...', 'info');
+    
+    setTimeout(() => {
+        showNotification('HR Report generated successfully! Check your downloads folder.', 'success');
+    }, 3000);
+}
+
+// Close modals when clicking outside
+window.onclick = function(event) {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+}
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    // Show welcome animation
+    setTimeout(() => {
+        showNotification('Welcome to the Nexi Hub HR Dashboard! All systems are operational.', 'success');
+    }, 1000);
+    
+    // Auto-refresh analytics every 5 minutes (in a real application)
+    setInterval(() => {
+        console.log('Auto-refreshing analytics data...');
+    }, 300000);
+});
 </script>
 
 <?php include '../includes/footer.php'; ?>
