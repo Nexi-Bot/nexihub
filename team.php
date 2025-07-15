@@ -334,65 +334,62 @@ include 'includes/header.php';
                 </div>
             </div>
 
-            <div class="team-member vacant">
+            <div class="team-member">
                 <div class="member-photo">
-                    <div class="photo-placeholder vacant-placeholder">
-                        <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
-                            <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2M4 18v-6h3v7c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-7h3v6h13v2H4v-2z"/>
-                        </svg>
-                    </div>
+                    <img src="assets/images/logan.jpg" alt="Logan" class="member-image">
                 </div>
                 <div class="member-info">
-                    <h3 class="member-name">Vacant</h3>
+                    <h3 class="member-name">Logan</h3>
                     <p class="member-title">Talent Acquisition Manager</p>
                     <p class="member-description">
-                        Leading recruitment efforts to attract top talent worldwide. Focus on building diverse, 
-                        high-performing teams that drive innovation across our platform ecosystem.
+                        Leading recruitment efforts to attract top talent worldwide. Logan focuses on building diverse, 
+                        high-performing teams that drive innovation across our platform ecosystem, ensuring we find 
+                        the right people to support our continued growth.
                     </p>
-                    <div class="member-status">
-                        <span class="status-badge vacant">Position Available</span>
+                    <div class="member-expertise">
+                        <span class="expertise-tag">Talent Acquisition</span>
+                        <span class="expertise-tag">Recruitment Strategy</span>
+                        <span class="expertise-tag">Team Building</span>
                     </div>
                 </div>
             </div>
 
-            <div class="team-member vacant">
+            <div class="team-member">
                 <div class="member-photo">
-                    <div class="photo-placeholder vacant-placeholder">
-                        <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
-                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                        </svg>
-                    </div>
+                    <img src="assets/images/mykyta.jpg" alt="Mykyta" class="member-image">
                 </div>
                 <div class="member-info">
-                    <h3 class="member-name">Vacant</h3>
+                    <h3 class="member-name">Mykyta</h3>
                     <p class="member-title">Learning & Development Manager</p>
                     <p class="member-description">
                         Designing and implementing comprehensive learning programs that enhance skills, 
-                        foster career growth, and support our culture of continuous improvement.
+                        foster career growth, and support our culture of continuous improvement. Mykyta 
+                        ensures our team members have the resources and opportunities to advance their careers.
                     </p>
-                    <div class="member-status">
-                        <span class="status-badge vacant">Position Available</span>
+                    <div class="member-expertise">
+                        <span class="expertise-tag">Learning Design</span>
+                        <span class="expertise-tag">Professional Development</span>
+                        <span class="expertise-tag">Training Programs</span>
                     </div>
                 </div>
             </div>
 
-            <div class="team-member vacant">
+            <div class="team-member">
                 <div class="member-photo">
-                    <div class="photo-placeholder vacant-placeholder">
-                        <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
-                            <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                        </svg>
-                    </div>
+                    <img src="assets/images/olliem.jpg" alt="Ollie" class="member-image">
                 </div>
                 <div class="member-info">
-                    <h3 class="member-name">Vacant</h3>
+                    <h3 class="member-name">Ollie</h3>
                     <p class="member-title">Head of Human Resources</p>
                     <p class="member-description">
                         Leading our Human Resources initiatives, overseeing talent acquisition, employee development, 
-                        and building a positive workplace culture across our global operations.
+                        and building a positive workplace culture across our global operations. Ollie ensures our team 
+                        continues to grow and thrive in our remote-first environment.
                     </p>
-                    <div class="member-status">
-                        <span class="status-badge vacant">Position Available</span>
+                    <div class="member-expertise">
+                        <span class="expertise-tag">Talent Management</span>
+                        <span class="expertise-tag">Employee Development</span>
+                        <span class="expertise-tag">Workplace Culture</span>
                     </div>
                 </div>
             </div>
@@ -442,23 +439,22 @@ include 'includes/header.php';
         
         <!-- Single member row - centered -->
         <div class="team-grid team-grid-center">
-            <div class="team-member vacant">
+            <div class="team-member">
                 <div class="member-photo">
-                    <div class="photo-placeholder vacant-placeholder">
-                        <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
-                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
-                        </svg>
-                    </div>
+                    <img src="assets/images/lanre.jpg" alt="Lanre" class="member-image">
                 </div>
                 <div class="member-info">
-                    <h3 class="member-name">Vacant</h3>
+                    <h3 class="member-name">Lanre</h3>
                     <p class="member-title">Business Intelligence Manager</p>
                     <p class="member-description">
                         Leading data-driven decision making through advanced analytics, reporting, and insights 
-                        that inform strategy and optimize performance across all Nexi Hub platforms.
+                        that inform strategy and optimize performance across all Nexi Hub platforms. Lanre transforms 
+                        complex data into actionable business intelligence for strategic growth.
                     </p>
-                    <div class="member-status">
-                        <span class="status-badge vacant">Position Available</span>
+                    <div class="member-expertise">
+                        <span class="expertise-tag">Data Analytics</span>
+                        <span class="expertise-tag">Business Intelligence</span>
+                        <span class="expertise-tag">Strategic Insights</span>
                     </div>
                 </div>
             </div>
