@@ -274,22 +274,6 @@ include 'includes/header.php';
                     <button class="apply-btn">Apply Now</button>
                 </div>
                 
-                <div class="position-card" data-position="Regional Director - Europe, Middle East & Africa">
-                    <div class="position-header">
-                        <h4 class="position-title">Regional Director - EMEA</h4>
-                        <span class="position-type">Leadership</span>
-                    </div>
-                    <div class="position-location">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                        </svg>
-                        Remote (Europe, Middle East, Africa)
-                    </div>
-                    <p class="position-summary">Oversee presence across European countries, Middle Eastern nations, and African continent.</p>
-                    <button class="apply-btn">Apply Now</button>
-                </div>
-                
                 <div class="position-card" data-position="Regional Director - Asia-Pacific">
                     <div class="position-header">
                         <h4 class="position-title">Regional Director - Asia-Pacific</h4>
@@ -328,54 +312,6 @@ include 'includes/header.php';
         <div class="position-category">
             <h3 class="category-title">Corporate Functions</h3>
             <div class="positions-grid">
-                <div class="position-card" data-position="Head of Human Resources">
-                    <div class="position-header">
-                        <h4 class="position-title">Head of Human Resources</h4>
-                        <span class="position-type">Management</span>
-                    </div>
-                    <div class="position-location">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                        </svg>
-                        Remote
-                    </div>
-                    <p class="position-summary">Strategic HR leadership focused on talent management and exceptional employee experience.</p>
-                    <button class="apply-btn">Apply Now</button>
-                </div>
-                
-                <div class="position-card" data-position="Talent Acquisition Manager">
-                    <div class="position-header">
-                        <h4 class="position-title">Talent Acquisition Manager</h4>
-                        <span class="position-type">Management</span>
-                    </div>
-                    <div class="position-location">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                        </svg>
-                        Remote
-                    </div>
-                    <p class="position-summary">Lead recruitment efforts to attract top talent worldwide and build diverse teams.</p>
-                    <button class="apply-btn">Apply Now</button>
-                </div>
-                
-                <div class="position-card" data-position="Learning & Development Manager">
-                    <div class="position-header">
-                        <h4 class="position-title">Learning & Development Manager</h4>
-                        <span class="position-type">Management</span>
-                    </div>
-                    <div class="position-location">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                        </svg>
-                        Remote
-                    </div>
-                    <p class="position-summary">Design comprehensive learning programs that enhance skills and foster career growth.</p>
-                    <button class="apply-btn">Apply Now</button>
-                </div>
-                
                 <div class="position-card" data-position="Corporate Strategy Manager">
                     <div class="position-header">
                         <h4 class="position-title">Corporate Strategy Manager</h4>
@@ -405,22 +341,6 @@ include 'includes/header.php';
                         Remote
                     </div>
                     <p class="position-summary">Ensure adherence to global regulations and support ethical business practices.</p>
-                    <button class="apply-btn">Apply Now</button>
-                </div>
-                
-                <div class="position-card" data-position="Business Intelligence Manager">
-                    <div class="position-header">
-                        <h4 class="position-title">Business Intelligence Manager</h4>
-                        <span class="position-type">Analytics</span>
-                    </div>
-                    <div class="position-location">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                        </svg>
-                        Remote
-                    </div>
-                    <p class="position-summary">Lead data-driven decision making through advanced analytics and insights across all platforms.</p>
                     <button class="apply-btn">Apply Now</button>
                 </div>
             </div>
