@@ -24,522 +24,583 @@ $analytics = [
     'open_tickets' => 8,
     'overdue_tasks' => 2
 ];
+
+include '../includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($page_title) ?> - Nexi Hub</title>
-    <meta name="description" content="<?= htmlspecialchars($page_description) ?>">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        /* Reset and Base Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f8fafc;
-            color: #1a202c;
-            line-height: 1.6;
-        }
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+<style>
+/* HR Dashboard Specific Styles - Built on Nexi Hub Design System */
+.hr-dashboard-container {
+    background: var(--background-dark);
+    min-height: 100vh;
+    padding-top: 2rem;
+}
 
-        /* HR Dashboard Specific Styles */
-        .hr-dashboard {
-            display: flex;
-            min-height: 100vh;
-            background: #f8fafc;
-        }
+.hr-dashboard-header {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
 
-        .hr-sidebar {
-            width: 280px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            position: fixed;
-            height: 100vh;
-            left: 0;
-            top: 0;
-            overflow-y: auto;
-            z-index: 1000;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-        }
+.hr-dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+}
 
-        .hr-sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
+.hr-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
 
-        .hr-sidebar-header h2 {
-            margin: 0;
-            font-size: 24px;
-            font-weight: 600;
-        }
+.hr-header-left h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-color) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
 
-        .hr-nav {
-            padding: 20px 0;
-        }
+.hr-header-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
 
-        .hr-nav-item {
-            display: block;
-            padding: 15px 25px;
-            color: white;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
-        }
+.hr-user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--background-dark);
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
 
-        .hr-nav-item:hover, .hr-nav-item.active {
-            background: rgba(255,255,255,0.1);
-            border-left-color: #fff;
-            color: white;
-        }
+.user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
 
-        .hr-nav-item i {
-            width: 20px;
-            margin-right: 12px;
-        }
+.user-details h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-weight: 600;
+}
 
-        .hr-main {
-            flex: 1;
-            margin-left: 280px;
-            padding: 20px;
-        }
+.user-details p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
 
-        .hr-header {
-            background: white;
-            padding: 20px 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+.hr-nav-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
 
-        .hr-header h1 {
-            margin: 0;
-            color: #2d3748;
-            font-size: 28px;
-            font-weight: 600;
-        }
+.hr-nav-tab {
+    padding: 0.75rem 1.5rem;
+    background: var(--background-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    user-select: none;
+}
 
-        .hr-user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+.hr-nav-tab:hover,
+.hr-nav-tab.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(230, 79, 33, 0.3);
+}
 
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
+.hr-nav-tab i {
+    margin-right: 0.5rem;
+}
 
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
+.hr-analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
 
-        .analytics-card {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            border-left: 4px solid;
-            transition: transform 0.2s ease;
-        }
+.hr-analytics-card {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
 
-        .analytics-card:hover {
-            transform: translateY(-2px);
-        }
+.hr-analytics-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+}
 
-        .analytics-card.primary { border-left-color: #667eea; }
-        .analytics-card.success { border-left-color: #48bb78; }
-        .analytics-card.warning { border-left-color: #ed8936; }
-        .analytics-card.danger { border-left-color: #f56565; }
-        .analytics-card.info { border-left-color: #4299e1; }
+.hr-analytics-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    border-color: var(--primary-color);
+}
 
-        .analytics-card h3 {
-            margin: 0 0 10px 0;
-            color: #2d3748;
-            font-size: 32px;
-            font-weight: 700;
-        }
+.analytics-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
 
-        .analytics-card p {
-            margin: 0;
-            color: #718096;
-            font-weight: 500;
-        }
+.analytics-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+}
 
-        .analytics-card i {
-            float: right;
-            font-size: 24px;
-            opacity: 0.3;
-            margin-top: -5px;
-        }
+.analytics-value {
+    text-align: right;
+}
 
-        .content-section {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
+.analytics-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1;
+}
 
-        .section-header {
-            padding: 20px 30px;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+.analytics-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-top: 0.5rem;
+}
 
-        .section-header h2 {
-            margin: 0;
-            color: #2d3748;
-            font-size: 20px;
-            font-weight: 600;
-        }
+.analytics-change {
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
 
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
+.analytics-change.positive {
+    color: #10b981;
+}
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
+.analytics-change.negative {
+    color: #ef4444;
+}
 
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
+.hr-section {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
 
-        .table-responsive {
-            overflow-x: auto;
-        }
+.hr-section-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
 
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 0;
-        }
+.hr-section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
 
-        .data-table th,
-        .data-table td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-        }
+.hr-section-content {
+    padding: 2rem;
+}
 
-        .data-table th {
-            background: #f7fafc;
-            font-weight: 600;
-            color: #2d3748;
-        }
+.hr-section-content.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
 
-        .data-table tr:hover {
-            background: #f7fafc;
-        }
+.hr-action-card {
+    background: var(--background-dark);
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+}
 
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-            text-transform: uppercase;
-        }
+.hr-action-card:hover {
+    border-color: var(--primary-color);
+    background: rgba(230, 79, 33, 0.05);
+    transform: translateY(-2px);
+}
 
-        .status-active { background: #c6f6d5; color: #22543d; }
-        .status-pending { background: #fed7d7; color: #742a2a; }
-        .status-completed { background: #bee3f8; color: #2a4365; }
+.hr-action-card i {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
 
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            padding: 20px 30px;
-        }
+.hr-action-card h4 {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+}
 
-        .action-card {
-            padding: 20px;
-            border: 2px dashed #cbd5e0;
-            border-radius: 8px;
-            text-align: center;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
+.hr-action-card p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin: 0;
+}
 
-        .action-card:hover {
-            border-color: #667eea;
-            background: #f0f4ff;
-        }
+.hr-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--background-dark);
+    border-radius: 12px;
+    overflow: hidden;
+}
 
-        .action-card i {
-            font-size: 24px;
-            color: #667eea;
-            margin-bottom: 10px;
-        }
+.hr-table th,
+.hr-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
 
-        .action-card h4 {
-            margin: 0 0 5px 0;
-            color: #2d3748;
-        }
+.hr-table th {
+    background: var(--background-light);
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
-        .action-card p {
-            margin: 0;
-            color: #718096;
-            font-size: 14px;
-        }
+.hr-table td {
+    color: var(--text-secondary);
+}
 
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-        }
+.hr-table tr:hover td {
+    background: rgba(230, 79, 33, 0.05);
+    color: var(--text-primary);
+}
 
-        .modal-content {
-            background: white;
-            margin: 5% auto;
-            padding: 0;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
+.status-badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
-        .modal-header {
-            padding: 20px 30px;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+.status-active {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
 
-        .modal-header h3 {
-            margin: 0;
-            color: #2d3748;
-        }
+.status-pending {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+}
 
-        .close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #718096;
-        }
+.status-completed {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+}
 
-        .modal-body {
-            padding: 30px;
-        }
+.status-overdue {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+.hr-content-section {
+    display: none;
+}
 
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #2d3748;
-        }
+.hr-content-section.active {
+    display: block;
+}
 
-        .form-control {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #cbd5e0;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.2s ease;
-        }
+.hr-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
 
-        .form-control:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
+.hr-btn-primary {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px rgba(230, 79, 33, 0.3);
+}
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
+.hr-btn-primary:hover {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(230, 79, 33, 0.4);
+}
 
-        @media (max-width: 768px) {
-            .hr-sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-            }
-            
-            .hr-main {
-                margin-left: 0;
-            }
-            
-            .analytics-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
+.hr-btn-secondary {
+    background: transparent;
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+}
 
-<body class="hr-dashboard">
-    <div class="hr-sidebar">
-        <div class="hr-sidebar-header">
-            <h2><i class="fas fa-users"></i> HR Portal</h2>
-        </div>
-        <nav class="hr-nav">
-            <a href="#dashboard" class="hr-nav-item active" onclick="showSection('dashboard')">
-                <i class="fas fa-tachometer-alt"></i> Dashboard
-            </a>
-            <a href="#staff-records" class="hr-nav-item" onclick="showSection('staff-records')">
-                <i class="fas fa-users"></i> Staff Records
-            </a>
-            <a href="#onboarding" class="hr-nav-item" onclick="showSection('onboarding')">
-                <i class="fas fa-user-plus"></i> Onboarding
-            </a>
-            <a href="#contracts" class="hr-nav-item" onclick="showSection('contracts')">
-                <i class="fas fa-file-contract"></i> Contracts
-            </a>
-            <a href="#elearning" class="hr-nav-item" onclick="showSection('elearning')">
-                <i class="fas fa-graduation-cap"></i> E-Learning
-            </a>
-            <a href="#tickets" class="hr-nav-item" onclick="showSection('tickets')">
-                <i class="fas fa-ticket-alt"></i> Tickets
-            </a>
-            <a href="#time-off" class="hr-nav-item" onclick="showSection('time-off')">
-                <i class="fas fa-calendar-alt"></i> Time Off
-            </a>
-            <a href="#tasks" class="hr-nav-item" onclick="showSection('tasks')">
-                <i class="fas fa-tasks"></i> Task Management
-            </a>
-            <a href="#audit-logs" class="hr-nav-item" onclick="showSection('audit-logs')">
-                <i class="fas fa-history"></i> Audit Logs
-            </a>
-            <a href="#billing" class="hr-nav-item" onclick="showSection('billing')">
-                <i class="fas fa-money-bill-wave"></i> Billing
-            </a>
-        </nav>
-    </div>
+.hr-btn-secondary:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
 
-    <div class="hr-main">
-        <div class="hr-header">
-            <h1 id="page-title">HR Dashboard</h1>
-            <div class="hr-user-info">
-                <div class="user-avatar">
-                    <?= strtoupper(substr($current_user['full_name'] ?? 'U', 0, 1)) ?>
+.logout-btn {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+}
+
+.logout-btn:hover {
+    background: rgba(239, 68, 68, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+}
+
+@media (max-width: 768px) {
+    .hr-header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .hr-nav-tabs {
+        justify-content: center;
+    }
+    
+    .hr-analytics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .hr-section-content.grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<div class="hr-dashboard-container">
+    <div class="container">
+        <a href="/staff/logout" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+        
+        <div class="hr-dashboard-header">
+            <div class="hr-header-content">
+                <div class="hr-header-left">
+                    <h1>HR Management System</h1>
+                    <p class="hr-header-subtitle">Complete staff management and organizational tools</p>
+                    
+                    <div class="hr-nav-tabs">
+                        <div class="hr-nav-tab active" onclick="showSection('dashboard')">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </div>
+                        <div class="hr-nav-tab" onclick="showSection('staff-records')">
+                            <i class="fas fa-users"></i> Staff Records
+                        </div>
+                        <div class="hr-nav-tab" onclick="showSection('onboarding')">
+                            <i class="fas fa-user-plus"></i> Onboarding
+                        </div>
+                        <div class="hr-nav-tab" onclick="showSection('time-off')">
+                            <i class="fas fa-calendar-alt"></i> Time Off
+                        </div>
+                        <div class="hr-nav-tab" onclick="showSection('reports')">
+                            <i class="fas fa-chart-bar"></i> Reports
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <div style="font-weight: 600;"><?= htmlspecialchars($current_user['full_name'] ?? 'User') ?></div>
-                    <div style="font-size: 14px; color: #718096;"><?= htmlspecialchars($user_role) ?></div>
+                
+                <div class="hr-user-info">
+                    <div class="user-avatar">
+                        <?= strtoupper(substr($current_user['full_name'], 0, 1)) ?>
+                    </div>
+                    <div class="user-details">
+                        <h3><?= htmlspecialchars($current_user['full_name']) ?></h3>
+                        <p><?= htmlspecialchars($user_role) ?></p>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Dashboard Section -->
-        <div id="dashboard-section" class="content-section">
-            <div class="analytics-grid">
-                <div class="analytics-card primary">
-                    <i class="fas fa-users"></i>
-                    <h3><?= $analytics['total_staff'] ?></h3>
-                    <p>Total Staff Members</p>
+        <div id="dashboard-section" class="hr-content-section active">
+            <div class="hr-analytics-grid">
+                <div class="hr-analytics-card">
+                    <div class="analytics-card-header">
+                        <div class="analytics-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="analytics-value">
+                            <h3 class="analytics-number"><?= $analytics['total_staff'] ?></h3>
+                            <div class="analytics-change positive">
+                                <i class="fas fa-arrow-up"></i> +2 this month
+                            </div>
+                        </div>
+                    </div>
+                    <p class="analytics-label">Total Staff Members</p>
                 </div>
-                <div class="analytics-card success">
-                    <i class="fas fa-user-check"></i>
-                    <h3><?= $analytics['active_staff'] ?></h3>
-                    <p>Active Staff</p>
+                
+                <div class="hr-analytics-card">
+                    <div class="analytics-card-header">
+                        <div class="analytics-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="analytics-value">
+                            <h3 class="analytics-number"><?= $analytics['active_staff'] ?></h3>
+                            <div class="analytics-change positive">
+                                <i class="fas fa-arrow-up"></i> 93% active
+                            </div>
+                        </div>
+                    </div>
+                    <p class="analytics-label">Active Staff</p>
                 </div>
-                <div class="analytics-card warning">
-                    <i class="fas fa-user-clock"></i>
-                    <h3><?= $analytics['pending_onboarding'] ?></h3>
-                    <p>Pending Onboarding</p>
+                
+                <div class="hr-analytics-card">
+                    <div class="analytics-card-header">
+                        <div class="analytics-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="analytics-value">
+                            <h3 class="analytics-number"><?= $analytics['pending_onboarding'] ?></h3>
+                            <div class="analytics-change negative">
+                                <i class="fas fa-arrow-down"></i> -1 this week
+                            </div>
+                        </div>
+                    </div>
+                    <p class="analytics-label">Pending Onboarding</p>
                 </div>
-                <div class="analytics-card danger">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <h3><?= $analytics['compliance_issues'] ?></h3>
-                    <p>Compliance Issues</p>
-                </div>
-                <div class="analytics-card info">
-                    <i class="fas fa-calendar"></i>
-                    <h3><?= $analytics['upcoming_time_off'] ?></h3>
-                    <p>Upcoming Time Off</p>
-                </div>
-                <div class="analytics-card primary">
-                    <i class="fas fa-ticket-alt"></i>
-                    <h3><?= $analytics['open_tickets'] ?></h3>
-                    <p>Open Tickets</p>
+                
+                <div class="hr-analytics-card">
+                    <div class="analytics-card-header">
+                        <div class="analytics-icon">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <div class="analytics-value">
+                            <h3 class="analytics-number"><?= $analytics['upcoming_time_off'] ?></h3>
+                            <div class="analytics-change positive">
+                                <i class="fas fa-arrow-up"></i> Next 30 days
+                            </div>
+                        </div>
+                    </div>
+                    <p class="analytics-label">Upcoming Time Off</p>
                 </div>
             </div>
 
-            <div class="content-section">
-                <div class="section-header">
-                    <h2>Quick Actions</h2>
+            <div class="hr-section">
+                <div class="hr-section-header">
+                    <h2 class="hr-section-title">Quick Actions</h2>
                 </div>
-                <div class="quick-actions">
-                    <div class="action-card" onclick="showAddStaffModal()">
+                <div class="hr-section-content grid">
+                    <div class="hr-action-card" onclick="showSection('staff-records')">
                         <i class="fas fa-user-plus"></i>
                         <h4>Add New Staff</h4>
-                        <p>Register a new employee</p>
+                        <p>Register a new employee and start onboarding</p>
                     </div>
-                    <div class="action-card" onclick="showSection('onboarding')">
+                    <div class="hr-action-card" onclick="showSection('time-off')">
+                        <i class="fas fa-calendar-check"></i>
+                        <h4>Review Time Off</h4>
+                        <p>Approve or deny pending time off requests</p>
+                    </div>
+                    <div class="hr-action-card" onclick="showSection('reports')">
+                        <i class="fas fa-file-alt"></i>
+                        <h4>Generate Reports</h4>
+                        <p>Create detailed staff and performance reports</p>
+                    </div>
+                    <div class="hr-action-card" onclick="showSection('onboarding')">
                         <i class="fas fa-clipboard-check"></i>
-                        <h4>Manage Onboarding</h4>
-                        <p>Track onboarding progress</p>
-                    </div>
-                    <div class="action-card" onclick="showSection('time-off')">
-                        <i class="fas fa-calendar-plus"></i>
-                        <h4>Time Off Requests</h4>
-                        <p>Review pending requests</p>
-                    </div>
-                    <div class="action-card" onclick="showSection('tickets')">
-                        <i class="fas fa-headset"></i>
-                        <h4>Support Tickets</h4>
-                        <p>Manage support requests</p>
+                        <h4>Track Onboarding</h4>
+                        <p>Monitor new employee progress</p>
                     </div>
                 </div>
             </div>
 
-            <div class="content-section">
-                <div class="section-header">
-                    <h2>Recent Activity</h2>
+            <div class="hr-section">
+                <div class="hr-section-header">
+                    <h2 class="hr-section-title">Recent Activity</h2>
+                    <a href="#" class="hr-btn hr-btn-secondary">View All</a>
                 </div>
-                <div class="table-responsive">
-                    <table class="data-table">
+                <div class="hr-section-content">
+                    <table class="hr-table">
                         <thead>
                             <tr>
                                 <th>Time</th>
-                                <th>User</th>
+                                <th>Staff Member</th>
                                 <th>Action</th>
                                 <th>Status</th>
                             </tr>
@@ -559,9 +620,15 @@ $analytics = [
                             </tr>
                             <tr>
                                 <td>6 hours ago</td>
-                                <td>Ollie Roberts</td>
+                                <td>Oliver Reaney</td>
                                 <td>Updated staff record</td>
                                 <td><span class="status-badge status-completed">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td>1 day ago</td>
+                                <td>Benjamin Clarke</td>
+                                <td>Approved time off request</td>
+                                <td><span class="status-badge status-active">Approved</span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -570,249 +637,211 @@ $analytics = [
         </div>
 
         <!-- Staff Records Section -->
-        <div id="staff-records-section" class="content-section" style="display: none;">
-            <div class="section-header">
-                <h2>Staff Records</h2>
-                <button class="btn btn-primary" onclick="showAddStaffModal()">
-                    <i class="fas fa-plus"></i> Add New Staff
-                </button>
-            </div>
-            <div class="table-responsive">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Staff ID</th>
-                            <th>Name</th>
-                            <th>Department</th>
-                            <th>Status</th>
-                            <th>Onboarding</th>
-                            <th>2FA</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>NEXI001</td>
-                            <td>Oliver Reaney</td>
-                            <td>Executive</td>
-                            <td><span class="status-badge status-active">Active</span></td>
-                            <td><span class="status-badge status-completed">Complete</span></td>
-                            <td><span class="status-badge status-completed">Enabled</span></td>
-                            <td>
-                                <button class="btn btn-primary" onclick="viewStaffDetails(1)">View</button>
-                            </td>
-                        </tr>
-                        <!-- More staff records will be loaded here -->
-                    </tbody>
-                </table>
+        <div id="staff-records-section" class="hr-content-section">
+            <div class="hr-section">
+                <div class="hr-section-header">
+                    <h2 class="hr-section-title">Staff Records</h2>
+                    <a href="#" class="hr-btn hr-btn-primary" onclick="alert('Add Staff functionality will be implemented')">
+                        <i class="fas fa-plus"></i> Add New Staff
+                    </a>
+                </div>
+                <div class="hr-section-content">
+                    <table class="hr-table">
+                        <thead>
+                            <tr>
+                                <th>Staff ID</th>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>NEXI001</td>
+                                <td>Oliver Reaney</td>
+                                <td>Executive</td>
+                                <td>CEO & Founder</td>
+                                <td><span class="status-badge status-active">Active</span></td>
+                                <td>
+                                    <a href="#" class="hr-btn hr-btn-secondary" onclick="alert('View details functionality will be implemented')">View</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>NEXI002</td>
+                                <td>Benjamin Clarke</td>
+                                <td>Executive</td>
+                                <td>Managing Director</td>
+                                <td><span class="status-badge status-active">Active</span></td>
+                                <td>
+                                    <a href="#" class="hr-btn hr-btn-secondary" onclick="alert('View details functionality will be implemented')">View</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>NEXI003</td>
+                                <td>Logan Mitchell</td>
+                                <td>Technology</td>
+                                <td>Lead Developer</td>
+                                <td><span class="status-badge status-pending">Onboarding</span></td>
+                                <td>
+                                    <a href="#" class="hr-btn hr-btn-secondary" onclick="alert('View details functionality will be implemented')">View</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- Other Sections -->
-        <div id="onboarding-section" class="content-section" style="display: none;">
-            <div class="section-header">
-                <h2>Employee Onboarding</h2>
-            </div>
-            <p style="padding: 20px 30px; margin: 0; color: #718096;">
-                This section will contain detailed onboarding management features.
-            </p>
-        </div>
-
-        <div id="contracts-section" class="content-section" style="display: none;">
-            <div class="section-header">
-                <h2>Contract & Consent Validation</h2>
-            </div>
-            <p style="padding: 20px 30px; margin: 0; color: #718096;">
-                Contract validation and compliance tracking will be implemented here.
-            </p>
-        </div>
-
-        <div id="elearning-section" class="content-section" style="display: none;">
-            <div class="section-header">
-                <h2>E-Learning Management</h2>
-            </div>
-            <p style="padding: 20px 30px; margin: 0; color: #718096;">
-                E-learning module will be implemented here. Awaiting your specifications.
-            </p>
-        </div>
-
-        <div id="tickets-section" class="content-section" style="display: none;">
-            <div class="section-header">
-                <h2>Support Tickets</h2>
-            </div>
-            <p style="padding: 20px 30px; margin: 0; color: #718096;">
-                Ticket management system will be implemented here. Awaiting your specifications.
-            </p>
-        </div>
-
-        <div id="time-off-section" class="content-section" style="display: none;">
-            <div class="section-header">
-                <h2>Time Off Management</h2>
-            </div>
-            <p style="padding: 20px 30px; margin: 0; color: #718096;">
-                Time off request and approval system will be implemented here. Awaiting your specifications.
-            </p>
-        </div>
-
-        <div id="tasks-section" class="content-section" style="display: none;">
-            <div class="section-header">
-                <h2>Task Management</h2>
-            </div>
-            <p style="padding: 20px 30px; margin: 0; color: #718096;">
-                Task management system will be implemented here. Awaiting your specifications.
-            </p>
-        </div>
-
-        <div id="audit-logs-section" class="content-section" style="display: none;">
-            <div class="section-header">
-                <h2>Audit Logs</h2>
-            </div>
-            <p style="padding: 20px 30px; margin: 0; color: #718096;">
-                Comprehensive audit logging will be implemented here. Awaiting your specifications.
-            </p>
-        </div>
-
-        <div id="billing-section" class="content-section" style="display: none;">
-            <div class="section-header">
-                <h2>Billing & Payroll</h2>
-            </div>
-            <p style="padding: 20px 30px; margin: 0; color: #718096;">
-                Billing and payroll management will be implemented here. Awaiting your specifications.
-            </p>
-        </div>
-    </div>
-
-    <!-- Add Staff Modal -->
-    <div id="addStaffModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Add New Staff Member</h3>
-                <button class="close" onclick="closeModal('addStaffModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="addStaffForm" onsubmit="addNewStaff(event)">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="fullName">Full Name *</label>
-                            <input type="text" id="fullName" name="fullName" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="preferredName">Preferred Name</label>
-                            <input type="text" id="preferredName" name="preferredName" class="form-control">
-                        </div>
-                    </div>
+        <!-- Onboarding Section -->
+        <div id="onboarding-section" class="hr-content-section">
+            <div class="hr-section">
+                <div class="hr-section-header">
+                    <h2 class="hr-section-title">Employee Onboarding</h2>
+                </div>
+                <div class="hr-section-content">
+                    <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+                        Track and manage the onboarding process for new employees. Ensure all required documents and training are completed.
+                    </p>
                     
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="jobTitle">Job Title *</label>
-                            <input type="text" id="jobTitle" name="jobTitle" class="form-control" required>
+                    <div class="hr-section-content grid">
+                        <div class="hr-action-card">
+                            <i class="fas fa-file-contract"></i>
+                            <h4>Contract Management</h4>
+                            <p>Upload and track employment contracts and NDAs</p>
                         </div>
-                        <div class="form-group">
-                            <label for="department">Department *</label>
-                            <select id="department" name="department" class="form-control" required>
-                                <option value="">Select Department</option>
-                                <option value="Executive">Executive</option>
-                                <option value="Technology">Technology</option>
-                                <option value="Human Resources">Human Resources</option>
-                                <option value="Finance">Finance</option>
-                                <option value="Legal">Legal</option>
-                                <option value="Regional">Regional</option>
-                            </select>
+                        <div class="hr-action-card">
+                            <i class="fas fa-graduation-cap"></i>
+                            <h4>Training Modules</h4>
+                            <p>Assign and monitor completion of required training</p>
+                        </div>
+                        <div class="hr-action-card">
+                            <i class="fas fa-shield-alt"></i>
+                            <h4>Security Setup</h4>
+                            <p>Configure 2FA and security protocols</p>
+                        </div>
+                        <div class="hr-action-card">
+                            <i class="fas fa-check-circle"></i>
+                            <h4>Completion Tracking</h4>
+                            <p>Monitor onboarding progress and completion</p>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="nexiEmail">Nexi Email *</label>
-                            <input type="email" id="nexiEmail" name="nexiEmail" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="privateEmail">Private Email *</label>
-                            <input type="email" id="privateEmail" name="privateEmail" class="form-control" required>
-                        </div>
-                    </div>
+        <!-- Time Off Section -->
+        <div id="time-off-section" class="hr-content-section">
+            <div class="hr-section">
+                <div class="hr-section-header">
+                    <h2 class="hr-section-title">Time Off Management</h2>
+                </div>
+                <div class="hr-section-content">
+                    <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+                        Manage staff time off requests, approvals, and tracking. Monitor leave balances and upcoming absences.
+                    </p>
+                    
+                    <table class="hr-table">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Request Date</th>
+                                <th>Leave Dates</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Mykyta Petrenko</td>
+                                <td>July 10, 2025</td>
+                                <td>July 20-24, 2025</td>
+                                <td>Vacation</td>
+                                <td><span class="status-badge status-pending">Pending</span></td>
+                                <td>
+                                    <a href="#" class="hr-btn hr-btn-primary" onclick="alert('Approve functionality will be implemented')">Approve</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Logan Mitchell</td>
+                                <td>July 8, 2025</td>
+                                <td>July 15, 2025</td>
+                                <td>Personal</td>
+                                <td><span class="status-badge status-active">Approved</span></td>
+                                <td>
+                                    <a href="#" class="hr-btn hr-btn-secondary" onclick="alert('View details functionality will be implemented')">View</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-                    <div style="text-align: right; margin-top: 30px;">
-                        <button type="button" class="btn" onclick="closeModal('addStaffModal')" style="background: #e2e8f0; color: #2d3748; margin-right: 10px;">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Create Staff Member</button>
+        <!-- Reports Section -->
+        <div id="reports-section" class="hr-content-section">
+            <div class="hr-section">
+                <div class="hr-section-header">
+                    <h2 class="hr-section-title">Reports & Analytics</h2>
+                </div>
+                <div class="hr-section-content">
+                    <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+                        Generate comprehensive reports on staff performance, attendance, and organizational metrics.
+                    </p>
+                    
+                    <div class="hr-section-content grid">
+                        <div class="hr-action-card">
+                            <i class="fas fa-users"></i>
+                            <h4>Staff Overview</h4>
+                            <p>Complete staff directory and status report</p>
+                        </div>
+                        <div class="hr-action-card">
+                            <i class="fas fa-calendar-check"></i>
+                            <h4>Attendance Report</h4>
+                            <p>Track attendance and time off patterns</p>
+                        </div>
+                        <div class="hr-action-card">
+                            <i class="fas fa-chart-line"></i>
+                            <h4>Performance Metrics</h4>
+                            <p>Analyze staff performance and productivity</p>
+                        </div>
+                        <div class="hr-action-card">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <h4>Payroll Summary</h4>
+                            <p>Generate payroll and compensation reports</p>
+                        </div>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
+</div>
 
 <script>
-// Navigation and UI functionality
 function showSection(sectionName) {
     // Hide all sections
-    const sections = ['dashboard', 'staff-records', 'onboarding', 'contracts', 'elearning', 'tickets', 'time-off', 'tasks', 'audit-logs', 'billing'];
+    const sections = document.querySelectorAll('.hr-content-section');
     sections.forEach(section => {
-        const element = document.getElementById(section + '-section');
-        if (element) element.style.display = 'none';
+        section.classList.remove('active');
     });
-
+    
+    // Remove active class from all tabs
+    const tabs = document.querySelectorAll('.hr-nav-tab');
+    tabs.forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
     // Show selected section
     const selectedSection = document.getElementById(sectionName + '-section');
-    if (selectedSection) selectedSection.style.display = 'block';
-
-    // Update navigation
-    document.querySelectorAll('.hr-nav-item').forEach(item => {
-        item.classList.remove('active');
-    });
+    if (selectedSection) {
+        selectedSection.classList.add('active');
+    }
+    
+    // Add active class to clicked tab
     event.target.classList.add('active');
-
-    // Update page title
-    const titles = {
-        'dashboard': 'HR Dashboard',
-        'staff-records': 'Staff Records',
-        'onboarding': 'Employee Onboarding',
-        'contracts': 'Contract & Consent Validation',
-        'elearning': 'E-Learning Management',
-        'tickets': 'Support Tickets',
-        'time-off': 'Time Off Management',
-        'tasks': 'Task Management',
-        'audit-logs': 'Audit Logs',
-        'billing': 'Billing & Payroll'
-    };
-    document.getElementById('page-title').textContent = titles[sectionName] || 'HR Dashboard';
-}
-
-// Modal functionality
-function showAddStaffModal() {
-    document.getElementById('addStaffModal').style.display = 'block';
-}
-
-function closeModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
-}
-
-// Form submission
-function addNewStaff(event) {
-    event.preventDefault();
-    
-    // Generate staff ID
-    const staffId = 'NEXI' + String(Math.floor(Math.random() * 9000) + 1000);
-    
-    alert(`Staff member will be created with ID: ${staffId}\n\nThe new employee will receive an email with login instructions and will be required to:\n1. Reset their password\n2. Set up 2FA\n3. Complete document signing process`);
-    
-    closeModal('addStaffModal');
-    document.getElementById('addStaffForm').reset();
-}
-
-function viewStaffDetails(staffId) {
-    alert('Staff details view will be implemented with full profile management.');
-}
-
-// Close modal when clicking outside
-window.onclick = function(event) {
-    const modals = document.querySelectorAll('.modal');
-    modals.forEach(modal => {
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
-    });
 }
 </script>
 
-</body>
-</html>
+<?php include '../includes/footer.php'; ?>
