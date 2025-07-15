@@ -22,16 +22,16 @@ $analytics = [
     'overdue_tasks' => 2
 ];
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($page_title) ?> - Nexi Hub</title>
-    <meta name="description" content="<?= htmlspecialchars($page_description) ?>">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Reset and Base Styles */
+        /* Reset and base styles */
         * {
             margin: 0;
             padding: 0;
@@ -39,13 +39,13 @@ $analytics = [
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
             background: #f8fafc;
-            color: #1a202c;
+            color: #2d3748;
             line-height: 1.6;
         }
 
-        /* HR Dashboard Specific Styles */
+        /* HR Dashboard Layout */
         .hr-dashboard {
             display: flex;
             min-height: 100vh;
@@ -234,6 +234,21 @@ $analytics = [
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ed8936;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+
         .table-responsive {
             overflow-x: auto;
         }
@@ -272,6 +287,7 @@ $analytics = [
         .status-active { background: #c6f6d5; color: #22543d; }
         .status-pending { background: #fed7d7; color: #742a2a; }
         .status-completed { background: #bee3f8; color: #2a4365; }
+        .status-incomplete { background: #fbb6ce; color: #702459; }
 
         .quick-actions {
             display: grid;
@@ -605,16 +621,18 @@ $analytics = [
             </div>
         </div>
 
-        <!-- Other Sections -->
+        <!-- Onboarding Section -->
         <div id="onboarding-section" class="content-section" style="display: none;">
             <div class="section-header">
                 <h2>Employee Onboarding</h2>
             </div>
             <p style="padding: 20px 30px; margin: 0; color: #718096;">
                 This section will contain detailed onboarding management features.
+                You mentioned you'll provide more details about this module.
             </p>
         </div>
 
+        <!-- Contracts Section -->
         <div id="contracts-section" class="content-section" style="display: none;">
             <div class="section-header">
                 <h2>Contract & Consent Validation</h2>
@@ -624,6 +642,7 @@ $analytics = [
             </p>
         </div>
 
+        <!-- E-Learning Section -->
         <div id="elearning-section" class="content-section" style="display: none;">
             <div class="section-header">
                 <h2>E-Learning Management</h2>
@@ -633,6 +652,7 @@ $analytics = [
             </p>
         </div>
 
+        <!-- Tickets Section -->
         <div id="tickets-section" class="content-section" style="display: none;">
             <div class="section-header">
                 <h2>Support Tickets</h2>
@@ -642,6 +662,7 @@ $analytics = [
             </p>
         </div>
 
+        <!-- Time Off Section -->
         <div id="time-off-section" class="content-section" style="display: none;">
             <div class="section-header">
                 <h2>Time Off Management</h2>
@@ -651,6 +672,7 @@ $analytics = [
             </p>
         </div>
 
+        <!-- Tasks Section -->
         <div id="tasks-section" class="content-section" style="display: none;">
             <div class="section-header">
                 <h2>Task Management</h2>
@@ -660,6 +682,7 @@ $analytics = [
             </p>
         </div>
 
+        <!-- Audit Logs Section -->
         <div id="audit-logs-section" class="content-section" style="display: none;">
             <div class="section-header">
                 <h2>Audit Logs</h2>
@@ -669,6 +692,7 @@ $analytics = [
             </p>
         </div>
 
+        <!-- Billing Section -->
         <div id="billing-section" class="content-section" style="display: none;">
             <div class="section-header">
                 <h2>Billing & Payroll</h2>
@@ -729,6 +753,82 @@ $analytics = [
                         </div>
                     </div>
 
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phoneNumber">Phone Number</label>
+                            <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="dateOfBirth">Date of Birth *</label>
+                            <input type="date" id="dateOfBirth" name="dateOfBirth" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nationality">Nationality *</label>
+                            <input type="text" id="nationality" name="nationality" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="countryOfResidence">Country of Residence *</label>
+                            <input type="text" id="countryOfResidence" name="countryOfResidence" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="discordUsername">Discord Username</label>
+                            <input type="text" id="discordUsername" name="discordUsername" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="manager">Manager</label>
+                            <select id="manager" name="manager" class="form-control">
+                                <option value="">Select Manager</option>
+                                <option value="1">Oliver Reaney</option>
+                                <option value="2">Benjamin Clark</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h4 style="margin: 30px 0 15px 0; color: #2d3748;">Required Documents Upload</h4>
+                    <p style="color: #718096; margin-bottom: 20px;">All documents must be uploaded before the employee can be created.</p>
+
+                    <div class="form-group">
+                        <label>Age Category *</label>
+                        <div style="margin-top: 10px;">
+                            <input type="radio" id="over16" name="ageCategory" value="over16" required onchange="toggleContractType()">
+                            <label for="over16" style="margin-left: 8px; margin-right: 20px;">Over 16</label>
+                            <input type="radio" id="under16" name="ageCategory" value="under16" required onchange="toggleContractType()">
+                            <label for="under16" style="margin-left: 8px;">Under 16</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contractUpload">Contract Upload *</label>
+                        <input type="file" id="contractUpload" name="contractUpload" class="form-control" accept=".pdf,.doc,.docx" required>
+                        <small style="color: #718096;">Upload the appropriate contract based on age category</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ndaUpload">NDA Upload *</label>
+                        <input type="file" id="ndaUpload" name="ndaUpload" class="form-control" accept=".pdf,.doc,.docx" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="policiesUpload">Company Policies Upload *</label>
+                        <input type="file" id="policiesUpload" name="policiesUpload" class="form-control" accept=".pdf,.doc,.docx" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="codeOfConductUpload">Code of Conduct Upload *</label>
+                        <input type="file" id="codeOfConductUpload" name="codeOfConductUpload" class="form-control" accept=".pdf,.doc,.docx" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="legalDeclarationUpload">Legal Declaration Upload *</label>
+                        <input type="file" id="legalDeclarationUpload" name="legalDeclarationUpload" class="form-control" accept=".pdf,.doc,.docx" required>
+                    </div>
+
                     <div style="text-align: right; margin-top: 30px;">
                         <button type="button" class="btn" onclick="closeModal('addStaffModal')" style="background: #e2e8f0; color: #2d3748; margin-right: 10px;">Cancel</button>
                         <button type="submit" class="btn btn-primary">Create Staff Member</button>
@@ -783,13 +883,41 @@ function closeModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
 }
 
+function toggleContractType() {
+    const ageCategory = document.querySelector('input[name="ageCategory"]:checked').value;
+    const contractLabel = document.querySelector('label[for="contractUpload"]');
+    
+    if (ageCategory === 'under16') {
+        contractLabel.textContent = 'Under 16 Contract Upload *';
+    } else {
+        contractLabel.textContent = 'Over 16 Contract Upload *';
+    }
+}
+
 // Form submission
 function addNewStaff(event) {
     event.preventDefault();
     
+    // Validate all required files are uploaded
+    const requiredFiles = ['contractUpload', 'ndaUpload', 'policiesUpload', 'codeOfConductUpload', 'legalDeclarationUpload'];
+    let allFilesUploaded = true;
+    
+    requiredFiles.forEach(fileInputId => {
+        const fileInput = document.getElementById(fileInputId);
+        if (!fileInput.files || fileInput.files.length === 0) {
+            allFilesUploaded = false;
+        }
+    });
+    
+    if (!allFilesUploaded) {
+        alert('Please upload all required documents before creating the staff member.');
+        return;
+    }
+    
     // Generate staff ID
     const staffId = 'NEXI' + String(Math.floor(Math.random() * 9000) + 1000);
     
+    // Here you would normally submit the form data to your backend
     alert(`Staff member will be created with ID: ${staffId}\n\nThe new employee will receive an email with login instructions and will be required to:\n1. Reset their password\n2. Set up 2FA\n3. Complete document signing process`);
     
     closeModal('addStaffModal');
