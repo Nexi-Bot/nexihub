@@ -789,7 +789,7 @@ include __DIR__ . '/../includes/header.php';
     <div class="container">
         <div class="dashboard-header">
             <h1>Staff Management Dashboard</h1>
-            <p>Secure Staff Information Management System</p>
+            <p>Secure Staff Information Management System - Region-Based Dashboard</p>
         </div>
 
         <?php if ($success_message): ?>
