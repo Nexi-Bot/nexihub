@@ -397,22 +397,6 @@ include 'includes/header.php';
                     <p class="position-summary">Plan and optimize resource allocation across all departments and projects.</p>
                     <button class="apply-btn">Apply Now</button>
                 </div>
-                
-                <div class="position-card" data-position="Quality Assurance Manager">
-                    <div class="position-header">
-                        <h4 class="position-title">Quality Assurance Manager</h4>
-                        <span class="position-type">Quality</span>
-                    </div>
-                    <div class="position-location">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                        </svg>
-                        Remote
-                    </div>
-                    <p class="position-summary">Ensure quality standards and testing processes across all platforms.</p>
-                    <button class="apply-btn">Apply Now</button>
-                </div>
             </div>
         </div>
         
