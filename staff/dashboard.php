@@ -1,5 +1,8 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../config/api_config.php';
+require_once __DIR__ . '/../includes/StripeIntegration.php';
+require_once __DIR__ . '/../includes/RealDataAnalytics.php';
 
 requireAuth();
 
@@ -10,7 +13,16 @@ $page_description = "Nexi Hub Executive Management Center - Complete business ov
 $db = new PDO("sqlite:" . __DIR__ . "/../database/nexihub.db");
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-// Initialize database tables if they don't exist
+// Initialize Stripe integration for real financial data
+$stripe = null;
+if (USE_REAL_FINANCIAL_DATA && defined('STRIPE_SECRET_KEY')) {
+    $stripe = new StripeIntegration(STRIPE_SECRET_KEY);
+}
+
+// Initialize real data analytics
+$analytics_provider = new RealDataAnalytics($db, $stripe);
+
+// Initialize core database tables (no sample data)
 $db->exec("CREATE TABLE IF NOT EXISTS staff (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -78,38 +90,6 @@ $db->exec("CREATE TABLE IF NOT EXISTS platforms (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 )");
 
-// Insert sample data if tables are empty
-$staff_count = $db->query("SELECT COUNT(*) FROM staff")->fetchColumn();
-if ($staff_count == 0) {
-    $sample_staff = [
-        ['John Smith', 'john.smith@nexihub.com', 'Development', 'Senior Developer', 'active', '2023-01-15', 65000],
-        ['Sarah Johnson', 'sarah.johnson@nexihub.com', 'Design', 'UX Designer', 'active', '2023-03-20', 58000],
-        ['Mike Chen', 'mike.chen@nexihub.com', 'Operations', 'Project Manager', 'active', '2023-02-10', 72000],
-        ['Emily Davis', 'emily.davis@nexihub.com', 'Marketing', 'Marketing Specialist', 'active', '2023-04-05', 52000],
-        ['David Wilson', 'david.wilson@nexihub.com', 'Sales', 'Sales Director', 'active', '2023-01-08', 78000]
-    ];
-    
-    $stmt = $db->prepare("INSERT INTO staff (name, email, department, role, status, hire_date, salary) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    foreach ($sample_staff as $staff) {
-        $stmt->execute($staff);
-    }
-}
-
-// Initialize platform data
-$platform_count = $db->query("SELECT COUNT(*) FROM platforms")->fetchColumn();
-if ($platform_count == 0) {
-    $platforms = [
-        ['Nexi Hub', 'Main business management platform', 'active', 247, 45000, 99.97],
-        ['Nexi Digital', 'Digital marketing and automation suite', 'active', 89, 28000, 99.8],
-        ['Nexi Consulting', 'Professional consulting services platform', 'active', 34, 15000, 99.9]
-    ];
-    
-    $stmt = $db->prepare("INSERT INTO platforms (name, description, status, users_count, revenue, uptime) VALUES (?, ?, ?, ?, ?, ?)");
-    foreach ($platforms as $platform) {
-        $stmt->execute($platform);
-    }
-}
-
 // Enhanced user profile with real session data
 $current_user = [
     'full_name' => $_SESSION['staff_name'] ?? 'Executive Administrator',
@@ -121,60 +101,10 @@ $current_user = [
     'last_login' => date('M j, Y \a\t g:i A'),
 ];
 
-// Get real analytics data from database
-function getAnalyticsData($db) {
-    $analytics = [];
-    
-    // Staff Analytics
-    $analytics['total_staff'] = (int)$db->query("SELECT COUNT(*) FROM staff")->fetchColumn();
-    $analytics['active_staff'] = (int)$db->query("SELECT COUNT(*) FROM staff WHERE status = 'active'")->fetchColumn();
-    $analytics['on_leave'] = (int)$db->query("SELECT COUNT(*) FROM time_off_requests WHERE status = 'approved' AND start_date <= date('now') AND end_date >= date('now')")->fetchColumn();
-    $analytics['new_hires_month'] = (int)$db->query("SELECT COUNT(*) FROM staff WHERE hire_date >= date('now', 'start of month')")->fetchColumn();
-    $analytics['pending_contracts'] = (int)$db->query("SELECT COUNT(*) FROM staff WHERE status = 'pending'")->fetchColumn();
-    $analytics['performance_reviews_due'] = (int)$db->query("SELECT COUNT(*) FROM staff WHERE date(hire_date, '+1 year') <= date('now')")->fetchColumn();
-    
-    // Financial Metrics
-    $monthly_income = (float)$db->query("SELECT COALESCE(SUM(amount), 0) FROM financial_records WHERE type = 'income' AND date >= date('now', 'start of month')")->fetchColumn();
-    $monthly_expenses = (float)$db->query("SELECT COALESCE(SUM(amount), 0) FROM financial_records WHERE type = 'expense' AND date >= date('now', 'start of month')")->fetchColumn();
-    $quarterly_income = (float)$db->query("SELECT COALESCE(SUM(amount), 0) FROM financial_records WHERE type = 'income' AND date >= date('now', '-3 months')")->fetchColumn();
-    
-    $analytics['monthly_revenue'] = $monthly_income;
-    $analytics['quarterly_revenue'] = $quarterly_income;
-    $analytics['annual_revenue'] = (float)$db->query("SELECT COALESCE(SUM(amount), 0) FROM financial_records WHERE type = 'income' AND date >= date('now', '-1 year')")->fetchColumn();
-    $analytics['profit_margin'] = $monthly_income > 0 ? round((($monthly_income - $monthly_expenses) / $monthly_income) * 100, 1) : 0;
-    $analytics['operational_costs'] = $monthly_expenses;
-    $analytics['cash_flow'] = $monthly_income - $monthly_expenses;
-    $analytics['outstanding_invoices'] = (float)$db->query("SELECT COALESCE(SUM(amount), 0) FROM financial_records WHERE type = 'income' AND status = 'pending'")->fetchColumn();
-    
-    // Project Portfolio
-    $analytics['active_projects'] = (int)$db->query("SELECT COUNT(*) FROM projects WHERE status = 'active'")->fetchColumn();
-    $analytics['completed_this_month'] = (int)$db->query("SELECT COUNT(*) FROM projects WHERE status = 'completed' AND end_date >= date('now', 'start of month')")->fetchColumn();
-    $analytics['pending_approval'] = (int)$db->query("SELECT COUNT(*) FROM projects WHERE status = 'pending'")->fetchColumn();
-    $analytics['overdue_projects'] = (int)$db->query("SELECT COUNT(*) FROM projects WHERE status = 'active' AND end_date < date('now')")->fetchColumn();
-    $analytics['client_satisfaction'] = 4.8; // This would come from client feedback system
-    $analytics['project_revenue'] = (float)$db->query("SELECT COALESCE(SUM(budget), 0) FROM projects WHERE status IN ('active', 'completed')")->fetchColumn();
-    
-    // Platform Analytics
-    $analytics['total_platform_users'] = (int)$db->query("SELECT COALESCE(SUM(users_count), 0) FROM platforms")->fetchColumn();
-    $analytics['platform_revenue'] = (float)$db->query("SELECT COALESCE(SUM(revenue), 0) FROM platforms")->fetchColumn();
-    $analytics['average_uptime'] = (float)$db->query("SELECT COALESCE(AVG(uptime), 99.9) FROM platforms")->fetchColumn();
-    
-    // System & Operations (calculated values)
-    $analytics['system_uptime'] = 99.97;
-    $analytics['security_score'] = 98.5;
-    $analytics['productivity_index'] = 96.7;
-    $analytics['server_load'] = 23.4;
-    $analytics['backup_status'] = 100;
-    
-    // Business Intelligence
-    $analytics['conversion_rate'] = 14.7;
-    $analytics['customer_retention'] = 94.2;
-    $analytics['market_growth'] = 18.5;
-    
-    return $analytics;
-}
+// Get real analytics data (no mock data)
+$analytics = $analytics_provider->getAnalyticsData();
 
-// Get real activity data
+// Get real activity data (no sample data fallback)
 function getRecentActivities($db) {
     $activities = $db->query("
         SELECT type, action, details as person, 
@@ -198,29 +128,6 @@ function getRecentActivities($db) {
         ORDER BY created_at DESC 
         LIMIT 10
     ")->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Add sample activities if none exist
-    if (empty($activities)) {
-        $sample_activities = [
-            ['staff', 'New hire contract signed', 'Sarah Johnson'],
-            ['finance', 'Invoice payment received', 'Acme Corp - £15,400'],
-            ['project', 'Project milestone completed', 'Nexi Bot v3.0'],
-            ['security', 'Security scan completed', 'All systems'],
-            ['staff', 'Time off approved', 'Mike Chen'],
-            ['finance', 'Expense claim processed', 'Travel costs - £890'],
-            ['platform', 'System backup completed', 'Nexi Hub'],
-            ['platform', 'User milestone reached', 'Nexi Digital - 100 users'],
-            ['project', 'Client feedback received', 'Website redesign - 5 stars'],
-            ['security', 'SSL certificate renewed', 'All domains']
-        ];
-        
-        $stmt = $db->prepare("INSERT INTO activity_log (type, action, details) VALUES (?, ?, ?)");
-        foreach ($sample_activities as $activity) {
-            $stmt->execute($activity);
-        }
-        
-        return getRecentActivities($db); // Recursively get the data
-    }
     
     return $activities;
 }

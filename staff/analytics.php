@@ -6,7 +6,19 @@ requireAuth();
 $page_title = "Analytics";
 $page_description = "Platform usage statistics and insights";
 
-// Sample analytics data (in a real app, this would come from your analytics system)
+// Real analytics data from Google Analytics API and database
+require_once __DIR__ . '/../config/api_config.php';
+require_once __DIR__ . '/../includes/RealDataAnalytics.php';
+
+// Database connection
+$db = new PDO("sqlite:" . __DIR__ . "/../database/nexihub.db");
+$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+// Initialize analytics provider
+$analytics_provider = new RealDataAnalytics($db);
+$analytics_data = $analytics_provider->getAnalyticsData();
+
+// Real analytics metrics (no sample data)
 $timeRange = $_GET['range'] ?? '7d';
 
 $analyticsData = [

@@ -26,7 +26,61 @@ if ($_POST && $action) {
     }
 }
 
-// Sample billing data (in a real app, this would come from Stripe)
+// Real billing data from Stripe API
+require_once __DIR__ . '/../config/api_config.php';
+require_once __DIR__ . '/../includes/StripeIntegration.php';
+
+// Initialize Stripe integration
+$stripe = null;
+if (USE_REAL_FINANCIAL_DATA && defined('STRIPE_SECRET_KEY')) {
+    $stripe = new StripeIntegration(STRIPE_SECRET_KEY);
+}
+
+// Get real billing data
+$billing_data = [];
+if ($stripe && $stripe->isConfigured()) {
+    $recent_transactions = $stripe->getRecentTransactions(20);
+    $subscription_metrics = $stripe->getSubscriptionMetrics();
+    
+    $billing_data = [
+        'transactions' => $recent_transactions,
+        'subscription_metrics' => $subscription_metrics,
+        'monthly_revenue' => $stripe->getMonthlyRevenue(),
+        'quarterly_revenue' => $stripe->getQuarterlyRevenue(),
+        'annual_revenue' => $stripe->getAnnualRevenue()
+    ];
+} else {
+    // Fallback to database if Stripe not configured
+    $db = new PDO("sqlite:" . __DIR__ . "/../database/nexihub.db");
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
+    $transactions = $db->query("
+        SELECT amount, description, date as created, status, 'USD' as currency
+        FROM financial_records 
+        WHERE type = 'income' 
+        ORDER BY date DESC 
+        LIMIT 20
+    ")->fetchAll(PDO::FETCH_ASSOC);
+    
+    $monthly_revenue = (float)$db->query("
+        SELECT COALESCE(SUM(amount), 0) FROM financial_records 
+        WHERE type = 'income' AND date >= date('now', 'start of month')
+    ")->fetchColumn();
+    
+    $billing_data = [
+        'transactions' => $transactions,
+        'subscription_metrics' => ['active_subscriptions' => 0, 'monthly_recurring_revenue' => 0],
+        'monthly_revenue' => $monthly_revenue,
+        'quarterly_revenue' => (float)$db->query("
+            SELECT COALESCE(SUM(amount), 0) FROM financial_records 
+            WHERE type = 'income' AND date >= date('now', '-3 months')
+        ")->fetchColumn(),
+        'annual_revenue' => (float)$db->query("
+            SELECT COALESCE(SUM(amount), 0) FROM financial_records 
+            WHERE type = 'income' AND date >= date('now', '-1 year')
+        ")->fetchColumn()
+    ];
+}
 $transactions = [
     ['id' => 'pi_1234567890', 'customer' => 'john@example.com', 'amount' => 999, 'currency' => 'GBP', 'status' => 'succeeded', 'date' => '2024-01-15 14:30:00', 'description' => 'Premium Subscription'],
     ['id' => 'pi_0987654321', 'customer' => 'sarah@example.com', 'amount' => 1999, 'currency' => 'GBP', 'status' => 'succeeded', 'date' => '2024-01-14 09:15:00', 'description' => 'Business Subscription'],

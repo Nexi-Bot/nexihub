@@ -1,0 +1,18 @@
+# Cache Directory
+
+This directory stores temporary cache files for API responses to improve performance and reduce API rate limits.
+
+## Files in this directory:
+- `stripe_cache.json` - Cached Stripe API responses
+- `analytics_cache.json` - Cached analytics data
+- `platform_cache.json` - Cached platform monitoring data
+
+## Cache Duration:
+- Default: 5 minutes (300 seconds)
+- Configurable in `/config/api_config.php`
+
+## Permissions:
+Ensure this directory is writable by the web server:
+```bash
+chmod 755 /path/to/nexihub/cache
+```
