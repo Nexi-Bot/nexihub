@@ -67,17 +67,6 @@ $db->exec("CREATE TABLE IF NOT EXISTS activity_log (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 )");
 
-$db->exec("CREATE TABLE IF NOT EXISTS platforms (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    description TEXT,
-    status TEXT DEFAULT 'active',
-    users_count INTEGER DEFAULT 0,
-    revenue DECIMAL(10,2) DEFAULT 0,
-    uptime DECIMAL(5,2) DEFAULT 99.9,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-)");
-
 // Insert sample data if tables are empty
 $staff_count = $db->query("SELECT COUNT(*) FROM staff")->fetchColumn();
 if ($staff_count == 0) {
@@ -92,21 +81,6 @@ if ($staff_count == 0) {
     $stmt = $db->prepare("INSERT INTO staff (name, email, department, role, status, hire_date, salary) VALUES (?, ?, ?, ?, ?, ?, ?)");
     foreach ($sample_staff as $staff) {
         $stmt->execute($staff);
-    }
-}
-
-// Initialize platform data
-$platform_count = $db->query("SELECT COUNT(*) FROM platforms")->fetchColumn();
-if ($platform_count == 0) {
-    $platforms = [
-        ['Nexi Hub', 'Main business management platform', 'active', 247, 45000, 99.97],
-        ['Nexi Digital', 'Digital marketing and automation suite', 'active', 89, 28000, 99.8],
-        ['Nexi Consulting', 'Professional consulting services platform', 'active', 34, 15000, 99.9]
-    ];
-    
-    $stmt = $db->prepare("INSERT INTO platforms (name, description, status, users_count, revenue, uptime) VALUES (?, ?, ?, ?, ?, ?)");
-    foreach ($platforms as $platform) {
-        $stmt->execute($platform);
     }
 }
 
@@ -154,11 +128,6 @@ function getAnalyticsData($db) {
     $analytics['client_satisfaction'] = 4.8; // This would come from client feedback system
     $analytics['project_revenue'] = (float)$db->query("SELECT COALESCE(SUM(budget), 0) FROM projects WHERE status IN ('active', 'completed')")->fetchColumn();
     
-    // Platform Analytics
-    $analytics['total_platform_users'] = (int)$db->query("SELECT COALESCE(SUM(users_count), 0) FROM platforms")->fetchColumn();
-    $analytics['platform_revenue'] = (float)$db->query("SELECT COALESCE(SUM(revenue), 0) FROM platforms")->fetchColumn();
-    $analytics['average_uptime'] = (float)$db->query("SELECT COALESCE(AVG(uptime), 99.9) FROM platforms")->fetchColumn();
-    
     // System & Operations (calculated values)
     $analytics['system_uptime'] = 99.97;
     $analytics['security_score'] = 98.5;
@@ -191,7 +160,6 @@ function getRecentActivities($db) {
                    WHEN 'finance' THEN 'credit-card'
                    WHEN 'project' THEN 'check-circle'
                    WHEN 'security' THEN 'shield-alt'
-                   WHEN 'platform' THEN 'cogs'
                    ELSE 'info-circle'
                END as icon
         FROM activity_log 
@@ -207,11 +175,7 @@ function getRecentActivities($db) {
             ['project', 'Project milestone completed', 'Nexi Bot v3.0'],
             ['security', 'Security scan completed', 'All systems'],
             ['staff', 'Time off approved', 'Mike Chen'],
-            ['finance', 'Expense claim processed', 'Travel costs - £890'],
-            ['platform', 'System backup completed', 'Nexi Hub'],
-            ['platform', 'User milestone reached', 'Nexi Digital - 100 users'],
-            ['project', 'Client feedback received', 'Website redesign - 5 stars'],
-            ['security', 'SSL certificate renewed', 'All domains']
+            ['finance', 'Expense claim processed', 'Travel costs - £890']
         ];
         
         $stmt = $db->prepare("INSERT INTO activity_log (type, action, details) VALUES (?, ?, ?)");
@@ -238,101 +202,6 @@ function getUserDashboardData($db, $user_id) {
     return $data;
 }
 
-// Handle AJAX requests
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    header('Content-Type: application/json');
-    
-    try {
-        switch ($_POST['action']) {
-            case 'add_staff':
-                $stmt = $db->prepare("INSERT INTO staff (name, email, department, role, hire_date, salary) VALUES (?, ?, ?, ?, ?, ?)");
-                $result = $stmt->execute([
-                    $_POST['name'],
-                    $_POST['email'],
-                    $_POST['department'],
-                    $_POST['role'],
-                    $_POST['hire_date'],
-                    $_POST['salary']
-                ]);
-                
-                if ($result) {
-                    // Log activity
-                    $stmt = $db->prepare("INSERT INTO activity_log (type, action, details) VALUES ('staff', 'New staff member added', ?)");
-                    $stmt->execute([$_POST['name']]);
-                    
-                    echo json_encode(['success' => true, 'message' => 'Staff member added successfully']);
-                } else {
-                    echo json_encode(['success' => false, 'message' => 'Failed to add staff member']);
-                }
-                break;
-                
-            case 'add_project':
-                $stmt = $db->prepare("INSERT INTO projects (name, description, client_name, budget, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?)");
-                $result = $stmt->execute([
-                    $_POST['name'],
-                    $_POST['description'],
-                    $_POST['client_name'],
-                    $_POST['budget'],
-                    $_POST['start_date'],
-                    $_POST['end_date']
-                ]);
-                
-                if ($result) {
-                    // Log activity
-                    $stmt = $db->prepare("INSERT INTO activity_log (type, action, details) VALUES ('project', 'New project created', ?)");
-                    $stmt->execute([$_POST['name']]);
-                    
-                    echo json_encode(['success' => true, 'message' => 'Project created successfully']);
-                } else {
-                    echo json_encode(['success' => false, 'message' => 'Failed to create project']);
-                }
-                break;
-                
-            case 'add_financial_record':
-                $stmt = $db->prepare("INSERT INTO financial_records (type, amount, description, category, date) VALUES (?, ?, ?, ?, ?)");
-                $result = $stmt->execute([
-                    $_POST['type'],
-                    $_POST['amount'],
-                    $_POST['description'],
-                    $_POST['category'],
-                    $_POST['date']
-                ]);
-                
-                if ($result) {
-                    // Log activity
-                    $stmt = $db->prepare("INSERT INTO activity_log (type, action, details) VALUES ('finance', 'Financial record added', ?)");
-                    $stmt->execute([$_POST['description']]);
-                    
-                    echo json_encode(['success' => true, 'message' => 'Financial record added successfully']);
-                } else {
-                    echo json_encode(['success' => false, 'message' => 'Failed to add financial record']);
-                }
-                break;
-                
-            case 'approve_time_off':
-                $stmt = $db->prepare("UPDATE time_off_requests SET status = 'approved' WHERE id = ?");
-                $result = $stmt->execute([$_POST['request_id']]);
-                
-                if ($result) {
-                    // Log activity
-                    $stmt = $db->prepare("INSERT INTO activity_log (type, action, details) VALUES ('staff', 'Time off approved', 'Request #" . $_POST['request_id'] . "')");
-                    $stmt->execute();
-                    
-                    echo json_encode(['success' => true, 'message' => 'Time off request approved']);
-                } else {
-                    echo json_encode(['success' => false, 'message' => 'Failed to approve time off']);
-                }
-                break;
-                
-            default:
-                echo json_encode(['success' => false, 'message' => 'Invalid action']);
-        }
-    } catch (Exception $e) {
-        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
-    }
-    exit;
-}
-
 $analytics = getAnalyticsData($db);
 $recent_activities = getRecentActivities($db);
 $user_dashboard_data = getUserDashboardData($db, $current_user['user_id']);
@@ -346,7 +215,7 @@ include '../includes/header.php';
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
-/* Enhanced Dashboard Styles - Professional Design */
+/* Enhanced Dashboard Styles - Matching Main Site Design */
 .dashboard-container {
     max-width: 1400px;
     margin: 0 auto;
@@ -455,7 +324,7 @@ include '../includes/header.php';
 /* Quick Stats Grid */
 .quick-stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 1.5rem;
     margin-bottom: 3rem;
 }
@@ -652,10 +521,6 @@ include '../includes/header.php';
     transition: all 0.3s ease;
     width: 100%;
     font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
 }
 
 .module-btn:hover {
@@ -738,7 +603,6 @@ include '../includes/header.php';
 .activity-icon.finance { background: #10b981; }
 .activity-icon.project { background: #f59e0b; }
 .activity-icon.security { background: #ef4444; }
-.activity-icon.platform { background: #8b5cf6; }
 
 .activity-details {
     flex-grow: 1;
@@ -758,8 +622,8 @@ include '../includes/header.php';
     gap: 1rem;
 }
 
-/* Platform Management Section */
-.platform-section {
+/* Analytics Section */
+.analytics-section {
     margin-top: 3rem;
 }
 
@@ -773,14 +637,14 @@ include '../includes/header.php';
     gap: 1rem;
 }
 
-.platform-grid {
+.analytics-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     gap: 2rem;
     margin-top: 2rem;
 }
 
-.platform-card {
+.chart-card {
     background: var(--background-light);
     border: 1px solid var(--border-color);
     border-radius: 20px;
@@ -788,196 +652,84 @@ include '../includes/header.php';
     transition: all 0.3s ease;
 }
 
-.platform-card:hover {
+.chart-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 20px 40px var(--shadow-medium);
     border-color: var(--primary-color);
 }
 
-.platform-header {
+.chart-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
 }
 
-.platform-title {
+.chart-title {
     font-size: 1.3rem;
     font-weight: 600;
     color: var(--text-primary);
     margin: 0;
 }
 
-.platform-status {
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.platform-status.active {
-    background: rgba(16, 185, 129, 0.2);
-    color: #10b981;
-}
-
-.platform-metrics {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.platform-metric {
-    text-align: center;
-    padding: 1rem;
-    background: var(--background-dark);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-}
-
-.metric-value {
-    font-size: 1.3rem;
-    font-weight: 700;
+.chart-value {
+    font-size: 1.8rem;
+    font-weight: 800;
     color: var(--primary-color);
-    margin-bottom: 0.25rem;
     font-family: 'JetBrains Mono', monospace;
 }
 
-.metric-label {
-    font-size: 0.7rem;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* Modal Styles */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 10000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(5px);
-    justify-content: center;
+.chart-placeholder {
+    height: 200px;
+    background: var(--background-dark);
+    border-radius: 12px;
+    display: flex;
     align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-style: italic;
+    border: 1px solid var(--border-color);
 }
 
-.modal-content {
+/* Performance Indicators */
+.performance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.performance-card {
     background: var(--background-light);
     border: 1px solid var(--border-color);
-    border-radius: 20px;
-    width: 90%;
-    max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.modal-header {
-    padding: 2rem 2rem 1rem;
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-header h3 {
-    margin: 0;
-    color: var(--text-primary);
-    font-size: 1.4rem;
-    font-weight: 700;
-}
-
-.modal-close {
-    font-size: 1.5rem;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: color 0.3s ease;
-}
-
-.modal-close:hover {
-    color: var(--text-primary);
-}
-
-.modal-body {
-    padding: 2rem;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: var(--text-primary);
-    font-weight: 600;
-}
-
-.form-input,
-.form-select,
-.form-textarea {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background: var(--background-dark);
-    color: var(--text-primary);
-    font-size: 0.95rem;
-}
-
-.form-input:focus,
-.form-select:focus,
-.form-textarea:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.form-textarea {
-    resize: vertical;
-    min-height: 80px;
-}
-
-.modal-footer {
-    padding: 1rem 2rem 2rem;
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-}
-
-.btn-primary,
-.btn-secondary {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
     transition: all 0.3s ease;
 }
 
-.btn-primary {
-    background: var(--primary-color);
-    color: white;
+.performance-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary-color);
 }
 
-.btn-primary:hover {
-    background: var(--secondary-color);
-    transform: translateY(-2px);
+.performance-score {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
 }
 
-.btn-secondary {
-    background: var(--background-dark);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-}
+.performance-score.excellent { color: #10b981; }
+.performance-score.good { color: #f59e0b; }
+.performance-score.warning { color: #ef4444; }
 
-.btn-secondary:hover {
-    background: var(--border-color);
+.performance-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
 }
 
 /* Responsive Design */
@@ -1006,7 +758,7 @@ include '../includes/header.php';
         grid-template-columns: 1fr;
     }
     
-    .platform-grid {
+    .analytics-grid {
         grid-template-columns: 1fr;
     }
 }
@@ -1027,6 +779,24 @@ include '../includes/header.php';
     }
 }
 
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--background-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-color);
+}
+
 /* Loading Animation */
 @keyframes pulse {
     0%, 100% {
@@ -1041,30 +811,24 @@ include '../includes/header.php';
     animation: pulse 2s infinite;
 }
 
-/* Notification System */
-.notification-container {
+/* Notification Styles */
+.notification {
     position: fixed;
     top: 20px;
     right: 20px;
-    z-index: 10001;
-    pointer-events: none;
-}
-
-.notification {
     background: var(--background-light);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 1rem 1.5rem;
     color: var(--text-primary);
     box-shadow: 0 10px 30px var(--shadow-medium);
-    margin-bottom: 0.5rem;
+    z-index: 10000;
     display: flex;
     align-items: center;
     gap: 0.75rem;
     min-width: 300px;
     transform: translateX(400px);
     transition: all 0.3s ease;
-    pointer-events: auto;
 }
 
 .notification.show {
@@ -1073,39 +837,14 @@ include '../includes/header.php';
 
 .notification.success {
     border-color: #10b981;
-    background: rgba(16, 185, 129, 0.1);
 }
 
 .notification.error {
     border-color: #ef4444;
-    background: rgba(239, 68, 68, 0.1);
 }
 
 .notification.info {
     border-color: var(--primary-color);
-    background: rgba(59, 130, 246, 0.1);
-}
-
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(100%);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes slideOutRight {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateX(100%);
-    }
 }
 </style>
 
@@ -1125,16 +864,12 @@ include '../includes/header.php';
                 <a href="#" class="action-btn" onclick="showNotifications()">
                     <i class="fas fa-bell"></i>
                     Notifications
-                    <?php if ($current_user['notifications'] > 0): ?>
                     <span class="notification-badge"><?= $current_user['notifications'] ?></span>
-                    <?php endif; ?>
                 </a>
                 <a href="#" class="action-btn" onclick="showMessages()">
                     <i class="fas fa-envelope"></i>
                     Messages
-                    <?php if ($current_user['unread_messages'] > 0): ?>
                     <span class="notification-badge"><?= $current_user['unread_messages'] ?></span>
-                    <?php endif; ?>
                 </a>
                 <a href="#" class="action-btn" onclick="showProfile()">
                     <i class="fas fa-user-cog"></i>
@@ -1169,10 +904,10 @@ include '../includes/header.php';
             <div class="stat-change positive">+<?= $analytics['completed_this_month'] ?> completed</div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon"><i class="fas fa-layer-group"></i></div>
-            <div class="stat-value"><?= $analytics['total_platform_users'] ?></div>
-            <div class="stat-label">Platform Users</div>
-            <div class="stat-change positive">Across all platforms</div>
+            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="stat-value"><?= $analytics['productivity_index'] ?>%</div>
+            <div class="stat-label">Productivity</div>
+            <div class="stat-change positive">+2.3% vs last month</div>
         </div>
         <div class="stat-card">
             <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
@@ -1182,9 +917,9 @@ include '../includes/header.php';
         </div>
         <div class="stat-card">
             <div class="stat-icon"><i class="fas fa-server"></i></div>
-            <div class="stat-value"><?= $analytics['average_uptime'] ?>%</div>
+            <div class="stat-value"><?= $analytics['system_uptime'] ?>%</div>
             <div class="stat-label">System Uptime</div>
-            <div class="stat-change positive">All platforms</div>
+            <div class="stat-change positive">99.97% average</div>
         </div>
     </div>
 
@@ -1222,11 +957,11 @@ include '../includes/header.php';
                     </div>
                 </div>
                 <div class="module-actions">
-                    <button class="module-btn" onclick="openStaffModal()">
-                        <i class="fas fa-user-plus"></i> Add Staff Member
+                    <button class="module-btn" onclick="openStaffManagement()">
+                        <i class="fas fa-user-plus"></i> Manage Staff
                     </button>
-                    <button class="module-btn secondary" onclick="openStaffManagement()">
-                        Manage Staff
+                    <button class="module-btn secondary" onclick="viewStaffReports()">
+                        View Reports
                     </button>
                 </div>
             </div>
@@ -1243,15 +978,15 @@ include '../includes/header.php';
                 <div class="module-content">
                     <div class="module-stats">
                         <div class="mini-stat">
-                            <div class="mini-stat-value">£<?= number_format($analytics['cash_flow']/1000, 1) ?>K</div>
+                            <div class="mini-stat-value">£<?= number_format($analytics['cash_flow']/1000) ?>K</div>
                             <div class="mini-stat-label">Cash Flow</div>
                         </div>
                         <div class="mini-stat">
-                            <div class="mini-stat-value">£<?= number_format($analytics['outstanding_invoices']/1000, 1) ?>K</div>
+                            <div class="mini-stat-value">£<?= number_format($analytics['outstanding_invoices']/1000) ?>K</div>
                             <div class="mini-stat-label">Outstanding</div>
                         </div>
                         <div class="mini-stat">
-                            <div class="mini-stat-value">£<?= number_format($analytics['operational_costs']/1000, 1) ?>K</div>
+                            <div class="mini-stat-value">£<?= number_format($analytics['operational_costs']/1000) ?>K</div>
                             <div class="mini-stat-label">Op Costs</div>
                         </div>
                         <div class="mini-stat">
@@ -1261,11 +996,11 @@ include '../includes/header.php';
                     </div>
                 </div>
                 <div class="module-actions">
-                    <button class="module-btn" onclick="openFinancialModal()">
-                        <i class="fas fa-plus"></i> Add Financial Record
+                    <button class="module-btn" onclick="openFinancialDashboard()">
+                        <i class="fas fa-calculator"></i> Financial Dashboard
                     </button>
-                    <button class="module-btn secondary" onclick="openFinancialDashboard()">
-                        Financial Dashboard
+                    <button class="module-btn secondary" onclick="generateFinancialReport()">
+                        Generate Report
                     </button>
                 </div>
             </div>
@@ -1300,11 +1035,11 @@ include '../includes/header.php';
                     </div>
                 </div>
                 <div class="module-actions">
-                    <button class="module-btn" onclick="openProjectModal()">
-                        <i class="fas fa-plus"></i> New Project
+                    <button class="module-btn" onclick="openProjectPortfolio()">
+                        <i class="fas fa-tasks"></i> Project Dashboard
                     </button>
-                    <button class="module-btn secondary" onclick="openProjectPortfolio()">
-                        Project Dashboard
+                    <button class="module-btn secondary" onclick="createNewProject()">
+                        New Project
                     </button>
                 </div>
             </div>
@@ -1329,7 +1064,7 @@ include '../includes/header.php';
                             <div class="mini-stat-label">Backup</div>
                         </div>
                         <div class="mini-stat">
-                            <div class="mini-stat-value"><?= number_format($analytics['server_load'], 1) ?>%</div>
+                            <div class="mini-stat-value"><?= $analytics['server_load'] ?>%</div>
                             <div class="mini-stat-label">Load</div>
                         </div>
                         <div class="mini-stat">
@@ -1452,197 +1187,188 @@ include '../includes/header.php';
         </div>
     </div>
 
-    <!-- Platform Management Section -->
-    <div class="platform-section">
+<script>
+// Enhanced notification system
+function showNotification(message, type = 'info', duration = 3000) {
+    const notification = document.createElement('div');
+    const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
+    const bgColor = type === 'success' ? 'rgba(16, 185, 129, 0.2)' : type === 'error' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(59, 130, 246, 0.2)';
+    
+    notification.innerHTML = `
+        <i class="fas fa-${icon}"></i>
+        ${message}
+    `;
+    
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${bgColor};
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        color: white;
+        z-index: 10001;
+        animation: slideInRight 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        max-width: 350px;
+        font-weight: 500;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => {
+            if (document.body.contains(notification)) {
+                document.body.removeChild(notification);
+            }
+        }, 300);
+    }, duration);
+}
+
+// Enhanced report generation
+function generateReports() {
+    showNotification('Initializing report generation system...', 'info');
+    
+    setTimeout(() => {
+        showNotification('Analyzing data across all companies...', 'info');
+    }, 1000);
+    
+    setTimeout(() => {
+        showNotification('Generating financial insights...', 'info');
+    }, 2000);
+    
+    setTimeout(() => {
+        showNotification('Compiling workforce analytics...', 'info');
+    }, 3000);
+    
+    setTimeout(() => {
+        showNotification('Reports generated successfully. Check your downloads folder.', 'success', 5000);
+    }, 4000);
+}
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    // Show welcome message
+    setTimeout(() => {
+        showNotification('Welcome to your Executive Command Center. All systems operational.', 'success', 6000);
+    }, 1500);
+    
+    // Simulate real-time updates
+    setInterval(() => {
+        const stats = document.querySelectorAll('.stat-value');
+        stats.forEach(stat => {
+            if (Math.random() > 0.95) { // 5% chance to update
+                stat.style.transform = 'scale(1.1)';
+                stat.style.color = '#10b981';
+                setTimeout(() => {
+                    stat.style.transform = 'scale(1)';
+                    stat.style.color = 'white';
+                }, 500);
+            }
+        });
+    }, 5000);
+    
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', function(event) {
+        if (event.ctrlKey && event.shiftKey) {
+            switch(event.key) {
+                case 'R':
+                    event.preventDefault();
+                    generateReports();
+                    break;
+                case 'N':
+                    event.preventDefault();
+                    showNotification('🚀 Quick action: New staff member modal would open here', 'info');
+                    break;
+            }
+        }
+    });
+});
+
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(100%); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    
+    @keyframes slideOutRight {
+        from { opacity: 1; transform: translateX(0); }
+        to { opacity: 0; transform: translateX(100%); }
+    }
+    
+    .hero-stat:hover .stat-icon {
+    <!-- Analytics & Performance Section -->
+    <div class="analytics-section">
         <h2 class="section-title">
-            <i class="fas fa-layer-group"></i>
-            Platform Management
+            <i class="fas fa-chart-line"></i>
+            Business Analytics & Performance
         </h2>
         
-        <div class="platform-grid">
-            <?php 
-            $platforms = $db->query("SELECT * FROM platforms ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
-            foreach($platforms as $platform): 
-            ?>
-            <div class="platform-card">
-                <div class="platform-header">
-                    <h3 class="platform-title"><?= htmlspecialchars($platform['name']) ?></h3>
-                    <span class="platform-status <?= $platform['status'] ?>"><?= ucfirst($platform['status']) ?></span>
+        <div class="analytics-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">Revenue Trend</h3>
+                    <div class="chart-value">£<?= number_format($analytics['quarterly_revenue']) ?></div>
                 </div>
-                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;"><?= htmlspecialchars($platform['description']) ?></p>
-                <div class="platform-metrics">
-                    <div class="platform-metric">
-                        <div class="metric-value"><?= number_format($platform['users_count']) ?></div>
-                        <div class="metric-label">Users</div>
-                    </div>
-                    <div class="platform-metric">
-                        <div class="metric-value">£<?= number_format($platform['revenue']/1000, 1) ?>K</div>
-                        <div class="metric-label">Revenue</div>
-                    </div>
-                    <div class="platform-metric">
-                        <div class="metric-value"><?= $platform['uptime'] ?>%</div>
-                        <div class="metric-label">Uptime</div>
-                    </div>
+                <div class="chart-placeholder">
+                    <i class="fas fa-chart-area"></i> Live revenue analytics chart
                 </div>
-                <button class="module-btn" onclick="managePlatform('<?= $platform['name'] ?>')">
-                    <i class="fas fa-cog"></i> Manage Platform
-                </button>
             </div>
-            <?php endforeach; ?>
+            
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">Project Pipeline</h3>
+                    <div class="chart-value"><?= $analytics['active_projects'] ?> Active</div>
+                </div>
+                <div class="chart-placeholder">
+                    <i class="fas fa-tasks"></i> Project status breakdown
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">Team Performance</h3>
+                    <div class="chart-value"><?= $analytics['productivity_index'] ?>%</div>
+                </div>
+                <div class="chart-placeholder">
+                    <i class="fas fa-users-cog"></i> Staff productivity metrics
+                </div>
+            </div>
+        </div>
+        
+        <!-- Performance Indicators -->
+        <div class="performance-grid">
+            <div class="performance-card">
+                <div class="performance-score excellent"><?= $analytics['security_score'] ?>%</div>
+                <div class="performance-label">Security Score</div>
+            </div>
+            <div class="performance-card">
+                <div class="performance-score excellent"><?= $analytics['system_uptime'] ?>%</div>
+                <div class="performance-label">System Uptime</div>
+            </div>
+            <div class="performance-card">
+                <div class="performance-score good"><?= $analytics['customer_retention'] ?>%</div>
+                <div class="performance-label">Client Retention</div>
+            </div>
+            <div class="performance-card">
+                <div class="performance-score excellent"><?= $analytics['market_growth'] ?>%</div>
+                <div class="performance-label">Market Growth</div>
+            </div>
         </div>
     </div>
 </div>
-
-<!-- Staff Modal -->
-<div id="staffModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Add New Staff Member</h3>
-            <span class="modal-close" onclick="closeModal('staffModal')">&times;</span>
-        </div>
-        <div class="modal-body">
-            <form id="staffForm" onsubmit="addStaff(event)">
-                <div class="form-group">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" name="name" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email Address</label>
-                    <input type="email" name="email" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Department</label>
-                    <select name="department" class="form-select" required>
-                        <option value="">Select Department</option>
-                        <option value="Development">Development</option>
-                        <option value="Design">Design</option>
-                        <option value="Operations">Operations</option>
-                        <option value="Marketing">Marketing</option>
-                        <option value="Sales">Sales</option>
-                        <option value="Finance">Finance</option>
-                        <option value="HR">Human Resources</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Role</label>
-                    <input type="text" name="role" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Hire Date</label>
-                    <input type="date" name="hire_date" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Annual Salary (£)</label>
-                    <input type="number" name="salary" class="form-input" min="0" step="100" required>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeModal('staffModal')">Cancel</button>
-                    <button type="submit" class="btn-primary">Add Staff Member</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Project Modal -->
-<div id="projectModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Create New Project</h3>
-            <span class="modal-close" onclick="closeModal('projectModal')">&times;</span>
-        </div>
-        <div class="modal-body">
-            <form id="projectForm" onsubmit="addProject(event)">
-                <div class="form-group">
-                    <label class="form-label">Project Name</label>
-                    <input type="text" name="name" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <textarea name="description" class="form-textarea" rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Client Name</label>
-                    <input type="text" name="client_name" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Budget (£)</label>
-                    <input type="number" name="budget" class="form-input" min="0" step="100" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Start Date</label>
-                    <input type="date" name="start_date" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Expected End Date</label>
-                    <input type="date" name="end_date" class="form-input" required>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeModal('projectModal')">Cancel</button>
-                    <button type="submit" class="btn-primary">Create Project</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Financial Record Modal -->
-<div id="financialModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Add Financial Record</h3>
-            <span class="modal-close" onclick="closeModal('financialModal')">&times;</span>
-        </div>
-        <div class="modal-body">
-            <form id="financialForm" onsubmit="addFinancialRecord(event)">
-                <div class="form-group">
-                    <label class="form-label">Type</label>
-                    <select name="type" class="form-select" required>
-                        <option value="">Select Type</option>
-                        <option value="income">Income</option>
-                        <option value="expense">Expense</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Amount (£)</label>
-                    <input type="number" name="amount" class="form-input" min="0" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <input type="text" name="description" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Category</label>
-                    <select name="category" class="form-select" required>
-                        <option value="">Select Category</option>
-                        <option value="revenue">Revenue</option>
-                        <option value="salaries">Salaries</option>
-                        <option value="office_expenses">Office Expenses</option>
-                        <option value="marketing">Marketing</option>
-                        <option value="software">Software</option>
-                        <option value="travel">Travel</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Date</label>
-                    <input type="date" name="date" class="form-input" required>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeModal('financialModal')">Cancel</button>
-                    <button type="submit" class="btn-primary">Add Record</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Notification Container -->
-<div class="notification-container" id="notificationContainer"></div>
 
 <script>
-// Professional Dashboard Management System
-class ExecutiveDashboard {
+// Enhanced Dashboard JavaScript
+class NexiDashboard {
     constructor() {
         this.init();
     }
@@ -1650,56 +1376,32 @@ class ExecutiveDashboard {
     init() {
         this.setupEventListeners();
         this.startRealtimeUpdates();
-        this.showWelcomeMessage();
+        this.initializeNotifications();
     }
     
     setupEventListeners() {
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (event) => {
-            if (event.ctrlKey && event.shiftKey) {
-                switch(event.key) {
-                    case 'S':
-                        event.preventDefault();
-                        openStaffModal();
-                        break;
-                    case 'P':
-                        event.preventDefault();
-                        openProjectModal();
-                        break;
-                    case 'F':
-                        event.preventDefault();
-                        openFinancialModal();
-                        break;
-                }
-            }
-        });
-        
-        // Close modals on escape
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') {
-                this.closeAllModals();
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            this.showWelcomeMessage();
         });
     }
     
     showWelcomeMessage() {
         setTimeout(() => {
-            this.showNotification('Executive Command Center loaded successfully. All systems operational.', 'success', 5000);
+            this.    showNotification('Executive Dashboard loaded! All systems operational.', 'success', 5000);
         }, 1000);
     }
     
     startRealtimeUpdates() {
-        // Simulate real-time stat updates
         setInterval(() => {
-            this.updateStatCards();
-        }, 30000); // Update every 30 seconds
+            this.updateStats();
+        }, 30000);
     }
     
-    updateStatCards() {
+    updateStats() {
         const statCards = document.querySelectorAll('.stat-value');
         statCards.forEach(card => {
-            if (Math.random() > 0.85) { // 15% chance to update
-                card.style.transform = 'scale(1.05)';
+            if (Math.random() > 0.8) {
+                card.style.transform = 'scale(1.1)';
                 card.style.color = 'var(--primary-color)';
                 setTimeout(() => {
                     card.style.transform = 'scale(1)';
@@ -1710,271 +1412,243 @@ class ExecutiveDashboard {
     }
     
     showNotification(message, type = 'info', duration = 3000) {
-        const container = document.getElementById('notificationContainer');
         const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
         
         const icons = {
             success: 'check-circle',
-            error: 'exclamation-circle',
-            info: 'info-circle'
-        };
-        
-        notification.className = `notification ${type}`;
-        notification.innerHTML = `
+                    <button type="button" class="btn-secondary" onclick="closeModal('projectModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Project</button>
+                </div>exclamation-circle'
+            </form>
+        </div>
+    </div>tification.innerHTML = `
             <i class="fas fa-${icons[type]}"></i>
-            <span>${message}</span>
-        `;
-        
-        container.appendChild(notification);
-        
-        // Show notification
-        setTimeout(() => {
-            notification.classList.add('show');
-        }, 100);
-        
-        // Remove notification
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                if (container.contains(notification)) {
-                    container.removeChild(notification);
-                }
-            }, 300);
-        }, duration);
-    }
-    
-    closeAllModals() {
-        const modals = document.querySelectorAll('.modal');
-        modals.forEach(modal => {
-            modal.style.display = 'none';
-        });
-        document.body.style.overflow = 'auto';
-    }
-}
-
-// Global notification function
+    <!-- Financial Record Modal -->
+    <div id="financialModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">fication);
+                <h3>Add Financial Record</h3>
+                <span class="modal-close" onclick="closeModal('financialModal')">&times;</span>
+            </div>cation.classList.add('show');
+            <form id="financialForm" onsubmit="addFinancialRecord(event)">
+                <div class="form-group">
+                    <label for="financial_type">Type</label>
+                    <select id="financial_type" name="type" required>
+                        <option value="">Select Type</option>
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="financial_amount">Amount (£)</label>
+                    <input type="number" id="financial_amount" name="amount" min="0" step="0.01" required>
+                </div>tions() {
+                <div class="form-group">
+                    <label for="financial_description">Description</label>s secure', 'success');
+                    <input type="text" id="financial_description" name="description" required>
+                </div>
+                <div class="form-group">
+                    <label for="financial_category">Category</label>r review', 'info');
+                    <select id="financial_category" name="category" required>
+                        <option value="">Select Category</option>
+                        <option value="Subscription">Subscription Revenue</option>
+                        <option value="Consulting">Consulting</option>
+                        <option value="Support">Support Contracts</option>
+                        <option value="Overhead">Overhead</option>
+                        <option value="Technology">Technology</option>info');
+                        <option value="Marketing">Marketing</option>
+                        <option value="Salaries">Salaries</option> successfully', 'success');
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="financial_date">Date</label>nter...', 'info');
+                    <input type="date" id="financial_date" name="date" required>
+                </div>Notification('Financial dashboard ready - All accounts reconciled', 'success');
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal('financialModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Add Record</button>
+                </div>rtfolio() {
+            </form>otification('Initializing Project Portfolio Manager...', 'info');
+        </div>(() => {
+    </div>shboard.showNotification('Project portfolio loaded - 47 active projects tracked', 'success');
+    }, 1500);
+<script>
+// Enhanced notification system
 function showNotification(message, type = 'info', duration = 3000) {
-    if (window.dashboard) {
-        window.dashboard.showNotification(message, type, duration);
-    }
+    const notification = document.createElement('div');trol Center...', 'info');
+    const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
+    const bgColor = type === 'success' ? 'rgba(16, 185, 129, 0.2)' : type === 'error' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(59, 130, 246, 0.2)';
+    }, 1500);
+    notification.innerHTML = `
+        <i class="fas fa-${icon}"></i>
+        ${message}essIntelligence() {
+    `;shboard.showNotification('Activating Business Intelligence Engine...', 'info');
+    setTimeout(() => {
+    notification.style.cssText = `('AI analytics ready - Insights generated', 'success');
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${bgColor};
+        backdrop-filter: blur(20px);ing Client Relations Portal...', 'info');
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;cation('Client portal ready - 127 active clients managed', 'success');
+        padding: 1rem 1.5rem;
+        color: white;
+        z-index: 10001;
+        animation: slideInRight 0.3s ease;
+        display: flex;fication('Opening Staff Onboarding System...', 'info');
+        align-items: center;
+        gap: 0.5rem;owNotification('Onboarding portal loaded - 5 new contracts ready', 'success');
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        max-width: 350px;
+        font-weight: 500;
+    `;on viewStaffReports() {
+    dashboard.showNotification('Generating staff performance reports...', 'info');
+    document.body.appendChild(notification);
+        dashboard.showNotification('Staff reports generated successfully', 'success');
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => {
+            if (document.body.contains(notification)) {
+                document.body.removeChild(notification);e financial analysis...', 'info');
+            }t(() => {
+        }, 300);d.showNotification('💰 Financial report complete - £892K monthly revenue', 'success');
+    }, duration);
 }
 
-// Modal Management Functions
-function showModal(modalId) {
+// Enhanced report generation
+function generateReports() {on('🔨 Opening project creation wizard...', 'info');
+    showNotification('Initializing report generation system...', 'info');
+        dashboard.showNotification('📝 Project template loaded successfully', 'success');
+    setTimeout(() => {
+        showNotification('Analyzing data across all companies...', 'info');
+    }, 1000);
+    tion generateInsights() {
+    setTimeout(() => {fication('🤖 AI analyzing business patterns...', 'info');
+        showNotification('Generating financial insights...', 'info');
+    }, 2000);oard.showNotification('✨ AI insights ready - 18.5% growth opportunity identified', 'success');
+    }, 3500);
+    setTimeout(() => {
+        showNotification('Compiling workforce analytics...', 'info');
+    }, 3000);geClientSuccess() {
+    dashboard.showNotification('📈 Loading client success metrics...', 'info');
+    setTimeout(() => {
+        showNotification('Reports generated successfully. Check your downloads folder.', 'success', 5000);
+    }, 4000);
+}
+
+// Modal Management Functionsons() {
+function showModal(modalId) {3 require attention', 'info');
     document.getElementById(modalId).style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
-
+.showNotification('💬 8 unread messages from team leads', 'info');
 function closeModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
-    document.body.style.overflow = 'auto';
-}
-
-// Modal Opening Functions
-function openStaffModal() {
-    showModal('staffModal');
-}
-
-function openProjectModal() {
-    showModal('projectModal');
-}
-
-function openFinancialModal() {
-    showModal('financialModal');
-}
+    document.body.style.overflow = 'auto';{
+}nfo');
 
 // AJAX Helper Function
 async function makeAjaxRequest(action, data = {}) {
     try {
         const formData = new FormData();
         formData.append('action', action);
-        
-        for (const key in data) {
-            formData.append(key, data[key]);
-        }
-        
-        const response = await fetch(window.location.href, {
+        vent) {
+        for (const [key, value] of Object.entries(data)) { event.shiftKey) {
+            formData.append(key, value);h(event.key) {
+        } case 'S':
+           event.preventDefault();
+        const response = await fetch(window.location.href, {            openStaffManagement();
             method: 'POST',
             body: formData
         });
-        
-        return await response.json();
-    } catch (error) {
-        console.error('AJAX Error:', error);
+        shboard();
+        const result = await response.json();
+        return result;
+    } catch (error) {;
+        console.error('AJAX Error:', error);tPortfolio();
         return { success: false, message: 'Network error occurred' };
     }
 }
-
-// CRUD Functions
-async function addStaff(event) {
-    event.preventDefault();
-    
-    const formData = new FormData(event.target);
+ionsCenter();
+// Staff Management Functions   break;
+async function addStaff(event) {   case 'I':
+    event.preventDefault();         event.preventDefault();
+                 generateInsights();
+    const formData = new FormData(event.target);                break;
     const data = Object.fromEntries(formData.entries());
     
-    showNotification('Adding new staff member...', 'info');
+    dashboard.showNotification('Adding new staff member...', 'info');
     
     const result = await makeAjaxRequest('add_staff', data);
     
-    if (result.success) {
-        showNotification('Staff member added successfully', 'success');
+    if (result.success) {hreshold: 0.1,
+        dashboard.showNotification(result.message, 'success');rootMargin: '0px 0px -50px 0px'
         closeModal('staffModal');
         event.target.reset();
-        setTimeout(() => location.reload(), 1500);
-    } else {
-        showNotification(result.message, 'error');
-    }
+        refreshDashboard();{
+    } else {ntries.forEach(entry => {
+        dashboard.showNotification(result.message, 'error');    if (entry.isIntersecting) {
+    }imation = 'pulse 0.6s ease-in-out';
 }
-
+animation = '';
+// Project Management Functions
 async function addProject(event) {
     event.preventDefault();
-    
+    tions);
     const formData = new FormData(event.target);
-    const data = Object.fromEntries(formData.entries());
+    const data = Object.fromEntries(formData.entries());d, .module-card').forEach(card => {
     
-    showNotification('Creating new project...', 'info');
+    dashboard.showNotification('Creating new project...', 'info');
     
     const result = await makeAjaxRequest('add_project', data);
-    
-    if (result.success) {
-        showNotification('Project created successfully', 'success');
-        closeModal('projectModal');
-        event.target.reset();
-        setTimeout(() => location.reload(), 1500);
-    } else {
-        showNotification(result.message, 'error');
-    }
-}
-
-async function addFinancialRecord(event) {
-    event.preventDefault();
-    
-    const formData = new FormData(event.target);
-    const data = Object.fromEntries(formData.entries());
-    
-    showNotification('Adding financial record...', 'info');
-    
-    const result = await makeAjaxRequest('add_financial_record', data);
-    
-    if (result.success) {
-        showNotification('Financial record added successfully', 'success');
-        closeModal('financialModal');
-        event.target.reset();
-        setTimeout(() => location.reload(), 1500);
-    } else {
-        showNotification(result.message, 'error');
-    }
-}
-
-// Module Action Functions
-function openStaffManagement() {
-    showNotification('Opening Staff Management Portal...', 'info');
-    setTimeout(() => {
-        showNotification('Staff management system loaded successfully', 'success');
-    }, 1500);
-}
-
-function openFinancialDashboard() {
-    showNotification('Loading Financial Control Center...', 'info');
-    setTimeout(() => {
-        showNotification('Financial dashboard ready - All accounts reconciled', 'success');
-    }, 2000);
-}
-
-function openProjectPortfolio() {
-    showNotification('Initializing Project Portfolio Manager...', 'info');
-    setTimeout(() => {
-        showNotification('Project portfolio loaded - 47 active projects tracked', 'success');
-    }, 1500);
-}
-
-function openOperationsCenter() {
-    showNotification('Starting Operations Control Center...', 'info');
-    setTimeout(() => {
-        showNotification('Operations center active - 3 approvals pending', 'success');
-    }, 1500);
-}
-
-function openBusinessIntelligence() {
-    showNotification('Activating Business Intelligence Engine...', 'info');
-    setTimeout(() => {
-        showNotification('AI analytics ready - Insights generated', 'success');
-    }, 2000);
-}
-
-function openClientPortal() {
-    showNotification('Loading Client Relations Portal...', 'info');
-    setTimeout(() => {
-        showNotification('Client portal ready - 127 active clients managed', 'success');
-    }, 1500);
-}
-
-function manageOnboarding() {
-    showNotification('Opening Staff Onboarding System...', 'info');
-    setTimeout(() => {
-        showNotification('Onboarding portal loaded - 5 new contracts ready', 'success');
-    }, 1500);
-}
-
-function generateInsights() {
-    showNotification('AI analyzing business patterns...', 'info');
-    setTimeout(() => {
-        showNotification('AI insights ready - 18.5% growth opportunity identified', 'success');
-    }, 3500);
-}
-
-function manageClientSuccess() {
-    showNotification('Loading client success metrics...', 'info');
-    setTimeout(() => {
-        showNotification('Client satisfaction: 4.8/5 stars', 'success');
-    }, 1500);
-}
-
-function managePlatform(platformName) {
-    showNotification(`Loading ${platformName} management interface...`, 'info');
-    setTimeout(() => {
-        showNotification(`${platformName} management portal ready`, 'success');
-    }, 1500);
-}
-
-// Header Action Functions
-function showNotifications() {
-    showNotification('12 new notifications - 3 require attention', 'info');
-}
-
-function showMessages() {
-    showNotification('8 unread messages from team leads', 'info');
-}
-
-function showProfile() {
-    showNotification('Loading user profile...', 'info');
-}
-
-// Initialize dashboard
-document.addEventListener('DOMContentLoaded', function() {
-    window.dashboard = new ExecutiveDashboard();
-    
-    // Add smooth animations to cards
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.animation = 'pulse 0.6s ease-in-out';
-                setTimeout(() => {
-                    entry.target.style.animation = '';
-                }, 600);
-            }
-        });
-    }, observerOptions);
-    
-    document.querySelectorAll('.stat-card, .module-card, .platform-card').forEach(card => {
-        observer.observe(card);
-    });
-});
-</script>
-
-<?php include '../includes/footer.php'; ?>
+    udes/footer.php'; ?>
+    if (result.success) {        dashboard.showNotification(result.message, 'success');        closeModal('projectModal');        event.target.reset();        refreshDashboard();    } else {        dashboard.showNotification(result.message, 'error');    }}// Financial Management Functionsasync function addFinancialRecord(event) {    event.preventDefault();        const formData = new FormData(event.target);    const data = Object.fromEntries(formData.entries());        dashboard.showNotification('Adding financial record...', 'info');        const result = await makeAjaxRequest('add_financial_record', data);        if (result.success) {        dashboard.showNotification(result.message, 'success');        closeModal('financialModal');        event.target.reset();        refreshDashboard();    } else {        dashboard.showNotification(result.message, 'error');    }}// Dashboard Refresh Functionfunction refreshDashboard() {    setTimeout(() => {        window.location.reload();    }, 1500);}// Enhanced Business Intelligence Functionsasync function generateInsights() {    dashboard.showNotification('AI analyzing business patterns...', 'info');        // Simulate AI analysis    setTimeout(() => {        const insights = [            'Revenue growth trend: +18.5% compared to last quarter',            'Staff productivity increased by 12% this month',            'Project completion rate improved to 94.2%',            'Customer satisfaction score: 4.8/5 stars',            'Opportunity identified: Expand consulting services'        ];                const randomInsight = insights[Math.floor(Math.random() * insights.length)];        dashboard.showNotification(`AI Insight: ${randomInsight}`, 'success', 8000);    }, 3500);}// Enhanced Operations Functionsasync function openOperationsCenter() {    dashboard.showNotification('Operations Control Center activated', 'info');        // Simulate loading operations data    setTimeout(() => {        dashboard.showNotification('3 approval requests pending review', 'info');    }, 1000);}async function manageOnboarding() {    dashboard.showNotification('Staff Onboarding System loaded', 'info');        setTimeout(() => {        dashboard.showNotification('5 new employee contracts ready for processing', 'success');    }, 1500);}async function viewStaffReports() {    dashboard.showNotification('Generating comprehensive staff reports...', 'info');        setTimeout(() => {        dashboard.showNotification('Staff performance reports generated successfully', 'success');    }, 2000);}async function generateFinancialReport() {    dashboard.showNotification('Creating comprehensive financial analysis...', 'info');        setTimeout(() => {        dashboard.showNotification('Financial report complete - Monthly revenue: £892K', 'success');    }, 3000);}// Client Relations Functionsasync function openClientPortal() {    dashboard.showNotification('Client Relations Portal loaded', 'info');        setTimeout(() => {        dashboard.showNotification('127 active clients - All accounts up to date', 'success');    }, 1500);}async function manageClientSuccess() {    dashboard.showNotification('Loading client success metrics...', 'info');        setTimeout(() => {        dashboard.showNotification('Client satisfaction score: 4.8/5 stars - Excellent performance', 'success');    }, 1500);}// Enhanced Notification Functionsfunction showNotifications() {    const notifications = [        'Time off request from Sarah Johnson pending approval',        'New project proposal from TechCorp requires review',        'Monthly financial report ready for download'    ];        dashboard.showNotification(`${notifications.length} notifications: ${notifications[0]}`, 'info', 6000);}function showMessages() {    dashboard.showNotification('8 unread messages - 3 urgent from project managers', 'info');}function showProfile() {    dashboard.showNotification('User profile settings loaded', 'info');}// Close modals when clicking outsidewindow.addEventListener('click', function(event) {    const modals = document.querySelectorAll('.modal');    modals.forEach(modal => {        if (event.target === modal) {            closeModal(modal.id);        }    });});// Keyboard shortcuts for modalsdocument.addEventListener('keydown', function(event) {    if (event.key === 'Escape') {        const openModal = document.querySelector('.modal[style*="flex"]');        if (openModal) {            closeModal(openModal.id);        }    }});// Enhanced dashboardclass NexiDashboard {    constructor() {        this.init();    }        init() {        this.setupEventListeners();        this.startRealtimeUpdates();        this.initializeNotifications();    }        setupEventListeners() {        document.addEventListener('DOMContentLoaded', () => {            this.showWelcomeMessage();        });    }        showWelcomeMessage() {        setTimeout(() => {            this.    showNotification('Executive Dashboard loaded! All systems operational.', 'success', 5000);        }, 1000);    }        startRealtimeUpdates() {        setInterval(() => {            this.updateStats();        }, 30000);    }        updateStats() {        const statCards = document.querySelectorAll('.stat-value');        statCards.forEach(card => {            if (Math.random() > 0.8) {                card.style.transform = 'scale(1.1)';                card.style.color = 'var(--primary-color)';                setTimeout(() => {                    card.style.transform = 'scale(1)';                    card.style.color = 'var(--text-primary)';                }, 500);            }        });    }        showNotification(message, type = 'info', duration = 3000) {        const notification = document.createElement('div');        notification.className = `notification ${type}`;                const icons = {            success: 'check-circle',            error: 'exclamation-triangle',            info: 'info-circle',            warning: 'exclamation-circle'        };                notification.innerHTML = `            <i class="fas fa-${icons[type]}"></i>            <span>${message}</span>        `;                document.body.appendChild(notification);                setTimeout(() => {            notification.classList.add('show');        }, 100);                setTimeout(() => {            notification.classList.remove('show');            setTimeout(() => {                if (document.body.contains(notification)) {                    document.body.removeChild(notification);                }            }, 300);        }, duration);    }        initializeNotifications() {        setTimeout(() => {            this.showNotification('Security scan completed - All systems secure', 'success');        }, 5000);                setTimeout(() => {            this.showNotification('Monthly analytics report ready for review', 'info');        }, 10000);    }}// Dashboard Module Functionsfunction openStaffManagement() {    showModal('staffModal');    dashboard.showNotification('Staff Management Portal opened', 'info');}function openFinancialDashboard() {    showModal('financialModal');    dashboard.showNotification('Financial Control Center opened', 'info');}function openProjectPortfolio() {    showModal('projectModal');    dashboard.showNotification('Project Portfolio Manager opened', 'info');}function openOperationsCenter() {    dashboard.showNotification('Operations Control Center activated', 'info');        // Simulate loading operations data    setTimeout(() => {        dashboard.showNotification('3 approval requests pending review', 'info');    }, 1000);}function openBusinessIntelligence() {    dashboard.showNotification('Activating Business Intelligence Engine...', 'info');    setTimeout(() => {        dashboard.showNotification('AI analytics ready - Insights generated', 'success');    }, 2000);}function openClientPortal() {    dashboard.showNotification('Client Relations Portal loaded', 'info');        setTimeout(() => {        dashboard.showNotification('127 active clients - All accounts up to date', 'success');    }, 1500);}function manageOnboarding() {    dashboard.showNotification('Staff Onboarding System loaded', 'info');        setTimeout(() => {        dashboard.showNotification('5 new employee contracts ready for processing', 'success');    }, 1500);}function viewStaffReports() {    dashboard.showNotification('Generating comprehensive staff reports...', 'info');        setTimeout(() => {        dashboard.showNotification('Staff performance reports generated successfully', 'success');    }, 2000);}function generateFinancialReport() {    dashboard.showNotification('Creating comprehensive financial analysis...', 'info');        setTimeout(() => {        dashboard.showNotification('Financial report complete - Monthly revenue: £892K', 'success');    }, 3000);}function generateInsights() {    dashboard.showNotification('AI analyzing business patterns...', 'info');        // Simulate AI analysis    setTimeout(() => {        const insights = [            'Revenue growth trend: +18.5% compared to last quarter',            'Staff productivity increased by 12% this month',            'Project completion rate improved to 94.2%',            'Customer satisfaction score: 4.8/5 stars',            'Opportunity identified: Expand consulting services'        ];                const randomInsight = insights[Math.floor(Math.random() * insights.length)];        dashboard.showNotification(`AI Insight: ${randomInsight}`, 'success', 8000);    }, 3500);}function showNotifications() {    const notifications = [        'Time off request from Sarah Johnson pending approval',        'New project proposal from TechCorp requires review',        'Monthly financial report ready for download'    ];        dashboard.showNotification(`${notifications.length} notifications: ${notifications[0]}`, 'info', 6000);}function showMessages() {    dashboard.showNotification('8 unread messages - 3 urgent from project managers', 'info');}function showProfile() {    dashboard.showNotification('User profile settings loaded', 'info');}// Initialize dashboardconst dashboard = new NexiDashboard();// Keyboard shortcutsdocument.addEventListener('keydown', function(event) {    if (event.ctrlKey && event.shiftKey) {        switch(event.key) {            case 'S':                event.preventDefault();                openStaffManagement();                break;            case 'F':                event.preventDefault();                openFinancialDashboard();                break;            case 'P':                event.preventDefault();                openProjectPortfolio();                break;            case 'O':                event.preventDefault();                openOperationsCenter();                break;            case 'I':                event.preventDefault();                generateInsights();                break;        }    }});// Animate elements on scrollconst observerOptions = {    threshold: 0.1,    rootMargin: '0px 0px -50px 0px'};const observer = new IntersectionObserver((entries) => {    entries.forEach(entry => {        if (entry.isIntersecting) {            entry.target.style.animation = 'pulse 0.6s ease-in-out';            setTimeout(() => {                entry.target.style.animation = '';            }, 600);        }    });}, observerOptions);document.querySelectorAll('.stat-card, .module-card').forEach(card => {    observer.observe(card);});</script><?php// AJAX Handler for dashboard operationsif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {    header('Content-Type: application/json');        try {        switch ($_POST['action']) {            case 'add_staff':                $stmt = $db->prepare("INSERT INTO staff (name, email, department, role, status, hire_date, salary) VALUES (?, ?, ?, ?, ?, ?, ?)");                $result = $stmt->execute([                    $_POST['name'],                    $_POST['email'],                    $_POST['department'],                    $_POST['role'],                    $_POST['status'] ?? 'active',                    $_POST['hire_date'],                    $_POST['salary']                ]);                                if ($result) {                    // Log activity                    $log_stmt = $db->prepare("INSERT INTO activity_log (type, action, details) VALUES (?, ?, ?)");                    $log_stmt->execute(['staff', 'New staff member added', $_POST['name']]);                                        echo json_encode(['success' => true, 'message' => 'Staff member added successfully']);                } else {                    echo json_encode(['success' => false, 'message' => 'Failed to add staff member']);                }                break;                            case 'add_project':                $stmt = $db->prepare("INSERT INTO projects (name, description, client_name, budget, start_date, end_date, status) VALUES (?, ?, ?, ?, ?, ?, ?)");                $result = $stmt->execute([                    $_POST['name'],                    $_POST['description'],                    $_POST['client_name'],                    $_POST['budget'],                    $_POST['start_date'],                    $_POST['end_date'],                    $_POST['status'] ?? 'active'                ]);                                if ($result) {                    // Log activity                    $log_stmt = $db->prepare("INSERT INTO activity_log (type, action, details) VALUES (?, ?, ?)");
+                    $log_stmt->execute(['project', 'New project created', $_POST['name']]);
+                    
+                    echo json_encode(['success' => true, 'message' => 'Project created successfully']);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Failed to create project']);
+                }
+                break;
+                
+            case 'add_financial_record':
+                $stmt = $db->prepare("INSERT INTO financial_records (type, amount, description, category, date, status) VALUES (?, ?, ?, ?, ?, ?)");
+                $result = $stmt->execute([
+                    $_POST['type'],
+                    $_POST['amount'],
+                    $_POST['description'],
+                    $_POST['category'],
+                    $_POST['date'],
+                    $_POST['status'] ?? 'completed'
+                ]);
+                
+                if ($result) {
+                    // Log activity
+                    $log_stmt = $db->prepare("INSERT INTO activity_log (type, action, details) VALUES (?, ?, ?)");
+                    $log_stmt->execute(['finance', 'Financial record added', $_POST['description']]);
+                    
+                    echo json_encode(['success' => true, 'message' => 'Financial record added successfully']);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Failed to add financial record']);
+                }
+                break;
+                
+            case 'approve_time_off':
+                $stmt = $db->prepare("UPDATE time_off_requests SET status = 'approved' WHERE id = ?");
+                $result = $stmt->execute([$_POST['request_id']]);
+                
+                if ($result) {
+                    // Log activity
+                    $log_stmt = $db->prepare("INSERT INTO activity_log (type, action, details) VALUES (?, ?, ?)");
+                    $log_stmt->execute(['staff', 'Time off request approved', 'Request #' . $_POST['request_id']]);
+                    
+                    echo json_encode(['success' => true, 'message' => 'Time off request approved']);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Failed to approve request']);
+                }
+                break;
+                
+            case 'get_staff_list':
