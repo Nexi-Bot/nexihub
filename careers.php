@@ -258,21 +258,6 @@ include 'includes/header.php';
         <div class="position-category">
             <h3 class="category-title">Regional Leadership</h3>
             <div class="positions-grid">
-                <div class="position-card" data-position="Regional Director - North America">
-                    <div class="position-header">
-                        <h4 class="position-title">Regional Director - North America</h4>
-                        <span class="position-type">Leadership</span>
-                    </div>
-                    <div class="position-location">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                        </svg>
-                        Remote (US, Canada, Mexico)
-                    </div>
-                    <p class="position-summary">Lead market expansion and operations across North America. Drive growth strategies and establish key partnerships.</p>
-                    <button class="apply-btn">Apply Now</button>
-                </div>
                 
                 <div class="position-card" data-position="Regional Director - Latin America">
                     <div class="position-header">

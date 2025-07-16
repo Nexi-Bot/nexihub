@@ -216,23 +216,20 @@ include 'includes/header.php';
         </p>
         
         <div class="team-grid">
-            <div class="team-member vacant">
+            <div class="team-member">
                 <div class="member-photo">
-                    <div class="photo-placeholder vacant-placeholder">
-                        <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                        </svg>
-                    </div>
+                    <img src="assets/images/Anthony.jpg" alt="Anthony" class="member-image">
                 </div>
                 <div class="member-info">
-                    <h3 class="member-name">Vacant</h3>
+                    <h3 class="member-name">Anthony</h3>
                     <p class="member-title">Regional Director - North America</p>
                     <p class="member-description">
                         Leading market expansion and operations across the United States, Canada, and Mexico. 
-                        This role will drive growth strategies and establish partnerships in key North American markets.
+                        Anthony brings extensive experience in business development, strategic partnerships, and market analysis 
+                        to drive growth across North American markets.
                     </p>
                     <div class="member-status">
-                        <span class="status-badge vacant">Position Available</span>
+                        <span class="status-badge active">Active</span>
                     </div>
                 </div>
             </div>
