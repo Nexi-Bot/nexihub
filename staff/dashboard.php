@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
 
-// requireAuth(); // Enable when ready
+requireAuth(); // Enable when ready
 
 $page_title = "Staff Management Dashboard";
 $page_description = "Nexi Hub Staff Management System";
@@ -184,12 +184,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_POST['parent_contact'],
                         $_POST['account_status'],
                         $_POST['internal_notes'],
-                        $_POST['staff_id']
+                        $_POST['edit_staff_id']
                     ]);
                     header("Location: dashboard.php?success=Staff member updated successfully");
                     exit;
                 } catch (PDOException $e) {
                     $error_message = "Error updating staff member: " . $e->getMessage();
+                }
+                break;
+                
+            case 'delete_staff':
+                // Delete staff member
+                $stmt = $db->prepare("DELETE FROM staff_profiles WHERE id = ?");
+                try {
+                    $stmt->execute([$_POST['delete_staff_id']]);
+                    header("Location: dashboard.php?success=Staff member deleted successfully");
+                    exit;
+                } catch (PDOException $e) {
+                    $error_message = "Error deleting staff member: " . $e->getMessage();
                 }
                 break;
         }
@@ -214,182 +226,276 @@ include __DIR__ . '/../includes/header.php';
 
 <style>
 /* Dashboard Styles matching Nexi Hub theme */
-.dashboard-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+.dashboard-section {
+    background: var(--background-dark);
+    padding: 4rem 0;
+    min-height: 100vh;
 }
 
 .dashboard-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 30px;
-    border-radius: 10px;
-    margin-bottom: 30px;
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 3rem;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
     text-align: center;
 }
 
+.dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+}
+
 .dashboard-header h1 {
-    margin: 0;
-    font-size: 2.5em;
-    font-weight: 300;
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-color) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .dashboard-header p {
-    margin: 10px 0 0 0;
-    opacity: 0.9;
+    color: var(--text-secondary);
+    margin: 0;
+    font-size: 1.2rem;
 }
 
 .alert {
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 5px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid transparent;
     font-weight: 500;
 }
 
 .alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.2);
 }
 
 .alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.2);
 }
 
-.btn {
-    display: inline-block;
-    padding: 12px 24px;
-    margin: 5px;
-    border: none;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
+.dashboard-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
 }
 
-.btn-primary {
-    background-color: #007bff;
-    color: white;
+.dashboard-stats {
+    color: var(--text-secondary);
+    font-size: 1rem;
 }
 
-.btn-primary:hover {
-    background-color: #0056b3;
-    transform: translateY(-2px);
-}
-
-.btn-success {
-    background-color: #28a745;
-    color: white;
-}
-
-.btn-warning {
-    background-color: #ffc107;
-    color: #212529;
-}
-
-.btn-sm {
-    padding: 8px 16px;
-    font-size: 0.9em;
+.dashboard-stats strong {
+    color: var(--primary-color);
+    font-size: 1.2rem;
 }
 
 .staff-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 2rem;
 }
 
 .staff-card {
-    background: white;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e9ecef;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: var(--background-light);
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.staff-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    transform: scaleX(0);
+    transition: all 0.3s ease;
+}
+
+.staff-card:hover::before {
+    transform: scaleX(1);
 }
 
 .staff-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px var(--shadow-medium);
+    border-color: var(--primary-color);
 }
 
 .staff-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #f8f9fa;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .staff-name {
-    font-size: 1.3em;
+    font-size: 1.3rem;
     font-weight: 600;
-    color: #333;
+    color: var(--text-primary);
     margin: 0;
 }
 
 .staff-id {
-    background-color: #667eea;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.8em;
-    font-weight: 500;
+    padding: 0.3rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
 .staff-details {
     display: grid;
-    gap: 8px;
+    gap: 0.5rem;
 }
 
 .detail-row {
     display: flex;
     justify-content: space-between;
-    padding: 5px 0;
+    padding: 0.3rem 0;
 }
 
 .detail-label {
     font-weight: 500;
-    color: #6c757d;
+    color: var(--text-secondary);
     min-width: 100px;
 }
 
 .detail-value {
-    color: #333;
+    color: var(--text-primary);
     text-align: right;
 }
 
 .status-active {
-    color: #28a745;
+    color: #10b981;
     font-weight: 600;
 }
 
 .status-inactive {
-    color: #dc3545;
+    color: #ef4444;
     font-weight: 600;
 }
 
 .two-fa-enabled {
-    color: #28a745;
+    color: #10b981;
     font-weight: 600;
 }
 
 .two-fa-disabled {
-    color: #dc3545;
+    color: #ef4444;
     font-weight: 600;
 }
 
 .staff-actions {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #e9ecef;
+    margin-top: auto;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.btn-sm {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-success {
+    background: #10b981;
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.btn-success:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+}
+
+.btn-warning {
+    background: #f59e0b;
+    color: white;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
+.btn-warning:hover {
+    background: #d97706;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+}
+
+.empty-state {
     text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-secondary);
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+    color: var(--primary-color);
+}
+
+.empty-state h3 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
 }
 
 /* Modal Styles */
@@ -401,91 +507,154 @@ include __DIR__ . '/../includes/header.php';
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
 }
 
 .modal-content {
-    background-color: white;
-    margin: 5% auto;
-    padding: 30px;
-    border-radius: 10px;
+    background: var(--background-light);
+    margin: 2% auto;
+    padding: 0;
+    border-radius: 16px;
     width: 90%;
-    max-width: 600px;
-    max-height: 90vh;
+    max-width: 700px;
+    max-height: 95vh;
     overflow-y: auto;
+    border: 1px solid var(--border-color);
 }
 
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #f8f9fa;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--background-dark);
+    border-radius: 16px 16px 0 0;
 }
 
 .modal-title {
-    font-size: 1.5em;
+    font-size: 1.5rem;
     font-weight: 600;
-    color: #333;
+    color: var(--text-primary);
     margin: 0;
 }
 
 .close {
-    font-size: 28px;
+    font-size: 1.5rem;
     font-weight: bold;
     cursor: pointer;
-    color: #aaa;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: all 0.3s ease;
 }
 
 .close:hover {
-    color: #000;
+    color: var(--primary-color);
+    background: rgba(230, 79, 33, 0.1);
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.form-section {
+    margin-bottom: 2rem;
+}
+
+.form-section h3 {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 1.5rem;
 }
 
 .form-label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 0.5rem;
     font-weight: 500;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .form-control {
     width: 100%;
-    padding: 12px;
-    border: 2px solid #e9ecef;
-    border-radius: 5px;
-    font-size: 16px;
-    transition: border-color 0.3s ease;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: var(--background-dark);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
 }
 
 .form-control:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(230, 79, 33, 0.1);
 }
 
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    gap: 1rem;
 }
 
 .checkbox-group {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: var(--background-dark);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
 }
 
 .checkbox-group input[type="checkbox"] {
     width: auto;
     margin: 0;
+    accent-color: var(--primary-color);
+}
+
+.modal-footer {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    background: var(--background-dark);
+    border-radius: 0 0 16px 16px;
+}
+
+.btn-secondary {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    background: var(--border-color);
 }
 
 @media (max-width: 768px) {
+    .dashboard-header h1 {
+        font-size: 2rem;
+    }
+    
+    .dashboard-actions {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
     .staff-grid {
         grid-template-columns: 1fr;
     }
@@ -496,106 +665,122 @@ include __DIR__ . '/../includes/header.php';
     
     .modal-content {
         width: 95%;
-        margin: 10px auto;
-        padding: 20px;
+        margin: 5% auto;
+    }
+    
+    .modal-body {
+        padding: 1rem;
+    }
+    
+    .modal-header, .modal-footer {
+        padding: 1rem;
     }
 }
 </style>
 
-<div class="dashboard-container">
-    <div class="dashboard-header">
-        <h1>Staff Management Dashboard</h1>
-        <p>Secure Staff Information Management System</p>
-    </div>
-
-    <?php if ($success_message): ?>
-        <div class="alert alert-success">
-            <?php echo $success_message; ?>
+<section class="dashboard-section">
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Staff Management Dashboard</h1>
+            <p>Secure Staff Information Management System</p>
         </div>
-    <?php endif; ?>
 
-    <?php if ($error_message): ?>
-        <div class="alert alert-danger">
-            <?php echo $error_message; ?>
-        </div>
-    <?php endif; ?>
-
-    <div style="margin-bottom: 20px;">
-        <button onclick="openAddModal()" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Add New Staff Member
-        </button>
-        <span style="margin-left: 20px; color: #6c757d;">
-            Total Staff: <strong><?php echo count($staff_members); ?></strong>
-        </span>
-    </div>
-
-    <div class="staff-grid">
-        <?php foreach ($staff_members as $staff): ?>
-            <div class="staff-card">
-                <div class="staff-header">
-                    <h3 class="staff-name"><?php echo htmlspecialchars($staff['full_name']); ?></h3>
-                    <span class="staff-id"><?php echo htmlspecialchars($staff['staff_id']); ?></span>
-                </div>
-                
-                <div class="staff-details">
-                    <div class="detail-row">
-                        <span class="detail-label">Job Title:</span>
-                        <span class="detail-value"><?php echo htmlspecialchars($staff['job_title'] ?: 'Not Set'); ?></span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Department:</span>
-                        <span class="detail-value"><?php echo htmlspecialchars($staff['department'] ?: 'Not Set'); ?></span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Email:</span>
-                        <span class="detail-value"><?php echo htmlspecialchars($staff['nexi_email'] ?: 'Not Set'); ?></span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Phone:</span>
-                        <span class="detail-value"><?php echo htmlspecialchars($staff['phone_number'] ?: 'Not Set'); ?></span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Status:</span>
-                        <span class="detail-value <?php echo $staff['account_status'] === 'Active' ? 'status-active' : 'status-inactive'; ?>">
-                            <?php echo htmlspecialchars($staff['account_status']); ?>
-                        </span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">2FA:</span>
-                        <span class="detail-value <?php echo $staff['two_fa_status'] ? 'two-fa-enabled' : 'two-fa-disabled'; ?>">
-                            <?php echo $staff['two_fa_status'] ? 'Enabled' : 'Disabled'; ?>
-                        </span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Date Joined:</span>
-                        <span class="detail-value"><?php echo $staff['date_joined'] ? date('M j, Y', strtotime($staff['date_joined'])) : 'Not Set'; ?></span>
-                    </div>
-                    <?php if ($staff['date_of_birth'] && calculateAge($staff['date_of_birth']) < 16): ?>
-                        <div class="detail-row">
-                            <span class="detail-label">Age:</span>
-                            <span class="detail-value" style="color: #ffc107; font-weight: 600;">
-                                <?php echo calculateAge($staff['date_of_birth']); ?> (Minor)
-                            </span>
-                        </div>
-                    <?php endif; ?>
-                </div>
-                
-                <div class="staff-actions">
-                    <button onclick="viewStaff(<?php echo $staff['id']; ?>)" class="btn btn-success btn-sm">View Details</button>
-                    <button onclick="editStaff(<?php echo $staff['id']; ?>)" class="btn btn-warning btn-sm">Edit</button>
-                </div>
+        <?php if ($success_message): ?>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i> <?php echo $success_message; ?>
             </div>
-        <?php endforeach; ?>
-    </div>
+        <?php endif; ?>
 
-    <?php if (empty($staff_members)): ?>
-        <div style="text-align: center; padding: 60px; color: #6c757d;">
-            <i class="fas fa-users" style="font-size: 3em; margin-bottom: 20px; opacity: 0.5;"></i>
-            <h3>No Staff Members Found</h3>
-            <p>Click "Add New Staff Member" to get started.</p>
+        <?php if ($error_message): ?>
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i> <?php echo $error_message; ?>
+            </div>
+        <?php endif; ?>
+
+        <div class="dashboard-actions">
+            <div class="dashboard-stats">
+                <i class="fas fa-users"></i> Total Staff: <strong><?php echo count($staff_members); ?></strong>
+            </div>
+            <button onclick="openAddModal()" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add New Staff Member
+            </button>
         </div>
-    <?php endif; ?>
-</div>
+
+        <?php if (!empty($staff_members)): ?>
+            <div class="staff-grid">
+                <?php foreach ($staff_members as $staff): ?>
+                    <div class="staff-card">
+                        <div class="staff-header">
+                            <h3 class="staff-name"><?php echo htmlspecialchars($staff['full_name']); ?></h3>
+                            <span class="staff-id"><?php echo htmlspecialchars($staff['staff_id']); ?></span>
+                        </div>
+                        
+                        <div class="staff-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Job Title:</span>
+                                <span class="detail-value"><?php echo htmlspecialchars($staff['job_title'] ?: 'Not Set'); ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Department:</span>
+                                <span class="detail-value"><?php echo htmlspecialchars($staff['department'] ?: 'Not Set'); ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Email:</span>
+                                <span class="detail-value"><?php echo htmlspecialchars($staff['nexi_email'] ?: 'Not Set'); ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Phone:</span>
+                                <span class="detail-value"><?php echo htmlspecialchars($staff['phone_number'] ?: 'Not Set'); ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Status:</span>
+                                <span class="detail-value <?php echo $staff['account_status'] === 'Active' ? 'status-active' : 'status-inactive'; ?>">
+                                    <?php echo htmlspecialchars($staff['account_status']); ?>
+                                </span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">2FA:</span>
+                                <span class="detail-value <?php echo $staff['two_fa_status'] ? 'two-fa-enabled' : 'two-fa-disabled'; ?>">
+                                    <?php echo $staff['two_fa_status'] ? 'Enabled' : 'Disabled'; ?>
+                                </span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Date Joined:</span>
+                                <span class="detail-value"><?php echo $staff['date_joined'] ? date('M j, Y', strtotime($staff['date_joined'])) : 'Not Set'; ?></span>
+                            </div>
+                            <?php if ($staff['date_of_birth'] && calculateAge($staff['date_of_birth']) < 16): ?>
+                                <div class="detail-row">
+                                    <span class="detail-label">Age:</span>
+                                    <span class="detail-value" style="color: var(--primary-color); font-weight: 600;">
+                                        <?php echo calculateAge($staff['date_of_birth']); ?> (Minor)
+                                    </span>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <div class="staff-actions">
+                            <button onclick="viewStaff(<?php echo $staff['id']; ?>)" class="btn btn-success btn-sm">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button onclick="editStaff(<?php echo $staff['id']; ?>)" class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button onclick="deleteStaff(<?php echo $staff['id']; ?>, '<?php echo htmlspecialchars($staff['full_name']); ?>')" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <div class="empty-state">
+                <i class="fas fa-users"></i>
+                <h3>No Staff Members Found</h3>
+                <p>Click "Add New Staff Member" to get started.</p>
+            </div>
+        <?php endif; ?>
+    </div>
+</section>
 
 <!-- Add Staff Modal -->
 <div id="addModal" class="modal">
@@ -608,149 +793,347 @@ include __DIR__ . '/../includes/header.php';
         <form method="POST" action="">
             <input type="hidden" name="action" value="add_staff">
             
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Staff ID *</label>
-                    <input type="text" name="staff_id" class="form-control" required placeholder="e.g., NXH002">
+            <div class="modal-body">
+                <div class="form-section">
+                    <h3>Basic Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Staff ID *</label>
+                            <input type="text" name="staff_id" class="form-control" required placeholder="e.g., NXH002">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Manager</label>
+                            <input type="text" name="manager" class="form-control" placeholder="Manager name">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" name="full_name" class="form-control" required placeholder="Full legal name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Preferred Name</label>
+                            <input type="text" name="preferred_name" class="form-control" placeholder="Nickname or preferred name">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Job Title</label>
+                            <input type="text" name="job_title" class="form-control" placeholder="Position title">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Department</label>
+                            <select name="department" class="form-control">
+                                <option value="">Select Department</option>
+                                <option value="Executive">Executive</option>
+                                <option value="Development">Development</option>
+                                <option value="Design">Design</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Sales">Sales</option>
+                                <option value="Support">Support</option>
+                                <option value="HR">Human Resources</option>
+                                <option value="Finance">Finance</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Manager</label>
-                    <input type="text" name="manager" class="form-control" placeholder="Manager name">
+                
+                <div class="form-section">
+                    <h3>Contact Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Nexi Email</label>
+                            <input type="email" name="nexi_email" class="form-control" placeholder="user@nexihub.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Private Email</label>
+                            <input type="email" name="private_email" class="form-control" placeholder="personal@email.com">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" name="phone_number" class="form-control" placeholder="+1 (555) 123-4567">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date of Birth</label>
+                            <input type="date" name="date_of_birth" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Discord Username</label>
+                            <input type="text" name="discord_username" class="form-control" placeholder="username#1234">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Discord ID</label>
+                            <input type="text" name="discord_id" class="form-control" placeholder="Discord user ID">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Nationality</label>
+                            <input type="text" name="nationality" class="form-control" placeholder="Country of citizenship">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Country of Residence</label>
+                            <input type="text" name="country_of_residence" class="form-control" placeholder="Current country">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Employment Details</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Date Joined</label>
+                            <input type="date" name="date_joined" class="form-control" value="<?php echo date('Y-m-d'); ?>">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">E-learning Status</label>
+                            <select name="elearning_status" class="form-control">
+                                <option value="Not Started">Not Started</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Time Off Balance (days)</label>
+                            <input type="number" name="time_off_balance" class="form-control" value="0" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Account Status</label>
+                            <select name="account_status" class="form-control">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="Suspended">Suspended</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Parent Contact (if under 16)</label>
+                        <textarea name="parent_contact" class="form-control" rows="3" placeholder="Parent/guardian contact information"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Internal Notes</label>
+                        <textarea name="internal_notes" class="form-control" rows="3" placeholder="Internal notes (confidential)"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" name="two_fa_status" id="two_fa_status">
+                            <label for="two_fa_status" class="form-label">Two-Factor Authentication Enabled</label>
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Full Name *</label>
-                    <input type="text" name="full_name" class="form-control" required placeholder="Full legal name">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Preferred Name</label>
-                    <input type="text" name="preferred_name" class="form-control" placeholder="Nickname or preferred name">
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Job Title</label>
-                    <input type="text" name="job_title" class="form-control" placeholder="Position title">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Department</label>
-                    <select name="department" class="form-control">
-                        <option value="">Select Department</option>
-                        <option value="Executive">Executive</option>
-                        <option value="Development">Development</option>
-                        <option value="Design">Design</option>
-                        <option value="Marketing">Marketing</option>
-                        <option value="Sales">Sales</option>
-                        <option value="Support">Support</option>
-                        <option value="HR">Human Resources</option>
-                        <option value="Finance">Finance</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Nexi Email</label>
-                    <input type="email" name="nexi_email" class="form-control" placeholder="user@nexihub.com">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Private Email</label>
-                    <input type="email" name="private_email" class="form-control" placeholder="personal@email.com">
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Phone Number</label>
-                    <input type="tel" name="phone_number" class="form-control" placeholder="+1 (555) 123-4567">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Date of Birth</label>
-                    <input type="date" name="date_of_birth" class="form-control">
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Discord Username</label>
-                    <input type="text" name="discord_username" class="form-control" placeholder="username#1234">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Discord ID</label>
-                    <input type="text" name="discord_id" class="form-control" placeholder="Discord user ID">
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Nationality</label>
-                    <input type="text" name="nationality" class="form-control" placeholder="Country of citizenship">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Country of Residence</label>
-                    <input type="text" name="country_of_residence" class="form-control" placeholder="Current country">
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Date Joined</label>
-                    <input type="date" name="date_joined" class="form-control" value="<?php echo date('Y-m-d'); ?>">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">E-learning Status</label>
-                    <select name="elearning_status" class="form-control">
-                        <option value="Not Started">Not Started</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Completed">Completed</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Time Off Balance (days)</label>
-                    <input type="number" name="time_off_balance" class="form-control" value="0" min="0">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Account Status</label>
-                    <select name="account_status" class="form-control">
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                        <option value="Suspended">Suspended</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Parent Contact (if under 16)</label>
-                <textarea name="parent_contact" class="form-control" rows="3" placeholder="Parent/guardian contact information"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Internal Notes</label>
-                <textarea name="internal_notes" class="form-control" rows="3" placeholder="Internal notes (confidential)"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <div class="checkbox-group">
-                    <input type="checkbox" name="two_fa_status" id="two_fa_status">
-                    <label for="two_fa_status" class="form-label">Two-Factor Authentication Enabled</label>
-                </div>
-            </div>
-            
-            <div style="text-align: right; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e9ecef;">
-                <button type="button" onclick="closeAddModal()" class="btn" style="background: #6c757d; color: white; margin-right: 10px;">Cancel</button>
+            <div class="modal-footer">
+                <button type="button" onclick="closeAddModal()" class="btn btn-secondary">Cancel</button>
                 <button type="submit" class="btn btn-primary">Add Staff Member</button>
             </div>
         </form>
     </div>
 </div>
 
+<!-- Edit Staff Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Edit Staff Member</h2>
+            <span class="close" onclick="closeEditModal()">&times;</span>
+        </div>
+        
+        <form method="POST" action="">
+            <input type="hidden" name="action" value="update_staff">
+            <input type="hidden" name="edit_staff_id" id="edit_staff_id">
+            
+            <div class="modal-body">
+                <div class="form-section">
+                    <h3>Basic Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Staff ID *</label>
+                            <input type="text" name="staff_id" id="edit_staff_id_display" class="form-control" readonly style="background: var(--background-dark); opacity: 0.7;">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Manager</label>
+                            <input type="text" name="manager" id="edit_manager" class="form-control" placeholder="Manager name">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" name="full_name" id="edit_full_name" class="form-control" required placeholder="Full legal name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Preferred Name</label>
+                            <input type="text" name="preferred_name" id="edit_preferred_name" class="form-control" placeholder="Nickname or preferred name">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Job Title</label>
+                            <input type="text" name="job_title" id="edit_job_title" class="form-control" placeholder="Position title">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Department</label>
+                            <select name="department" id="edit_department" class="form-control">
+                                <option value="">Select Department</option>
+                                <option value="Executive">Executive</option>
+                                <option value="Development">Development</option>
+                                <option value="Design">Design</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Sales">Sales</option>
+                                <option value="Support">Support</option>
+                                <option value="HR">Human Resources</option>
+                                <option value="Finance">Finance</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Contact Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Nexi Email</label>
+                            <input type="email" name="nexi_email" id="edit_nexi_email" class="form-control" placeholder="user@nexihub.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Private Email</label>
+                            <input type="email" name="private_email" id="edit_private_email" class="form-control" placeholder="personal@email.com">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" name="phone_number" id="edit_phone_number" class="form-control" placeholder="+1 (555) 123-4567">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date of Birth</label>
+                            <input type="date" name="date_of_birth" id="edit_date_of_birth" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Discord Username</label>
+                            <input type="text" name="discord_username" id="edit_discord_username" class="form-control" placeholder="username#1234">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Discord ID</label>
+                            <input type="text" name="discord_id" id="edit_discord_id" class="form-control" placeholder="Discord user ID">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Nationality</label>
+                            <input type="text" name="nationality" id="edit_nationality" class="form-control" placeholder="Country of citizenship">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Country of Residence</label>
+                            <input type="text" name="country_of_residence" id="edit_country_of_residence" class="form-control" placeholder="Current country">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Employment Details</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Date Joined</label>
+                            <input type="date" name="date_joined" id="edit_date_joined" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">E-learning Status</label>
+                            <select name="elearning_status" id="edit_elearning_status" class="form-control">
+                                <option value="Not Started">Not Started</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Time Off Balance (days)</label>
+                            <input type="number" name="time_off_balance" id="edit_time_off_balance" class="form-control" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Account Status</label>
+                            <select name="account_status" id="edit_account_status" class="form-control">
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="Suspended">Suspended</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Parent Contact (if under 16)</label>
+                        <textarea name="parent_contact" id="edit_parent_contact" class="form-control" rows="3" placeholder="Parent/guardian contact information"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Internal Notes</label>
+                        <textarea name="internal_notes" id="edit_internal_notes" class="form-control" rows="3" placeholder="Internal notes (confidential)"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" name="two_fa_status" id="edit_two_fa_status">
+                            <label for="edit_two_fa_status" class="form-label">Two-Factor Authentication Enabled</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" onclick="closeEditModal()" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update Staff Member</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- View Staff Modal -->
+<div id="viewModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Staff Member Details</h2>
+            <span class="close" onclick="closeViewModal()">&times;</span>
+        </div>
+        
+        <div class="modal-body" id="viewModalBody">
+            <!-- Content will be dynamically populated -->
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" onclick="closeViewModal()" class="btn btn-secondary">Close</button>
+            <button type="button" onclick="editStaffFromView()" class="btn btn-primary" id="editFromViewBtn">Edit Staff</button>
+        </div>
+    </div>
+</div>
+
 <script>
+// Staff data for JavaScript operations
+const staffData = <?php echo json_encode($staff_members); ?>;
+
 function openAddModal() {
     document.getElementById('addModal').style.display = 'block';
 }
@@ -759,23 +1142,331 @@ function closeAddModal() {
     document.getElementById('addModal').style.display = 'none';
 }
 
+function openEditModal() {
+    document.getElementById('editModal').style.display = 'block';
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+
+function openViewModal() {
+    document.getElementById('viewModal').style.display = 'block';
+}
+
+function closeViewModal() {
+    document.getElementById('viewModal').style.display = 'none';
+}
+
 function viewStaff(staffId) {
-    // TODO: Implement view modal
-    alert('View staff details for ID: ' + staffId + '\n\nThis feature will be implemented in the next update.');
+    const staff = staffData.find(s => s.id == staffId);
+    if (!staff) {
+        alert('Staff member not found');
+        return;
+    }
+    
+    const age = staff.date_of_birth ? calculateAge(staff.date_of_birth) : 'N/A';
+    const isMinor = age !== 'N/A' && age < 16;
+    
+    const modalBody = document.getElementById('viewModalBody');
+    modalBody.innerHTML = `
+        <div class="form-section">
+            <h3>Basic Information</h3>
+            <div class="staff-view-grid">
+                <div class="view-item">
+                    <span class="view-label">Staff ID:</span>
+                    <span class="view-value">${staff.staff_id || 'Not Set'}</span>
+                </div>
+                <div class="view-item">
+                    <span class="view-label">Full Name:</span>
+                    <span class="view-value">${staff.full_name || 'Not Set'}</span>
+                </div>
+                <div class="view-item">
+                    <span class="view-label">Preferred Name:</span>
+                    <span class="view-value">${staff.preferred_name || 'Not Set'}</span>
+                </div>
+                <div class="view-item">
+                    <span class="view-label">Manager:</span>
+                    <span class="view-value">${staff.manager || 'Not Set'}</span>
+                </div>
+                <div class="view-item">
+                    <span class="view-label">Job Title:</span>
+                    <span class="view-value">${staff.job_title || 'Not Set'}</span>
+                </div>
+                <div class="view-item">
+                    <span class="view-label">Department:</span>
+                    <span class="view-value">${staff.department || 'Not Set'}</span>
+                </div>
+                ${isMinor ? `
+                <div class="view-item">
+                    <span class="view-label">Age:</span>
+                    <span class="view-value" style="color: var(--primary-color); font-weight: 600;">${age} (Minor)</span>
+                </div>
+                ` : ''}
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>Contact Information</h3>
+            <div class="staff-view-grid">
+                <div class="view-item">
+                    <span class="view-label">Nexi Email:</span>
+                    <span class="view-value">${staff.nexi_email || 'Not Set'}</span>
+                </div>
+                <div class="view-item">
+                    <span class="view-label">Private Email:</span>
+                    <span class="view-value">${staff.private_email || 'Not Set'}</span>
+                </div>
+                <div class="view-item">
+                    <span class="view-label">Phone Number:</span>
+                    <span class="view-value">${staff.phone_number || 'Not Set'}</span>
+                </div>
+                <div class="view-item">
+                    <span class="view-label">Date of Birth:</span>
+                    <span class="view-value">${staff.date_of_birth ? formatDate(staff.date_of_birth) : 'Not Set'}</span>
+                </div>
+                <div class="view-item">
+                    <span class="view-label">Discord Username:</span>
+                    <span class="view-value">${staff.discord_username || 'Not Set'}</span>
+                </div>
+                <div class="view-item">
+                    <span class="view-label">Discord ID:</span>
+                    <span class="view-value">${staff.discord_id || 'Not Set'}</span>
+                </div>
+                <div class="view-item">
+                    <span class="view-label">Nationality:</span>
+                    <span class="view-value">${staff.nationality || 'Not Set'}</span>
+                </div>
+                <div class="view-item">
+                    <span class="view-label">Country of Residence:</span>
+                    <span class="view-value">${staff.country_of_residence || 'Not Set'}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>Employment Details</h3>
+            <div class="staff-view-grid">
+                <div class="view-item">
+                    <span class="view-label">Date Joined:</span>
+                    <span class="view-value">${staff.date_joined ? formatDate(staff.date_joined) : 'Not Set'}</span>
+                </div>
+                <div class="view-item">
+                    <span class="view-label">E-learning Status:</span>
+                    <span class="view-value">${staff.elearning_status || 'Not Set'}</span>
+                </div>
+                <div class="view-item">
+                    <span class="view-label">Time Off Balance:</span>
+                    <span class="view-value">${staff.time_off_balance || 0} days</span>
+                </div>
+                <div class="view-item">
+                    <span class="view-label">Account Status:</span>
+                    <span class="view-value ${staff.account_status === 'Active' ? 'status-active' : 'status-inactive'}">${staff.account_status || 'Not Set'}</span>
+                </div>
+                <div class="view-item">
+                    <span class="view-label">Two-Factor Auth:</span>
+                    <span class="view-value ${staff.two_fa_status ? 'two-fa-enabled' : 'two-fa-disabled'}">${staff.two_fa_status ? 'Enabled' : 'Disabled'}</span>
+                </div>
+                <div class="view-item">
+                    <span class="view-label">Last Login:</span>
+                    <span class="view-value">${staff.last_login ? formatDateTime(staff.last_login) : 'Never'}</span>
+                </div>
+            </div>
+        </div>
+        
+        ${isMinor && staff.parent_contact ? `
+        <div class="form-section">
+            <h3>Parent Contact</h3>
+            <div class="view-item-full">
+                <span class="view-value">${staff.parent_contact}</span>
+            </div>
+        </div>
+        ` : ''}
+        
+        ${staff.internal_notes ? `
+        <div class="form-section">
+            <h3>Internal Notes</h3>
+            <div class="view-item-full">
+                <span class="view-value">${staff.internal_notes}</span>
+            </div>
+        </div>
+        ` : ''}
+        
+        <div class="form-section">
+            <h3>Record Information</h3>
+            <div class="staff-view-grid">
+                <div class="view-item">
+                    <span class="view-label">Created:</span>
+                    <span class="view-value">${staff.created_at ? formatDateTime(staff.created_at) : 'Not Set'}</span>
+                </div>
+                <div class="view-item">
+                    <span class="view-label">Last Updated:</span>
+                    <span class="view-value">${staff.updated_at ? formatDateTime(staff.updated_at) : 'Not Set'}</span>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('editFromViewBtn').onclick = () => editStaff(staffId);
+    openViewModal();
 }
 
 function editStaff(staffId) {
-    // TODO: Implement edit modal
-    alert('Edit staff for ID: ' + staffId + '\n\nThis feature will be implemented in the next update.');
+    const staff = staffData.find(s => s.id == staffId);
+    if (!staff) {
+        alert('Staff member not found');
+        return;
+    }
+    
+    // Populate edit form
+    document.getElementById('edit_staff_id').value = staff.id;
+    document.getElementById('edit_staff_id_display').value = staff.staff_id || '';
+    document.getElementById('edit_manager').value = staff.manager || '';
+    document.getElementById('edit_full_name').value = staff.full_name || '';
+    document.getElementById('edit_preferred_name').value = staff.preferred_name || '';
+    document.getElementById('edit_job_title').value = staff.job_title || '';
+    document.getElementById('edit_department').value = staff.department || '';
+    document.getElementById('edit_nexi_email').value = staff.nexi_email || '';
+    document.getElementById('edit_private_email').value = staff.private_email || '';
+    document.getElementById('edit_phone_number').value = staff.phone_number || '';
+    document.getElementById('edit_date_of_birth').value = staff.date_of_birth || '';
+    document.getElementById('edit_discord_username').value = staff.discord_username || '';
+    document.getElementById('edit_discord_id').value = staff.discord_id || '';
+    document.getElementById('edit_nationality').value = staff.nationality || '';
+    document.getElementById('edit_country_of_residence').value = staff.country_of_residence || '';
+    document.getElementById('edit_date_joined').value = staff.date_joined || '';
+    document.getElementById('edit_elearning_status').value = staff.elearning_status || 'Not Started';
+    document.getElementById('edit_time_off_balance').value = staff.time_off_balance || 0;
+    document.getElementById('edit_account_status').value = staff.account_status || 'Active';
+    document.getElementById('edit_parent_contact').value = staff.parent_contact || '';
+    document.getElementById('edit_internal_notes').value = staff.internal_notes || '';
+    document.getElementById('edit_two_fa_status').checked = staff.two_fa_status == '1';
+    
+    closeViewModal();
+    openEditModal();
 }
 
-// Close modal when clicking outside of it
-window.onclick = function(event) {
-    const modal = document.getElementById('addModal');
-    if (event.target === modal) {
-        closeAddModal();
+function editStaffFromView() {
+    const staffId = document.getElementById('edit_staff_id').value;
+    editStaff(staffId);
+}
+
+function deleteStaff(staffId, staffName) {
+    if (confirm(`Are you sure you want to delete ${staffName}?\n\nThis action cannot be undone and will permanently remove all staff data.`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '';
+        
+        const actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = 'delete_staff';
+        
+        const idInput = document.createElement('input');
+        idInput.type = 'hidden';
+        idInput.name = 'delete_staff_id';
+        idInput.value = staffId;
+        
+        form.appendChild(actionInput);
+        form.appendChild(idInput);
+        document.body.appendChild(form);
+        form.submit();
     }
 }
+
+// Close modals when clicking outside of them
+window.onclick = function(event) {
+    const addModal = document.getElementById('addModal');
+    const editModal = document.getElementById('editModal');
+    const viewModal = document.getElementById('viewModal');
+    
+    if (event.target === addModal) {
+        closeAddModal();
+    } else if (event.target === editModal) {
+        closeEditModal();
+    } else if (event.target === viewModal) {
+        closeViewModal();
+    }
+}
+
+// Helper functions
+function calculateAge(dateOfBirth) {
+    if (!dateOfBirth) return 'N/A';
+    const dob = new Date(dateOfBirth);
+    const now = new Date();
+    const diffTime = Math.abs(now - dob);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return Math.floor(diffDays / 365);
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'Not Set';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function formatDateTime(dateTimeString) {
+    if (!dateTimeString) return 'Not Set';
+    const date = new Date(dateTimeString);
+    return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
 </script>
+
+<style>
+.staff-view-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.view-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background: var(--background-dark);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.view-item-full {
+    padding: 1rem;
+    background: var(--background-dark);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.view-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-width: 120px;
+}
+
+.view-value {
+    color: var(--text-primary);
+    text-align: right;
+    word-break: break-word;
+}
+
+@media (max-width: 768px) {
+    .staff-view-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .view-item {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .view-value {
+        text-align: left;
+    }
+}
+</style>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
