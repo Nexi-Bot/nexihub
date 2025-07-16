@@ -431,7 +431,36 @@ include 'includes/header.php';
                     </div>
                 </div>
             </div>
+        </div>
+        
+        <!-- Single member row - centered -->
+        <div class="team-grid team-grid-center">
+            <div class="team-member">
+                <div class="member-photo">
+                    <img src="assets/images/lanre.jpg" alt="Lanre" class="member-image">
+                </div>
+                <div class="member-info">
+                    <h3 class="member-name">Lanre</h3>
+                    <p class="member-title">Business Intelligence Manager</p>
+                    <p class="member-description">
+                        Leading data-driven decision making through advanced analytics, reporting, and insights 
+                        that inform strategy and optimize performance across all Nexi Hub platforms. Lanre transforms 
+                        complex data into actionable business intelligence for strategic growth.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
+<section class="content-section alt">
+    <div class="container">
+        <h2 class="section-title">Shared Services</h2>
+        <p class="section-subtitle" style="margin-bottom: 3rem;">
+            Cross-functional support roles driving excellence across all platforms
+        </p>
+        
+        <div class="team-grid">
             <div class="team-member vacant">
                 <div class="member-photo">
                     <div class="photo-placeholder vacant-placeholder">
@@ -549,24 +578,6 @@ include 'includes/header.php';
                     <div class="member-status">
                         <span class="status-badge vacant">Position Available</span>
                     </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Single member row - centered -->
-        <div class="team-grid team-grid-center">
-            <div class="team-member">
-                <div class="member-photo">
-                    <img src="assets/images/lanre.jpg" alt="Lanre" class="member-image">
-                </div>
-                <div class="member-info">
-                    <h3 class="member-name">Lanre</h3>
-                    <p class="member-title">Business Intelligence Manager</p>
-                    <p class="member-description">
-                        Leading data-driven decision making through advanced analytics, reporting, and insights 
-                        that inform strategy and optimize performance across all Nexi Hub platforms. Lanre transforms 
-                        complex data into actionable business intelligence for strategic growth.
-                    </p>
                 </div>
             </div>
         </div>
