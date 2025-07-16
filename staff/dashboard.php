@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS staff_profiles (
     full_name VARCHAR(100) NOT NULL,
     job_title VARCHAR(100),
     department VARCHAR(100),
+    region VARCHAR(10),
     preferred_name VARCHAR(50),
     nexi_email VARCHAR(100),
     private_email VARCHAR(100),
@@ -110,12 +111,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Add new staff member
                 $stmt = $db->prepare("
                     INSERT INTO staff_profiles (
-                        staff_id, manager, full_name, job_title, department, 
+                        staff_id, manager, full_name, job_title, department, region,
                         preferred_name, nexi_email, private_email, phone_number,
                         discord_username, discord_id, nationality, country_of_residence,
                         date_of_birth, two_fa_status, date_joined, elearning_status,
                         time_off_balance, parent_contact, account_status, internal_notes
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ");
                 
                 try {
@@ -125,6 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_POST['full_name'],
                         $_POST['job_title'],
                         $_POST['department'],
+                        $_POST['region'],
                         $_POST['preferred_name'],
                         $_POST['nexi_email'],
                         $_POST['private_email'],
@@ -153,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Update existing staff member
                 $stmt = $db->prepare("
                     UPDATE staff_profiles SET 
-                        manager = ?, full_name = ?, job_title = ?, department = ?,
+                        manager = ?, full_name = ?, job_title = ?, department = ?, region = ?,
                         preferred_name = ?, nexi_email = ?, private_email = ?, phone_number = ?,
                         discord_username = ?, discord_id = ?, nationality = ?, country_of_residence = ?,
                         date_of_birth = ?, two_fa_status = ?, date_joined = ?, elearning_status = ?,
@@ -168,6 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_POST['full_name'],
                         $_POST['job_title'],
                         $_POST['department'],
+                        $_POST['region'],
                         $_POST['preferred_name'],
                         $_POST['nexi_email'],
                         $_POST['private_email'],
@@ -209,9 +212,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Fetch all staff members
-$stmt = $db->prepare("SELECT * FROM staff_profiles ORDER BY full_name");
+$stmt = $db->prepare("SELECT * FROM staff_profiles ORDER BY department, region, full_name");
 $stmt->execute();
 $staff_members = $stmt->fetchAll();
+
+// Group staff by department and region
+$staff_by_department = [];
+foreach ($staff_members as $staff) {
+    $dept = $staff['department'] ?: 'Unassigned';
+    $region = $staff['region'] ?: 'No Region';
+    
+    if (!isset($staff_by_department[$dept])) {
+        $staff_by_department[$dept] = [];
+    }
+    if (!isset($staff_by_department[$dept][$region])) {
+        $staff_by_department[$dept][$region] = [];
+    }
+    
+    $staff_by_department[$dept][$region][] = $staff;
+}
 
 // Calculate age from date of birth
 function calculateAge($dateOfBirth) {
@@ -498,6 +517,78 @@ include __DIR__ . '/../includes/header.php';
     margin-bottom: 0.5rem;
 }
 
+/* Department and Region Styles */
+.department-section {
+    margin-bottom: 3rem;
+}
+
+.department-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 16px;
+    color: white;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.department-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.department-title i {
+    font-size: 1.5rem;
+}
+
+.department-count {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.region-section {
+    margin-bottom: 2rem;
+}
+
+.region-header {
+    margin-bottom: 1.5rem;
+}
+
+.region-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.region-title i {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.region-count {
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-left: 0.5rem;
+}
+
 /* Modal Styles */
 .modal {
     display: none;
@@ -659,6 +750,22 @@ include __DIR__ . '/../includes/header.php';
         grid-template-columns: 1fr;
     }
     
+    .department-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+        padding: 1.5rem;
+    }
+    
+    .department-title {
+        font-size: 1.5rem;
+    }
+    
+    .region-title {
+        font-size: 1.1rem;
+        padding: 0.75rem 1rem;
+    }
+    
     .form-row {
         grid-template-columns: 1fr;
     }
@@ -707,71 +814,99 @@ include __DIR__ . '/../includes/header.php';
         </div>
 
         <?php if (!empty($staff_members)): ?>
-            <div class="staff-grid">
-                <?php foreach ($staff_members as $staff): ?>
-                    <div class="staff-card">
-                        <div class="staff-header">
-                            <h3 class="staff-name"><?php echo htmlspecialchars($staff['full_name']); ?></h3>
-                            <span class="staff-id"><?php echo htmlspecialchars($staff['staff_id']); ?></span>
-                        </div>
-                        
-                        <div class="staff-details">
-                            <div class="detail-row">
-                                <span class="detail-label">Job Title:</span>
-                                <span class="detail-value"><?php echo htmlspecialchars($staff['job_title'] ?: 'Not Set'); ?></span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Department:</span>
-                                <span class="detail-value"><?php echo htmlspecialchars($staff['department'] ?: 'Not Set'); ?></span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Email:</span>
-                                <span class="detail-value"><?php echo htmlspecialchars($staff['nexi_email'] ?: 'Not Set'); ?></span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Phone:</span>
-                                <span class="detail-value"><?php echo htmlspecialchars($staff['phone_number'] ?: 'Not Set'); ?></span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Status:</span>
-                                <span class="detail-value <?php echo $staff['account_status'] === 'Active' ? 'status-active' : 'status-inactive'; ?>">
-                                    <?php echo htmlspecialchars($staff['account_status']); ?>
-                                </span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">2FA:</span>
-                                <span class="detail-value <?php echo $staff['two_fa_status'] ? 'two-fa-enabled' : 'two-fa-disabled'; ?>">
-                                    <?php echo $staff['two_fa_status'] ? 'Enabled' : 'Disabled'; ?>
-                                </span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Date Joined:</span>
-                                <span class="detail-value"><?php echo $staff['date_joined'] ? date('M j, Y', strtotime($staff['date_joined'])) : 'Not Set'; ?></span>
-                            </div>
-                            <?php if ($staff['date_of_birth'] && calculateAge($staff['date_of_birth']) < 16): ?>
-                                <div class="detail-row">
-                                    <span class="detail-label">Age:</span>
-                                    <span class="detail-value" style="color: var(--primary-color); font-weight: 600;">
-                                        <?php echo calculateAge($staff['date_of_birth']); ?> (Minor)
-                                    </span>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                        
-                        <div class="staff-actions">
-                            <button onclick="viewStaff(<?php echo $staff['id']; ?>)" class="btn btn-success btn-sm">
-                                <i class="fas fa-eye"></i> View
-                            </button>
-                            <button onclick="editStaff(<?php echo $staff['id']; ?>)" class="btn btn-warning btn-sm">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                            <button onclick="deleteStaff(<?php echo $staff['id']; ?>, '<?php echo htmlspecialchars($staff['full_name']); ?>')" class="btn btn-danger btn-sm">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
+            <?php foreach ($staff_by_department as $department => $regions): ?>
+                <div class="department-section">
+                    <div class="department-header">
+                        <h2 class="department-title">
+                            <i class="fas fa-building"></i>
+                            <?php echo htmlspecialchars($department); ?>
+                        </h2>
+                        <div class="department-count">
+                            <?php 
+                            $dept_count = 0;
+                            foreach ($regions as $region_staff) {
+                                $dept_count += count($region_staff);
+                            }
+                            echo $dept_count . ' member' . ($dept_count !== 1 ? 's' : '');
+                            ?>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            </div>
+                    
+                    <?php foreach ($regions as $region => $region_staff): ?>
+                        <div class="region-section">
+                            <div class="region-header">
+                                <h3 class="region-title">
+                                    <i class="fas fa-globe"></i>
+                                    <?php echo htmlspecialchars($region); ?>
+                                    <span class="region-count">(<?php echo count($region_staff); ?>)</span>
+                                </h3>
+                            </div>
+                            
+                            <div class="staff-grid">
+                                <?php foreach ($region_staff as $staff): ?>
+                                    <div class="staff-card">
+                                        <div class="staff-header">
+                                            <h3 class="staff-name"><?php echo htmlspecialchars($staff['full_name']); ?></h3>
+                                            <span class="staff-id"><?php echo htmlspecialchars($staff['staff_id']); ?></span>
+                                        </div>
+                                        
+                                        <div class="staff-details">
+                                            <div class="detail-row">
+                                                <span class="detail-label">Job Title:</span>
+                                                <span class="detail-value"><?php echo htmlspecialchars($staff['job_title'] ?: 'Not Set'); ?></span>
+                                            </div>
+                                            <div class="detail-row">
+                                                <span class="detail-label">Email:</span>
+                                                <span class="detail-value"><?php echo htmlspecialchars($staff['nexi_email'] ?: 'Not Set'); ?></span>
+                                            </div>
+                                            <div class="detail-row">
+                                                <span class="detail-label">Phone:</span>
+                                                <span class="detail-value"><?php echo htmlspecialchars($staff['phone_number'] ?: 'Not Set'); ?></span>
+                                            </div>
+                                            <div class="detail-row">
+                                                <span class="detail-label">Status:</span>
+                                                <span class="detail-value <?php echo $staff['account_status'] === 'Active' ? 'status-active' : 'status-inactive'; ?>">
+                                                    <?php echo htmlspecialchars($staff['account_status']); ?>
+                                                </span>
+                                            </div>
+                                            <div class="detail-row">
+                                                <span class="detail-label">2FA:</span>
+                                                <span class="detail-value <?php echo $staff['two_fa_status'] ? 'two-fa-enabled' : 'two-fa-disabled'; ?>">
+                                                    <?php echo $staff['two_fa_status'] ? 'Enabled' : 'Disabled'; ?>
+                                                </span>
+                                            </div>
+                                            <div class="detail-row">
+                                                <span class="detail-label">Date Joined:</span>
+                                                <span class="detail-value"><?php echo $staff['date_joined'] ? date('M j, Y', strtotime($staff['date_joined'])) : 'Not Set'; ?></span>
+                                            </div>
+                                            <?php if ($staff['date_of_birth'] && calculateAge($staff['date_of_birth']) < 16): ?>
+                                                <div class="detail-row">
+                                                    <span class="detail-label">Age:</span>
+                                                    <span class="detail-value" style="color: var(--primary-color); font-weight: 600;">
+                                                        <?php echo calculateAge($staff['date_of_birth']); ?> (Minor)
+                                                    </span>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                        
+                                        <div class="staff-actions">
+                                            <button onclick="viewStaff(<?php echo $staff['id']; ?>)" class="btn btn-success btn-sm">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                            <button onclick="editStaff(<?php echo $staff['id']; ?>)" class="btn btn-warning btn-sm">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                            <button onclick="deleteStaff(<?php echo $staff['id']; ?>, '<?php echo htmlspecialchars($staff['full_name']); ?>')" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endforeach; ?>
         <?php else: ?>
             <div class="empty-state">
                 <i class="fas fa-users"></i>
@@ -833,6 +968,16 @@ include __DIR__ . '/../includes/header.php';
                                 <option value="Corporate Functions">Corporate Functions</option>
                                 <option value="Shared Services">Shared Services</option>
                                 <option value="Company Leadership Team">Company Leadership Team</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Region</label>
+                            <select name="region" class="form-control">
+                                <option value="">Select Region</option>
+                                <option value="NAM">North America (NAM)</option>
+                                <option value="EMEA">Europe, Middle East & Africa (EMEA)</option>
+                                <option value="APAC">Asia-Pacific (APAC)</option>
+                                <option value="LATAM">Latin America (LATAM)</option>
                             </select>
                         </div>
                     </div>
@@ -997,6 +1142,22 @@ include __DIR__ . '/../includes/header.php';
                                 <option value="Shared Services">Shared Services</option>
                                 <option value="Company Leadership Team">Company Leadership Team</option>
                             </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Region</label>
+                            <select name="region" id="edit_region" class="form-control">
+                                <option value="">Select Region</option>
+                                <option value="NAM">North America (NAM)</option>
+                                <option value="EMEA">Europe, Middle East & Africa (EMEA)</option>
+                                <option value="APAC">Asia-Pacific (APAC)</option>
+                                <option value="LATAM">Latin America (LATAM)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <!-- Empty for balance -->
                         </div>
                     </div>
                 </div>
@@ -1193,6 +1354,10 @@ function viewStaff(staffId) {
                     <span class="view-label">Department:</span>
                     <span class="view-value">${staff.department || 'Not Set'}</span>
                 </div>
+                <div class="view-item">
+                    <span class="view-label">Region:</span>
+                    <span class="view-value">${staff.region || 'Not Set'}</span>
+                </div>
                 ${isMinor ? `
                 <div class="view-item">
                     <span class="view-label">Age:</span>
@@ -1322,6 +1487,7 @@ function editStaff(staffId) {
     document.getElementById('edit_preferred_name').value = staff.preferred_name || '';
     document.getElementById('edit_job_title').value = staff.job_title || '';
     document.getElementById('edit_department').value = staff.department || '';
+    document.getElementById('edit_region').value = staff.region || '';
     document.getElementById('edit_nexi_email').value = staff.nexi_email || '';
     document.getElementById('edit_private_email').value = staff.private_email || '';
     document.getElementById('edit_phone_number').value = staff.phone_number || '';
