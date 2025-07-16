@@ -93,19 +93,19 @@ class StripeIntegration {
         return $this->getCachedOrFetch('monthly_revenue', function() {
             $start_of_month = strtotime('first day of this month midnight');
             
-            $charges = $this->makeStripeRequest('charges', [
+            $payment_intents = $this->makeStripeRequest('payment_intents', [
                 'created[gte]' => $start_of_month,
                 'limit' => 100
             ]);
             
-            if (!$charges || !isset($charges['data'])) {
+            if (!$payment_intents || !isset($payment_intents['data'])) {
                 return 0;
             }
             
             $total = 0;
-            foreach ($charges['data'] as $charge) {
-                if ($charge['paid'] && !$charge['refunded']) {
-                    $total += $charge['amount'];
+            foreach ($payment_intents['data'] as $intent) {
+                if ($intent['status'] === 'succeeded') {
+                    $total += $intent['amount'];
                 }
             }
             
@@ -120,19 +120,19 @@ class StripeIntegration {
         return $this->getCachedOrFetch('quarterly_revenue', function() {
             $start_of_quarter = strtotime('-3 months');
             
-            $charges = $this->makeStripeRequest('charges', [
+            $payment_intents = $this->makeStripeRequest('payment_intents', [
                 'created[gte]' => $start_of_quarter,
                 'limit' => 100
             ]);
             
-            if (!$charges || !isset($charges['data'])) {
+            if (!$payment_intents || !isset($payment_intents['data'])) {
                 return 0;
             }
             
             $total = 0;
-            foreach ($charges['data'] as $charge) {
-                if ($charge['paid'] && !$charge['refunded']) {
-                    $total += $charge['amount'];
+            foreach ($payment_intents['data'] as $intent) {
+                if ($intent['status'] === 'succeeded') {
+                    $total += $intent['amount'];
                 }
             }
             
@@ -147,19 +147,19 @@ class StripeIntegration {
         return $this->getCachedOrFetch('annual_revenue', function() {
             $start_of_year = strtotime('-1 year');
             
-            $charges = $this->makeStripeRequest('charges', [
+            $payment_intents = $this->makeStripeRequest('payment_intents', [
                 'created[gte]' => $start_of_year,
                 'limit' => 100
             ]);
             
-            if (!$charges || !isset($charges['data'])) {
+            if (!$payment_intents || !isset($payment_intents['data'])) {
                 return 0;
             }
             
             $total = 0;
-            foreach ($charges['data'] as $charge) {
-                if ($charge['paid'] && !$charge['refunded']) {
-                    $total += $charge['amount'];
+            foreach ($payment_intents['data'] as $intent) {
+                if ($intent['status'] === 'succeeded') {
+                    $total += $intent['amount'];
                 }
             }
             
@@ -172,24 +172,24 @@ class StripeIntegration {
      */
     public function getRecentTransactions($limit = 10) {
         return $this->getCachedOrFetch('recent_transactions', function() use ($limit) {
-            $charges = $this->makeStripeRequest('charges', [
+            $payment_intents = $this->makeStripeRequest('payment_intents', [
                 'limit' => $limit
             ]);
             
-            if (!$charges || !isset($charges['data'])) {
+            if (!$payment_intents || !isset($payment_intents['data'])) {
                 return [];
             }
             
             $transactions = [];
-            foreach ($charges['data'] as $charge) {
+            foreach ($payment_intents['data'] as $intent) {
                 $transactions[] = [
-                    'id' => $charge['id'],
-                    'amount' => $charge['amount'] / 100,
-                    'currency' => strtoupper($charge['currency']),
-                    'description' => $charge['description'] ?: 'Payment',
-                    'status' => $charge['paid'] ? 'completed' : 'pending',
-                    'created' => date('Y-m-d H:i:s', $charge['created']),
-                    'customer_email' => $charge['billing_details']['email'] ?? ''
+                    'id' => $intent['id'],
+                    'amount' => $intent['amount'] / 100,
+                    'currency' => strtoupper($intent['currency']),
+                    'description' => $intent['description'] ?: 'Payment',
+                    'status' => $intent['status'] === 'succeeded' ? 'completed' : 'pending',
+                    'created' => date('Y-m-d H:i:s', $intent['created']),
+                    'customer_email' => $intent['receipt_email'] ?? ''
                 ];
             }
             
@@ -203,7 +203,6 @@ class StripeIntegration {
     public function getSubscriptionMetrics() {
         return $this->getCachedOrFetch('subscription_metrics', function() {
             $subscriptions = $this->makeStripeRequest('subscriptions', [
-                'status' => 'active',
                 'limit' => 100
             ]);
             
@@ -215,19 +214,23 @@ class StripeIntegration {
                 ];
             }
             
-            $active_count = count($subscriptions['data']);
+            $active_count = 0;
             $mrr = 0;
             
             foreach ($subscriptions['data'] as $sub) {
-                if (isset($sub['items']['data'][0]['price']['unit_amount'])) {
-                    $amount = $sub['items']['data'][0]['price']['unit_amount'] / 100;
-                    $interval = $sub['items']['data'][0]['price']['recurring']['interval'];
+                if ($sub['status'] === 'active') {
+                    $active_count++;
                     
-                    // Convert to monthly
-                    if ($interval === 'year') {
-                        $mrr += $amount / 12;
-                    } elseif ($interval === 'month') {
-                        $mrr += $amount;
+                    if (isset($sub['items']['data'][0]['price']['unit_amount'])) {
+                        $amount = $sub['items']['data'][0]['price']['unit_amount'] / 100;
+                        $interval = $sub['items']['data'][0]['price']['recurring']['interval'];
+                        
+                        // Convert to monthly
+                        if ($interval === 'year') {
+                            $mrr += $amount / 12;
+                        } elseif ($interval === 'month') {
+                            $mrr += $amount;
+                        }
                     }
                 }
             }
