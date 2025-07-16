@@ -80,7 +80,7 @@ if (!$oliverExists) {
             'NXH001',
             'Oliver Reaney',
             'Founder & CEO',
-            'Executive',
+            'Executive Leadership',
             'oliver@nexihub.com',
             'Active',
             '2024-01-01',
@@ -827,14 +827,12 @@ include __DIR__ . '/../includes/header.php';
                             <label class="form-label">Department</label>
                             <select name="department" class="form-control">
                                 <option value="">Select Department</option>
-                                <option value="Executive">Executive</option>
-                                <option value="Development">Development</option>
-                                <option value="Design">Design</option>
-                                <option value="Marketing">Marketing</option>
-                                <option value="Sales">Sales</option>
-                                <option value="Support">Support</option>
-                                <option value="HR">Human Resources</option>
-                                <option value="Finance">Finance</option>
+                                <option value="Executive Leadership">Executive Leadership</option>
+                                <option value="Senior Leadership">Senior Leadership</option>
+                                <option value="Regional Leadership Team">Regional Leadership Team</option>
+                                <option value="Corporate Functions">Corporate Functions</option>
+                                <option value="Shared Services">Shared Services</option>
+                                <option value="Company Leadership Team">Company Leadership Team</option>
                             </select>
                         </div>
                     </div>
@@ -992,14 +990,12 @@ include __DIR__ . '/../includes/header.php';
                             <label class="form-label">Department</label>
                             <select name="department" id="edit_department" class="form-control">
                                 <option value="">Select Department</option>
-                                <option value="Executive">Executive</option>
-                                <option value="Development">Development</option>
-                                <option value="Design">Design</option>
-                                <option value="Marketing">Marketing</option>
-                                <option value="Sales">Sales</option>
-                                <option value="Support">Support</option>
-                                <option value="HR">Human Resources</option>
-                                <option value="Finance">Finance</option>
+                                <option value="Executive Leadership">Executive Leadership</option>
+                                <option value="Senior Leadership">Senior Leadership</option>
+                                <option value="Regional Leadership Team">Regional Leadership Team</option>
+                                <option value="Corporate Functions">Corporate Functions</option>
+                                <option value="Shared Services">Shared Services</option>
+                                <option value="Company Leadership Team">Company Leadership Team</option>
                             </select>
                         </div>
                     </div>
