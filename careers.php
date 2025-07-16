@@ -274,22 +274,6 @@ include 'includes/header.php';
                     <button class="apply-btn">Apply Now</button>
                 </div>
                 
-                <div class="position-card" data-position="Regional Director - Asia-Pacific">
-                    <div class="position-header">
-                        <h4 class="position-title">Regional Director - Asia-Pacific</h4>
-                        <span class="position-type">Leadership</span>
-                    </div>
-                    <div class="position-location">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                        </svg>
-                        Remote (APAC Region)
-                    </div>
-                    <p class="position-summary">Manage operations across East Asia, Southeast Asia, Australia, New Zealand, and Pacific Islands.</p>
-                    <button class="apply-btn">Apply Now</button>
-                </div>
-                
                 <div class="position-card" data-position="Regional Director - Latin America">
                     <div class="position-header">
                         <h4 class="position-title">Regional Director - Latin America</h4>
@@ -341,6 +325,242 @@ include 'includes/header.php';
                         Remote
                     </div>
                     <p class="position-summary">Ensure adherence to global regulations and support ethical business practices.</p>
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Shared Services -->
+        <div class="position-category">
+            <h3 class="category-title">Shared Services</h3>
+            <div class="positions-grid">
+                <div class="position-card" data-position="Brand Manager">
+                    <div class="position-header">
+                        <h4 class="position-title">Brand Manager</h4>
+                        <span class="position-type">Marketing</span>
+                    </div>
+                    <div class="position-location">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        Remote
+                    </div>
+                    <p class="position-summary">Develop and maintain brand identity across all Nexi Hub platforms and communications.</p>
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+                
+                <div class="position-card" data-position="Marketing Manager">
+                    <div class="position-header">
+                        <h4 class="position-title">Marketing Manager</h4>
+                        <span class="position-type">Marketing</span>
+                    </div>
+                    <div class="position-location">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        Remote
+                    </div>
+                    <p class="position-summary">Lead marketing strategies and campaigns to drive growth across all platforms.</p>
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+                
+                <div class="position-card" data-position="Partnership Manager">
+                    <div class="position-header">
+                        <h4 class="position-title">Partnership Manager</h4>
+                        <span class="position-type">Business Development</span>
+                    </div>
+                    <div class="position-location">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        Remote
+                    </div>
+                    <p class="position-summary">Build and manage strategic partnerships to expand our platform reach.</p>
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+                
+                <div class="position-card" data-position="Research & Development Manager">
+                    <div class="position-header">
+                        <h4 class="position-title">Research & Development Manager</h4>
+                        <span class="position-type">Innovation</span>
+                    </div>
+                    <div class="position-location">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        Remote
+                    </div>
+                    <p class="position-summary">Lead research initiatives and drive innovation across all Nexi Hub platforms.</p>
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+                
+                <div class="position-card" data-position="Resource Planning Manager">
+                    <div class="position-header">
+                        <h4 class="position-title">Resource Planning Manager</h4>
+                        <span class="position-type">Operations</span>
+                    </div>
+                    <div class="position-location">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        Remote
+                    </div>
+                    <p class="position-summary">Plan and optimize resource allocation across all departments and projects.</p>
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+                
+                <div class="position-card" data-position="Quality Assurance Manager">
+                    <div class="position-header">
+                        <h4 class="position-title">Quality Assurance Manager</h4>
+                        <span class="position-type">Quality</span>
+                    </div>
+                    <div class="position-location">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        Remote
+                    </div>
+                    <p class="position-summary">Ensure quality standards and testing processes across all platforms.</p>
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Company Leadership Team -->
+        <div class="position-category">
+            <h3 class="category-title">Company Leadership Team</h3>
+            <div class="positions-grid">
+                <div class="position-card" data-position="Nexi Pulse General Manager">
+                    <div class="position-header">
+                        <h4 class="position-title">Nexi Pulse General Manager</h4>
+                        <span class="position-type">Leadership</span>
+                    </div>
+                    <div class="position-location">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        Remote
+                    </div>
+                    <p class="position-summary">Lead the Nexi Pulse platform strategy, operations, and team management.</p>
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+                
+                <div class="position-card" data-position="Nexi Pulse Head of Product">
+                    <div class="position-header">
+                        <h4 class="position-title">Nexi Pulse Head of Product</h4>
+                        <span class="position-type">Product</span>
+                    </div>
+                    <div class="position-location">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        Remote
+                    </div>
+                    <p class="position-summary">Drive product vision and strategy for the Nexi Pulse platform.</p>
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+                
+                <div class="position-card" data-position="Nexi Pulse Head of Technology">
+                    <div class="position-header">
+                        <h4 class="position-title">Nexi Pulse Head of Technology</h4>
+                        <span class="position-type">Technology</span>
+                    </div>
+                    <div class="position-location">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        Remote
+                    </div>
+                    <p class="position-summary">Lead technical development and architecture for Nexi Pulse.</p>
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+                
+                <div class="position-card" data-position="Nexi Bot General Manager">
+                    <div class="position-header">
+                        <h4 class="position-title">Nexi Bot General Manager</h4>
+                        <span class="position-type">Leadership</span>
+                    </div>
+                    <div class="position-location">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        Remote
+                    </div>
+                    <p class="position-summary">Oversee Nexi Bot platform operations, strategy, and growth initiatives.</p>
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+                
+                <div class="position-card" data-position="Nexi Bot Head of Engineering">
+                    <div class="position-header">
+                        <h4 class="position-title">Nexi Bot Head of Engineering</h4>
+                        <span class="position-type">Engineering</span>
+                    </div>
+                    <div class="position-location">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        Remote
+                    </div>
+                    <p class="position-summary">Lead engineering team and technical development for Nexi Bot.</p>
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+                
+                <div class="position-card" data-position="Nexi Web General Manager">
+                    <div class="position-header">
+                        <h4 class="position-title">Nexi Web General Manager</h4>
+                        <span class="position-type">Leadership</span>
+                    </div>
+                    <div class="position-location">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        Remote
+                    </div>
+                    <p class="position-summary">Manage Nexi Web platform strategy, operations, and business development.</p>
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+                
+                <div class="position-card" data-position="Nexi Web Creative Director">
+                    <div class="position-header">
+                        <h4 class="position-title">Nexi Web Creative Director</h4>
+                        <span class="position-type">Creative</span>
+                    </div>
+                    <div class="position-location">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        Remote
+                    </div>
+                    <p class="position-summary">Lead creative vision and design strategy for Nexi Web platform.</p>
+                    <button class="apply-btn">Apply Now</button>
+                </div>
+                
+                <div class="position-card" data-position="Nexi Web Head of Engineering">
+                    <div class="position-header">
+                        <h4 class="position-title">Nexi Web Head of Engineering</h4>
+                        <span class="position-type">Engineering</span>
+                    </div>
+                    <div class="position-location">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        Remote
+                    </div>
+                    <p class="position-summary">Lead engineering team and technical development for Nexi Web.</p>
                     <button class="apply-btn">Apply Now</button>
                 </div>
             </div>
