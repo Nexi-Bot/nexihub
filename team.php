@@ -392,23 +392,21 @@ include 'includes/header.php';
                 </div>
             </div>
 
-            <div class="team-member vacant">
+            <div class="team-member">
                 <div class="member-photo">
-                    <div class="photo-placeholder vacant-placeholder">
-                        <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
-                            <path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2-7h-3V2h-2v2H8V2H6v2H3v2h18V4zM3 8v12h18V8H3z"/>
-                        </svg>
-                    </div>
+                    <img src="assets/images/tom.jpg" alt="Thomas" class="member-image">
                 </div>
                 <div class="member-info">
-                    <h3 class="member-name">Vacant</h3>
+                    <h3 class="member-name">Thomas</h3>
                     <p class="member-title">Corporate Strategy Manager</p>
                     <p class="member-description">
                         Driving strategic initiatives, market analysis, and long-term planning to support 
                         Nexi Hub's growth and competitive positioning in the digital tools market.
                     </p>
-                    <div class="member-status">
-                        <span class="status-badge vacant">Position Available</span>
+                    <div class="member-expertise">
+                        <span class="expertise-tag">Strategic Planning</span>
+                        <span class="expertise-tag">Market Analysis</span>
+                        <span class="expertise-tag">Business Development</span>
                     </div>
                 </div>
             </div>
@@ -427,6 +425,126 @@ include 'includes/header.php';
                     <p class="member-description">
                         Ensuring adherence to global regulations, managing compliance programs, 
                         and supporting our commitment to ethical business practices across all markets.
+                    </p>
+                    <div class="member-status">
+                        <span class="status-badge vacant">Position Available</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="team-member vacant">
+                <div class="member-photo">
+                    <div class="photo-placeholder vacant-placeholder">
+                        <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="member-info">
+                    <h3 class="member-name">Vacant</h3>
+                    <p class="member-title">Brand Manager</p>
+                    <p class="member-description">
+                        Shared Services
+                    </p>
+                    <div class="member-status">
+                        <span class="status-badge vacant">Position Available</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="team-member vacant">
+                <div class="member-photo">
+                    <div class="photo-placeholder vacant-placeholder">
+                        <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="member-info">
+                    <h3 class="member-name">Vacant</h3>
+                    <p class="member-title">Marketing Manager</p>
+                    <p class="member-description">
+                        Shared Services
+                    </p>
+                    <div class="member-status">
+                        <span class="status-badge vacant">Position Available</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="team-member vacant">
+                <div class="member-photo">
+                    <div class="photo-placeholder vacant-placeholder">
+                        <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="member-info">
+                    <h3 class="member-name">Vacant</h3>
+                    <p class="member-title">Partnership Manager</p>
+                    <p class="member-description">
+                        Shared Services
+                    </p>
+                    <div class="member-status">
+                        <span class="status-badge vacant">Position Available</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="team-member vacant">
+                <div class="member-photo">
+                    <div class="photo-placeholder vacant-placeholder">
+                        <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="member-info">
+                    <h3 class="member-name">Vacant</h3>
+                    <p class="member-title">Research & Development Manager</p>
+                    <p class="member-description">
+                        Shared Services
+                    </p>
+                    <div class="member-status">
+                        <span class="status-badge vacant">Position Available</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="team-member vacant">
+                <div class="member-photo">
+                    <div class="photo-placeholder vacant-placeholder">
+                        <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="member-info">
+                    <h3 class="member-name">Vacant</h3>
+                    <p class="member-title">Resource Planning Manager</p>
+                    <p class="member-description">
+                        Shared Services
+                    </p>
+                    <div class="member-status">
+                        <span class="status-badge vacant">Position Available</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="team-member vacant">
+                <div class="member-photo">
+                    <div class="photo-placeholder vacant-placeholder">
+                        <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="member-info">
+                    <h3 class="member-name">Vacant</h3>
+                    <p class="member-title">Quality Assurance Manager</p>
+                    <p class="member-description">
+                        Shared Services
                     </p>
                     <div class="member-status">
                         <span class="status-badge vacant">Position Available</span>
@@ -457,252 +575,176 @@ include 'includes/header.php';
 
 <section class="content-section">
     <div class="container">
-        <h2 class="section-title">Additional Opportunities</h2>
+        <h2 class="section-title">Company Leadership Team</h2>
         <p class="section-subtitle" style="margin-bottom: 3rem;">
-            Shared Services and Platform Leadership roles available across our organization
+            Platform-specific leadership roles driving innovation across our product ecosystem
         </p>
         
-        <div class="team-grid-compact">
-            <div class="team-member-compact vacant">
-                <div class="member-photo-compact">
+        <div class="team-grid">
+            <div class="team-member vacant">
+                <div class="member-photo">
                     <div class="photo-placeholder vacant-placeholder">
                         <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                         </svg>
                     </div>
                 </div>
-                <div class="member-info-compact">
-                    <h4 class="member-name-compact">Brand Manager</h4>
-                    <p class="member-title-compact">Shared Services</p>
+                <div class="member-info">
+                    <h3 class="member-name">Vacant</h3>
+                    <p class="member-title">Nexi Pulse General Manager</p>
+                    <p class="member-description">
+                        Company Leadership Team
+                    </p>
                     <div class="member-status">
-                        <span class="status-badge vacant">Open Position</span>
+                        <span class="status-badge vacant">Position Available</span>
                     </div>
                 </div>
             </div>
 
-            <div class="team-member-compact vacant">
-                <div class="member-photo-compact">
+            <div class="team-member vacant">
+                <div class="member-photo">
                     <div class="photo-placeholder vacant-placeholder">
                         <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                         </svg>
                     </div>
                 </div>
-                <div class="member-info-compact">
-                    <h4 class="member-name-compact">Marketing Manager</h4>
-                    <p class="member-title-compact">Shared Services</p>
+                <div class="member-info">
+                    <h3 class="member-name">Vacant</h3>
+                    <p class="member-title">Nexi Pulse Head of Product</p>
+                    <p class="member-description">
+                        Company Leadership Team
+                    </p>
                     <div class="member-status">
-                        <span class="status-badge vacant">Open Position</span>
+                        <span class="status-badge vacant">Position Available</span>
                     </div>
                 </div>
             </div>
 
-            <div class="team-member-compact vacant">
-                <div class="member-photo-compact">
+            <div class="team-member vacant">
+                <div class="member-photo">
                     <div class="photo-placeholder vacant-placeholder">
                         <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                         </svg>
                     </div>
                 </div>
-                <div class="member-info-compact">
-                    <h4 class="member-name-compact">Partnership Manager</h4>
-                    <p class="member-title-compact">Shared Services</p>
+                <div class="member-info">
+                    <h3 class="member-name">Vacant</h3>
+                    <p class="member-title">Nexi Pulse Head of Technology</p>
+                    <p class="member-description">
+                        Company Leadership Team
+                    </p>
                     <div class="member-status">
-                        <span class="status-badge vacant">Open Position</span>
+                        <span class="status-badge vacant">Position Available</span>
                     </div>
                 </div>
             </div>
 
-            <div class="team-member-compact vacant">
-                <div class="member-photo-compact">
+            <div class="team-member vacant">
+                <div class="member-photo">
                     <div class="photo-placeholder vacant-placeholder">
                         <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                         </svg>
                     </div>
                 </div>
-                <div class="member-info-compact">
-                    <h4 class="member-name-compact">Research & Development Manager</h4>
-                    <p class="member-title-compact">Shared Services</p>
+                <div class="member-info">
+                    <h3 class="member-name">Vacant</h3>
+                    <p class="member-title">Nexi Bot General Manager</p>
+                    <p class="member-description">
+                        Company Leadership Team
+                    </p>
                     <div class="member-status">
-                        <span class="status-badge vacant">Open Position</span>
+                        <span class="status-badge vacant">Position Available</span>
                     </div>
                 </div>
             </div>
 
-            <div class="team-member-compact vacant">
-                <div class="member-photo-compact">
+            <div class="team-member vacant">
+                <div class="member-photo">
                     <div class="photo-placeholder vacant-placeholder">
                         <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                         </svg>
                     </div>
                 </div>
-                <div class="member-info-compact">
-                    <h4 class="member-name-compact">Resource Planning Manager</h4>
-                    <p class="member-title-compact">Shared Services</p>
+                <div class="member-info">
+                    <h3 class="member-name">Vacant</h3>
+                    <p class="member-title">Nexi Bot Head of Engineering</p>
+                    <p class="member-description">
+                        Company Leadership Team
+                    </p>
                     <div class="member-status">
-                        <span class="status-badge vacant">Open Position</span>
+                        <span class="status-badge vacant">Position Available</span>
                     </div>
                 </div>
             </div>
 
-            <div class="team-member-compact vacant">
-                <div class="member-photo-compact">
+            <div class="team-member vacant">
+                <div class="member-photo">
                     <div class="photo-placeholder vacant-placeholder">
                         <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                         </svg>
                     </div>
                 </div>
-                <div class="member-info-compact">
-                    <h4 class="member-name-compact">Quality Assurance Manager</h4>
-                    <p class="member-title-compact">Shared Services</p>
+                <div class="member-info">
+                    <h3 class="member-name">Vacant</h3>
+                    <p class="member-title">Nexi Web General Manager</p>
+                    <p class="member-description">
+                        Company Leadership Team
+                    </p>
                     <div class="member-status">
-                        <span class="status-badge vacant">Open Position</span>
+                        <span class="status-badge vacant">Position Available</span>
                     </div>
                 </div>
             </div>
 
-            <div class="team-member-compact vacant">
-                <div class="member-photo-compact">
+            <div class="team-member vacant">
+                <div class="member-photo">
                     <div class="photo-placeholder vacant-placeholder">
                         <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                         </svg>
                     </div>
                 </div>
-                <div class="member-info-compact">
-                    <h4 class="member-name-compact">Nexi Pulse General Manager</h4>
-                    <p class="member-title-compact">Platform Leadership</p>
+                <div class="member-info">
+                    <h3 class="member-name">Vacant</h3>
+                    <p class="member-title">Nexi Web Creative Director</p>
+                    <p class="member-description">
+                        Company Leadership Team
+                    </p>
                     <div class="member-status">
-                        <span class="status-badge vacant">Open Position</span>
+                        <span class="status-badge vacant">Position Available</span>
                     </div>
                 </div>
             </div>
 
-            <div class="team-member-compact vacant">
-                <div class="member-photo-compact">
+            <div class="team-member vacant">
+                <div class="member-photo">
                     <div class="photo-placeholder vacant-placeholder">
                         <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                         </svg>
                     </div>
                 </div>
-                <div class="member-info-compact">
-                    <h4 class="member-name-compact">Nexi Pulse Head of Product</h4>
-                    <p class="member-title-compact">Platform Leadership</p>
+                <div class="member-info">
+                    <h3 class="member-name">Vacant</h3>
+                    <p class="member-title">Nexi Web Head of Engineering</p>
+                    <p class="member-description">
+                        Company Leadership Team
+                    </p>
                     <div class="member-status">
-                        <span class="status-badge vacant">Open Position</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="team-member-compact vacant">
-                <div class="member-photo-compact">
-                    <div class="photo-placeholder vacant-placeholder">
-                        <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="member-info-compact">
-                    <h4 class="member-name-compact">Nexi Pulse Head of Technology</h4>
-                    <p class="member-title-compact">Platform Leadership</p>
-                    <div class="member-status">
-                        <span class="status-badge vacant">Open Position</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="team-member-compact vacant">
-                <div class="member-photo-compact">
-                    <div class="photo-placeholder vacant-placeholder">
-                        <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="member-info-compact">
-                    <h4 class="member-name-compact">Nexi Bot General Manager</h4>
-                    <p class="member-title-compact">Platform Leadership</p>
-                    <div class="member-status">
-                        <span class="status-badge vacant">Open Position</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="team-member-compact vacant">
-                <div class="member-photo-compact">
-                    <div class="photo-placeholder vacant-placeholder">
-                        <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="member-info-compact">
-                    <h4 class="member-name-compact">Nexi Bot Head of Engineering</h4>
-                    <p class="member-title-compact">Platform Leadership</p>
-                    <div class="member-status">
-                        <span class="status-badge vacant">Open Position</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="team-member-compact vacant">
-                <div class="member-photo-compact">
-                    <div class="photo-placeholder vacant-placeholder">
-                        <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="member-info-compact">
-                    <h4 class="member-name-compact">Nexi Web General Manager</h4>
-                    <p class="member-title-compact">Platform Leadership</p>
-                    <div class="member-status">
-                        <span class="status-badge vacant">Open Position</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="team-member-compact vacant">
-                <div class="member-photo-compact">
-                    <div class="photo-placeholder vacant-placeholder">
-                        <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="member-info-compact">
-                    <h4 class="member-name-compact">Nexi Web Creative Director</h4>
-                    <p class="member-title-compact">Platform Leadership</p>
-                    <div class="member-status">
-                        <span class="status-badge vacant">Open Position</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="team-member-compact vacant">
-                <div class="member-photo-compact">
-                    <div class="photo-placeholder vacant-placeholder">
-                        <svg viewBox="0 0 24 24" fill="currentColor" class="vacant-icon">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="member-info-compact">
-                    <h4 class="member-name-compact">Nexi Web Head of Engineering</h4>
-                    <p class="member-title-compact">Platform Leadership</p>
-                    <div class="member-status">
-                        <span class="status-badge vacant">Open Position</span>
+                        <span class="status-badge vacant">Position Available</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+
 
 <section class="content-section alt">
     <div class="container">
