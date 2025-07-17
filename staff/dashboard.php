@@ -107,32 +107,32 @@ try {
         // Columns may already exist
     }
 
-    // Insert the 5 contract templates
+    // Insert the 5 contract templates (will be updated with actual content)
     $contractTemplates = [
         [
             'name' => 'Voluntary Contract of Employment',
             'type' => 'employment',
-            'content' => generateVoluntaryContract()
+            'content' => '<h1>Voluntary Contract of Employment</h1><p>Contract content will be loaded here...</p>'
         ],
         [
             'name' => 'Staff Code of Conduct',
             'type' => 'conduct',
-            'content' => generateCodeOfConduct()
+            'content' => '<h1>Staff Code of Conduct</h1><p>Code of conduct content will be loaded here...</p>'
         ],
         [
             'name' => 'Non-Disclosure Agreement (NDA)',
             'type' => 'nda',
-            'content' => generateNDA()
+            'content' => '<h1>Non-Disclosure Agreement</h1><p>NDA content will be loaded here...</p>'
         ],
         [
             'name' => 'Company Policies and Procedures',
             'type' => 'policies',
-            'content' => generateCompanyPolicies()
+            'content' => '<h1>Company Policies and Procedures</h1><p>Policies content will be loaded here...</p>'
         ],
         [
             'name' => 'Shareholder Agreement',
             'type' => 'shareholder',
-            'content' => generateShareholderAgreement()
+            'content' => '<h1>Shareholder Agreement</h1><p>Shareholder agreement content will be loaded here...</p>'
         ]
     ];
 
