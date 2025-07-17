@@ -16,7 +16,12 @@ define('DISCORD_CLIENT_ID', '1394054979811282955'); // You'll need to provide th
 define('DISCORD_CLIENT_SECRET', 'Oy5sgCK4IF4gb1GQpbMovUgtImc04AaN'); // You'll need to provide this
 
 // Site Configuration
-$is_local = (isset($_SERVER['HTTP_HOST']) && ($_SERVER['HTTP_HOST'] === 'localhost:8000' || $_SERVER['HTTP_HOST'] === '127.0.0.1:8000'));
+$is_local = (isset($_SERVER['HTTP_HOST']) && (
+    $_SERVER['HTTP_HOST'] === 'localhost:8000' || 
+    $_SERVER['HTTP_HOST'] === '127.0.0.1:8000' ||
+    $_SERVER['HTTP_HOST'] === 'localhost' ||
+    $_SERVER['HTTP_HOST'] === '127.0.0.1'
+));
 define('SITE_URL', $is_local ? 'http://localhost:8000' : 'https://nexihub.uk');
 define('SITE_NAME', 'Nexi Hub');
 define('IS_LOCAL_DEV', $is_local);
@@ -48,8 +53,8 @@ function checkSessionTimeout() {
 
 // Database Connection
 try {
-    if (DB_TYPE === 'sqlite' || IS_LOCAL_DEV) {
-        // Use SQLite for local development
+    if (IS_LOCAL_DEV && file_exists(__DIR__ . "/../database/nexihub.db")) {
+        // Use SQLite for local development only when file exists
         $pdo = new PDO(
             "sqlite:" . __DIR__ . "/../database/nexihub.db",
             null,
@@ -61,7 +66,7 @@ try {
             ]
         );
     } else {
-        // Use MySQL for production
+        // Use MySQL for production or when SQLite file doesn't exist
         $pdo = new PDO(
             "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4",
             DB_USER,

@@ -29,7 +29,7 @@ try {
     }
 
     // Check if user exists and is active
-    $stmt = $pdo->prepare("SELECT id, email, name, discord_id, two_fa_secret, two_fa_enabled, password_hash FROM staff WHERE email = ? AND is_active = 1");
+    $stmt = $pdo->prepare("SELECT id, email, discord_id, two_fa_secret, two_fa_enabled, password_hash, discord_username, job_title FROM staff WHERE email = ? AND is_active = 1");
     $stmt->execute([$email]);
     $staff = $stmt->fetch();
 
@@ -60,7 +60,7 @@ try {
     // Store staff information in session
     $_SESSION['staff_id'] = $staff['id'];
     $_SESSION['staff_email'] = $staff['email'];
-    $_SESSION['staff_name'] = $staff['name'];
+    $_SESSION['staff_name'] = $staff['discord_username'] ?? $staff['email'];
     $_SESSION['email_verified'] = true;
 
     error_log("Email verification successful for: $email (Staff ID: {$staff['id']})");
