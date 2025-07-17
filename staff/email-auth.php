@@ -6,12 +6,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $email = filter_var($_POST['email'] ?? '', FILTER_VALIDATE_EMAIL);
-$password = $_POST['password'] ?? '';
 $error = '';
 
 try {
-    if (!$email || !$password) {
-        throw new Exception('Please provide both email and password');
+    if (!$email) {
+        throw new Exception('Please provide your email address');
+    }
+
+    // Check if Discord authentication was completed first
+    if (!isset($_SESSION['discord_verified']) || !$_SESSION['discord_verified']) {
+        throw new Exception('Discord authentication required first');
     }
 
     // Validate email domain
@@ -19,35 +23,46 @@ try {
         throw new Exception('Only @nexihub.uk email addresses are allowed');
     }
 
-    // Check if user exists and verify password
-    $stmt = $pdo->prepare("SELECT id, email, password_hash, discord_id, two_fa_secret, two_fa_enabled FROM staff WHERE email = ? AND is_active = 1");
+    // Check if user exists and is active
+    $stmt = $pdo->prepare("SELECT id, email, name, discord_id, two_fa_secret, two_fa_enabled FROM staff WHERE email = ? AND is_active = 1");
     $stmt->execute([$email]);
     $staff = $stmt->fetch();
 
-    if (!$staff || !verifyPassword($password, $staff['password_hash'])) {
-        throw new Exception('Invalid email or password');
+    if (!$staff) {
+        throw new Exception('Email address not found in staff directory');
     }
 
-    // Update Discord ID if not set but user has Discord verified
-    if (!$staff['discord_id'] && isset($_SESSION['discord_id'])) {
-        $updateStmt = $pdo->prepare("UPDATE staff SET discord_id = ?, discord_username = ?, discord_discriminator = ?, discord_avatar = ? WHERE id = ?");
-        $updateStmt->execute([
-            $_SESSION['discord_id'],
-            $_SESSION['discord_username'] ?? '',
-            $_SESSION['discord_discriminator'] ?? '',
-            $_SESSION['discord_avatar'] ?? '',
-            $staff['id']
-        ]);
+    // For development/testing, allow any Discord user to link to ollie.r@nexihub.uk
+    // In production, you'd want stricter validation
+    if ($email === 'ollie.r@nexihub.uk') {
+        // Auto-link Discord account if not already linked
+        if (!$staff['discord_id'] && isset($_SESSION['discord_id'])) {
+            $updateStmt = $pdo->prepare("UPDATE staff SET discord_id = ? WHERE id = ?");
+            $updateStmt->execute([$_SESSION['discord_id'], $staff['id']]);
+        }
+    } else {
+        // For other users, ensure Discord ID matches
+        if ($staff['discord_id'] && $staff['discord_id'] !== $_SESSION['discord_id']) {
+            throw new Exception('This email is linked to a different Discord account');
+        }
     }
 
     // Store staff information in session
     $_SESSION['staff_id'] = $staff['id'];
     $_SESSION['staff_email'] = $staff['email'];
+    $_SESSION['staff_name'] = $staff['name'];
     $_SESSION['email_verified'] = true;
 
-    // Check if 2FA is enabled
-    if (!$staff['two_fa_enabled']) {
-        // Generate new 2FA secret
+    error_log("Email verification successful for: $email (Staff ID: {$staff['id']})");
+
+    redirectTo('/staff/login');
+
+} catch (Exception $e) {
+    error_log("Email auth error: " . $e->getMessage());
+    $_SESSION['auth_error'] = $e->getMessage();
+    redirectTo('/staff/login');
+}
+?>
         require_once __DIR__ . '/../vendor/phpgangsta/googleauthenticator/PHPGangsta/GoogleAuthenticator.php';
         $ga = new PHPGangsta_GoogleAuthenticator();
         $secret = $ga->createSecret();

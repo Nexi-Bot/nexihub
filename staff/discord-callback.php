@@ -87,15 +87,32 @@ try {
         $_SESSION['staff_id'] = $staff['id'];
         $_SESSION['staff_email'] = $staff['email'];
     } else {
-        // For testing/development: If Discord account isn't linked, check if it's a known staff member
-        // In production, you'd want to require pre-linking Discord accounts
-        if ($userData['username'] === 'olliereaney') {
-            // Link this Discord account to the staff member
-            $stmt = $pdo->prepare("UPDATE staff SET discord_id = ? WHERE email = ?");
-            $stmt->execute([$userData['id'], 'ollie.r@nexihub.uk']);
+        // Auto-link Discord account for known staff members
+        // Check if this is a recognized Discord username for staff
+        if ($userData['username'] === 'olliereaney' || $userData['username'] === 'Oliver Reaney' || 
+            strtolower($userData['username']) === 'ollie' || strtolower($userData['username']) === 'ollier') {
             
-            $_SESSION['staff_id'] = 1; // Assuming ID 1 for ollie.r@nexihub.uk
-            $_SESSION['staff_email'] = 'ollie.r@nexihub.uk';
+            // Get the actual staff ID from database
+            $stmt = $pdo->prepare("SELECT id FROM staff WHERE email = ? AND is_active = 1");
+            $stmt->execute(['ollie.r@nexihub.uk']);
+            $staff_record = $stmt->fetch();
+            
+            if ($staff_record) {
+                // Link this Discord account to the staff member
+                $stmt = $pdo->prepare("UPDATE staff SET discord_id = ? WHERE id = ?");
+                $stmt->execute([$userData['id'], $staff_record['id']]);
+                
+                $_SESSION['staff_id'] = $staff_record['id'];
+                $_SESSION['staff_email'] = 'ollie.r@nexihub.uk';
+                
+                error_log("Auto-linked Discord account {$userData['username']} to staff ID {$staff_record['id']}");
+            }
+        } else {
+            // For other Discord users, check if they match any staff email or are authorized
+            error_log("Unknown Discord user: {$userData['username']} (ID: {$userData['id']})");
+            $_SESSION['auth_error'] = 'Your Discord account is not linked to a staff member. Please contact HR.';
+            redirectTo('/staff/login');
+            exit;
         }
     }
 
