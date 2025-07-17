@@ -1060,7 +1060,48 @@ function openSigningModal(contractId) {
     
     document.getElementById('modalContractTitle').textContent = contract.name;
     document.getElementById('modalTemplateId').value = contractId;
-    document.getElementById('modalContractContent').innerHTML = contract.content.replace(/\n/g, '<br>');
+    
+    // Clean and format contract content for display
+    let content = contract.content;
+    
+    // Remove markdown symbols and format properly
+    content = content.replace(/^#+\s*/gm, ''); // Remove markdown headers
+    content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Convert bold markdown
+    content = content.replace(/\*(.*?)\*/g, '<em>$1</em>'); // Convert italic markdown
+    content = content.replace(/•/g, '•'); // Fix bullet points
+    
+    // Convert to proper HTML formatting
+    const lines = content.split('\n');
+    let formattedContent = '';
+    
+    for (let line of lines) {
+        line = line.trim();
+        if (!line) continue;
+        
+        // Check if it's a section header
+        if (line.match(/^(ARTICLE|SECTION|\d+\.\d+|\d+\.)\s+/) || 
+            (line.length < 100 && line === line.toUpperCase() && !line.match(/[.!?]$/))) {
+            formattedContent += `<h4 style="color: var(--primary-color); margin: 1.5rem 0 0.5rem 0; font-size: 1.1rem;">${line}</h4>`;
+        } else {
+            formattedContent += `<p style="margin: 0.8rem 0; line-height: 1.6;">${line}</p>`;
+        }
+    }
+    
+    document.getElementById('modalContractContent').innerHTML = formattedContent;
+    
+    // Show/hide guardian section based on age
+    const guardianSection = document.getElementById('guardianSection');
+    if (userProfile && userProfile.is_under_17) {
+        guardianSection.style.display = 'block';
+        // Make guardian fields required
+        document.getElementById('guardianName').required = true;
+        document.getElementById('guardianEmail').required = true;
+    } else {
+        guardianSection.style.display = 'none';
+        // Remove required attribute
+        document.getElementById('guardianName').required = false;
+        document.getElementById('guardianEmail').required = false;
+    }
     
     document.getElementById('signingModal').style.display = 'block';
     
@@ -1080,7 +1121,34 @@ function viewContract(contractId) {
     window.currentViewingContractId = contractId;
     
     document.getElementById('viewModalTitle').textContent = contract.name;
-    document.getElementById('viewModalContent').innerHTML = contract.content.replace(/\n/g, '<br>');
+    
+    // Clean and format contract content for display
+    let content = contract.content;
+    
+    // Remove markdown symbols and format properly
+    content = content.replace(/^#+\s*/gm, ''); // Remove markdown headers
+    content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Convert bold markdown
+    content = content.replace(/\*(.*?)\*/g, '<em>$1</em>'); // Convert italic markdown
+    content = content.replace(/•/g, '•'); // Fix bullet points
+    
+    // Convert to proper HTML formatting
+    const lines = content.split('\n');
+    let formattedContent = '';
+    
+    for (let line of lines) {
+        line = line.trim();
+        if (!line) continue;
+        
+        // Check if it's a section header
+        if (line.match(/^(ARTICLE|SECTION|\d+\.\d+|\d+\.)\s+/) || 
+            (line.length < 100 && line === line.toUpperCase() && !line.match(/[.!?]$/))) {
+            formattedContent += `<h4 style="color: var(--primary-color); margin: 1.5rem 0 0.5rem 0; font-size: 1.1rem;">${line}</h4>`;
+        } else {
+            formattedContent += `<p style="margin: 0.8rem 0; line-height: 1.6;">${line}</p>`;
+        }
+    }
+    
+    document.getElementById('viewModalContent').innerHTML = formattedContent;
     
     document.getElementById('viewModal').style.display = 'block';
 }
