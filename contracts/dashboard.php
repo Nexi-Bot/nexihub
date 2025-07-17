@@ -17,11 +17,19 @@ try {
             PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
         ]);
     } else {
-        $db = new PDO("sqlite:" . __DIR__ . "/../database/nexihub.db");
+        $db_path = realpath(__DIR__ . "/../database/nexihub.db");
+        if (!$db_path || !file_exists($db_path)) {
+            throw new Exception("Database file not found at: " . __DIR__ . "/../database/nexihub.db");
+        }
+        $db = new PDO("sqlite:" . $db_path);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 } catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+    error_log("Contract Portal Database Error: " . $e->getMessage());
+    die("Database connection failed. Please check the system configuration.");
+} catch (Exception $e) {
+    error_log("Contract Portal Error: " . $e->getMessage());
+    die("System error: " . $e->getMessage());
 }
 
 // Handle contract signing
