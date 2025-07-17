@@ -29,7 +29,15 @@ if ($_POST['action'] ?? '' === 'login') {
                 $_SESSION['contract_user_email'] = $user['email'];
                 $_SESSION['contract_user_role'] = $user['role'];
                 $_SESSION['contract_staff_id'] = $user['staff_id'];
-                header('Location: dashboard.php');
+                
+                // Check if password reset is required
+                if ($user['needs_password_reset']) {
+                    $_SESSION['needs_password_reset'] = true;
+                    header('Location: ./password-reset.php');
+                    exit;
+                }
+                
+                header('Location: ./dashboard.php');
                 exit;
             } else {
                 $error = "Invalid email or password";
@@ -42,7 +50,7 @@ if ($_POST['action'] ?? '' === 'login') {
     }
 }
 
-$page_title = "Contract Portal - Login";
+$page_title = "Nexi HR Portal - Login";
 $page_description = "Staff Contract Signing Portal";
 include __DIR__ . '/../includes/header.php';
 ?>
@@ -50,7 +58,7 @@ include __DIR__ . '/../includes/header.php';
 <section class="hero">
     <div class="container">
         <div class="hero-content">
-            <h1 class="hero-title">Contract Portal</h1>
+            <h1 class="hero-title">Nexi HR Portal</h1>
             <p class="hero-subtitle">Digital Contract Signing</p>
             <p class="hero-description">
                 Secure portal for staff to view and digitally sign employment contracts, NDAs, and company policies.
@@ -99,7 +107,7 @@ include __DIR__ . '/../includes/header.php';
                         <svg viewBox="0 0 24 24" fill="currentColor">
                             <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
                         </svg>
-                        Sign In to Contract Portal
+                        Sign In to Nexi HR Portal
                     </button>
                 </form>
                 
@@ -117,7 +125,7 @@ include __DIR__ . '/../includes/header.php';
             </div>
             
             <div class="info-panel">
-                <h3>What you can do in the Contract Portal:</h3>
+                <h3>What you can do in the Nexi HR Portal:</h3>
                 <div class="feature-list">
                     <div class="feature-item">
                         <svg viewBox="0 0 24 24" fill="currentColor">

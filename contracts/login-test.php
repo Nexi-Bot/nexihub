@@ -85,7 +85,7 @@ echo "<pre>" . print_r($_SESSION, true) . "</pre>";
 
 <h3>Quick Links</h3>
 <ul>
-    <li><a href="index.php">Contract Portal Login Page</a></li>
+    <li><a href="index.php">Nexi HR Portal Login Page</a></li>
     <li><a href="dashboard.php">Dashboard (requires login)</a></li>
     <li><a href="test-db.php">Database Connection Test</a></li>
 </ul>

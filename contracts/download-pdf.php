@@ -10,7 +10,14 @@ if (!isset($_SESSION['contract_user_id'])) {
 
 // Get contract ID from request
 $contract_id = $_GET['contract_id'] ?? '';
-$staff_id = $_SESSION['contract_staff_id'];
+$template_id = $_GET['template_id'] ?? '';  // Alternative parameter for email system
+$staff_id = $_SESSION['contract_staff_id'] ?? $_GET['staff_id'] ?? '';
+$format = $_GET['format'] ?? 'download'; // 'download' or 'raw' for email system
+
+// Use template_id if contract_id not provided (for email system)
+if (!$contract_id && $template_id) {
+    $contract_id = $template_id;
+}
 
 if (!$contract_id || !$staff_id) {
     http_response_code(400);
@@ -33,8 +40,8 @@ try {
 
     // Get signed contract data
     $stmt = $db->prepare("
-        SELECT ct.name, ct.content, ct.type,
-               sc.is_signed, sc.signed_at, sc.signature_data,
+        SELECT ct.name, ct.content, ct.type, ct.id as template_id,
+               sc.id as contract_id, sc.is_signed, sc.signed_at, sc.signature_data,
                sc.signer_full_name, sc.signer_position, sc.signer_date_of_birth,
                sc.is_under_17, sc.guardian_full_name, sc.guardian_email, 
                sc.guardian_signature_data, sc.signed_timestamp
@@ -52,7 +59,14 @@ try {
 
     // Generate and output PDF
     $pdf = generateContractPDF($contract);
-    $pdf->Output(sanitizeFilename($contract['name']) . '_signed.pdf', 'D');
+    
+    if ($format === 'raw') {
+        // Return raw PDF content for email system
+        echo $pdf->Output('', 'S');
+    } else {
+        // Download PDF file
+        $pdf->Output(sanitizeFilename($contract['name']) . '_signed.pdf', 'D');
+    }
 
 } catch (PDOException $e) {
     http_response_code(500);
@@ -135,7 +149,7 @@ function generateContractPDF($contract) {
     $pdf->SetY($current_y);
     $pdf->Cell(42, 4, 'Document Reference:', 0, 0, 'L');
     $pdf->SetFont('helvetica', '', 9);
-    $pdf->Cell(0, 4, 'NEXI-' . strtoupper($contract['type']) . '-' . date('Y') . '-' . sprintf('%04d', $contract['id'] ?? 1), 0, 1, 'L');
+    $pdf->Cell(0, 4, 'NEXI-' . strtoupper($contract['type']) . '-' . date('Y') . '-' . sprintf('%04d', $contract['contract_id'] ?? $contract['template_id'] ?? 1), 0, 1, 'L');
     
     $pdf->SetFont('helvetica', 'B', 9);
     $pdf->Cell(42, 4, 'Execution Date:', 0, 0, 'L');
@@ -266,11 +280,37 @@ function generateContractPDF($contract) {
         $pdf->SetDrawColor(200, 200, 200);
         $pdf->Rect($col2_x, $sig_y, 60, 20);
         
-        // Note: TCPDF has limitations with base64 images, so we'll show a placeholder
-        $pdf->SetXY($col2_x + 2, $sig_y + 8);
-        $pdf->SetFont('helvetica', 'I', 8);
-        $pdf->SetTextColor($light_gray[0], $light_gray[1], $light_gray[2]);
-        $pdf->Cell(56, 4, '[Digital Signature Verified]', 0, 0, 'C');
+        try {
+            // Process base64 image data for TCPDF
+            $signature_image = $contract['signature_data'];
+            
+            // Create a temporary file for the signature image
+            $temp_file = tempnam(sys_get_temp_dir(), 'signature_') . '.png';
+            
+            // Extract base64 data and decode
+            if (preg_match('/^data:image\/[^;]+;base64,(.*)$/', $signature_image, $matches)) {
+                $image_data = base64_decode($matches[1]);
+                file_put_contents($temp_file, $image_data);
+                
+                // Add the signature image to PDF
+                $pdf->Image($temp_file, $col2_x + 2, $sig_y + 2, 56, 16, '', '', '', false, 300, '', false, false, 0);
+                
+                // Clean up temp file
+                unlink($temp_file);
+            } else {
+                // Fallback text if image processing fails
+                $pdf->SetXY($col2_x + 2, $sig_y + 8);
+                $pdf->SetFont('helvetica', 'I', 8);
+                $pdf->SetTextColor($light_gray[0], $light_gray[1], $light_gray[2]);
+                $pdf->Cell(56, 4, '[Digital Signature Verified]', 0, 0, 'C');
+            }
+        } catch (Exception $e) {
+            // Fallback text if image processing fails
+            $pdf->SetXY($col2_x + 2, $sig_y + 8);
+            $pdf->SetFont('helvetica', 'I', 8);
+            $pdf->SetTextColor($light_gray[0], $light_gray[1], $light_gray[2]);
+            $pdf->Cell(56, 4, '[Digital Signature Verified]', 0, 0, 'C');
+        }
     }
     
     $pdf->Ln($rect_height + 5);
@@ -323,10 +363,37 @@ function generateContractPDF($contract) {
             $pdf->SetDrawColor(230, 79, 33);
             $pdf->Rect($col2_x, $sig_y, 60, 20);
             
-            $pdf->SetXY($col2_x + 2, $sig_y + 8);
-            $pdf->SetFont('helvetica', 'I', 8);
-            $pdf->SetTextColor($primary_color[0], $primary_color[1], $primary_color[2]);
-            $pdf->Cell(56, 4, '[Guardian Signature Verified]', 0, 0, 'C');
+            try {
+                // Process base64 image data for TCPDF
+                $guardian_signature = $contract['guardian_signature_data'];
+                
+                // Create a temporary file for the guardian signature image
+                $temp_file = tempnam(sys_get_temp_dir(), 'guardian_signature_') . '.png';
+                
+                // Extract base64 data and decode
+                if (preg_match('/^data:image\/[^;]+;base64,(.*)$/', $guardian_signature, $matches)) {
+                    $image_data = base64_decode($matches[1]);
+                    file_put_contents($temp_file, $image_data);
+                    
+                    // Add the guardian signature image to PDF
+                    $pdf->Image($temp_file, $col2_x + 2, $sig_y + 2, 56, 16, '', '', '', false, 300, '', false, false, 0);
+                    
+                    // Clean up temp file
+                    unlink($temp_file);
+                } else {
+                    // Fallback text if image processing fails
+                    $pdf->SetXY($col2_x + 2, $sig_y + 8);
+                    $pdf->SetFont('helvetica', 'I', 8);
+                    $pdf->SetTextColor($primary_color[0], $primary_color[1], $primary_color[2]);
+                    $pdf->Cell(56, 4, '[Guardian Signature Verified]', 0, 0, 'C');
+                }
+            } catch (Exception $e) {
+                // Fallback text if image processing fails
+                $pdf->SetXY($col2_x + 2, $sig_y + 8);
+                $pdf->SetFont('helvetica', 'I', 8);
+                $pdf->SetTextColor($primary_color[0], $primary_color[1], $primary_color[2]);
+                $pdf->Cell(56, 4, '[Guardian Signature Verified]', 0, 0, 'C');
+            }
         }
         
         $pdf->Ln($rect_height + 5);
@@ -342,7 +409,7 @@ function generateContractPDF($contract) {
     $pdf->MultiCell(0, 3.5, 'VERIFICATION: This document was generated on ' . date('F j, Y \a\t g:i:s A T') . ' by the Nexi Bot LTD Contract Management System. Digital signatures have been cryptographically verified and stored securely. This document constitutes a legally binding agreement under applicable electronic signature laws.', 0, 'C');
     
     $pdf->Ln(2);
-    $pdf->Cell(0, 3, 'Document ID: NEXI-' . strtoupper($contract['type']) . '-' . date('Y') . '-' . sprintf('%04d', $contract['id'] ?? 1) . ' | Generated: ' . date('Y-m-d H:i:s T'), 0, 1, 'C');
+    $pdf->Cell(0, 3, 'Document ID: NEXI-' . strtoupper($contract['type']) . '-' . date('Y') . '-' . sprintf('%04d', $contract['contract_id'] ?? $contract['template_id'] ?? 1) . ' | Generated: ' . date('Y-m-d H:i:s T'), 0, 1, 'C');
 
     return $pdf;
 }

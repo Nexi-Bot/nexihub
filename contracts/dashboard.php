@@ -1,5 +1,9 @@
 <?php
+// Include config first (which handles session initialization)
 require_once __DIR__ . '/../config/config.php';
+
+// Prevent session timeout for contract system
+$_SESSION['LAST_ACTIVITY'] = time();
 
 // Check if user is logged in
 if (!isset($_SESSION['contract_user_id'])) {
@@ -95,7 +99,26 @@ if ($_POST['action'] ?? '' === 'sign_contract') {
                             $signed_timestamp
                         ]);
                         
-                        $success = "Contract signed successfully!";
+                        // Get contract name for email notification
+                        $stmt = $db->prepare("SELECT name FROM contract_templates WHERE id = ?");
+                        $stmt->execute([$template_id]);
+                        $contract_name = $stmt->fetchColumn();
+                        
+                        // Send email notifications
+                        try {
+                            require_once __DIR__ . '/../includes/ContractEmailNotifier.php';
+                            $emailNotifier = new ContractEmailNotifier();
+                            $emailSent = $emailNotifier->sendContractSignedNotification($staff_id, $contract_name, $template_id);
+                            
+                            if ($emailSent) {
+                                $success = "Contract signed successfully! Email notifications have been sent.";
+                            } else {
+                                $success = "Contract signed successfully! (Note: Email notifications could not be sent - please check email configuration)";
+                            }
+                        } catch (Exception $e) {
+                            error_log("Email notification error: " . $e->getMessage());
+                            $success = "Contract signed successfully! (Note: Email notifications could not be sent)";
+                        }
                     } else {
                         $error = "This contract has already been signed.";
                     }
@@ -135,20 +158,26 @@ try {
     // Handle error silently for now
 }
 
-// Get available contracts
+// Get available contracts - prioritize signed contracts and avoid duplicates
 $contracts = [];
 try {
     $stmt = $db->prepare("
-        SELECT ct.*, 
-               sc.is_signed, sc.signed_at, sc.signature_data,
-               sc.signer_full_name, sc.signer_position, sc.signer_date_of_birth,
-               sc.is_under_17, sc.guardian_full_name, sc.guardian_email, 
-               sc.guardian_signature_data, sc.signed_timestamp
+        SELECT ct.*,
+               COALESCE(signed_sc.id, unsigned_sc.id) as contract_record_id,
+               COALESCE(signed_sc.is_signed, unsigned_sc.is_signed, 0) as is_signed,
+               signed_sc.signed_at, signed_sc.signature_data,
+               signed_sc.signer_full_name, signed_sc.signer_position, signed_sc.signer_date_of_birth,
+               signed_sc.is_under_17, signed_sc.guardian_full_name, signed_sc.guardian_email, 
+               signed_sc.guardian_signature_data, signed_sc.signed_timestamp
         FROM contract_templates ct
-        LEFT JOIN staff_contracts sc ON ct.id = sc.template_id AND sc.staff_id = ?
+        LEFT JOIN staff_contracts signed_sc ON ct.id = signed_sc.template_id 
+            AND signed_sc.staff_id = ? AND signed_sc.is_signed = 1
+        LEFT JOIN staff_contracts unsigned_sc ON ct.id = unsigned_sc.template_id 
+            AND unsigned_sc.staff_id = ? AND unsigned_sc.is_signed = 0
+            AND signed_sc.id IS NULL  -- Only show unsigned if no signed version exists
         ORDER BY ct.name
     ");
-    $stmt->execute([$_SESSION['contract_staff_id'] ?? 0]);
+    $stmt->execute([$_SESSION['contract_staff_id'] ?? 0, $_SESSION['contract_staff_id'] ?? 0]);
     $contracts = $stmt->fetchAll();
 } catch (PDOException $e) {
     $error = "Error fetching contracts: " . $e->getMessage();
@@ -194,7 +223,7 @@ if ($_GET['action'] ?? '' === 'get_contract') {
     exit;
 }
 
-$page_title = "Contract Portal - Dashboard";
+$page_title = "Nexi HR Portal - Dashboard";
 $page_description = "Review and sign your employment contracts";
 include __DIR__ . '/../includes/header.php';
 ?>
@@ -297,7 +326,7 @@ include __DIR__ . '/../includes/header.php';
                                 Contract successfully signed and stored securely. You can review the signed document below.
                             </p>
                             
-                            <button onclick="viewContract(<?php echo $contract['id']; ?>)" class="product-link">
+                            <button onclick="viewContract(<?php echo $contract['contract_record_id']; ?>)" class="product-link">
                                 View Signed Contract →
                             </button>
                         <?php else: ?>
@@ -948,6 +977,19 @@ include __DIR__ . '/../includes/header.php';
 }
 
 .signature-display {
+    padding: 1rem;
+    margin-top: 1rem;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.signature-display img {
+    max-width: 100%;
+    max-height: 120px;
+    object-fit: contain;
+}
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
@@ -983,8 +1025,11 @@ include __DIR__ . '/../includes/header.php';
 
 <script>
 const contracts = <?php echo json_encode($contracts); ?>;
+const userProfile = <?php echo json_encode($user_profile); ?>;
 let isDrawing = false;
+let guardianIsDrawing = false;
 let signaturePad;
+let guardianSignaturePad;
 
 function initSignaturePad() {
     const canvas = document.getElementById('signaturePad');
@@ -1052,11 +1097,104 @@ function initSignaturePad() {
         });
         canvas.dispatchEvent(mouseEvent);
     }
+    
+    // Initialize guardian signature pad if visible
+    const guardianCanvas = document.getElementById('guardianSignaturePad');
+    if (guardianCanvas && document.getElementById('guardianSection').style.display !== 'none') {
+        initGuardianSignaturePad();
+    }
+}
+
+function initGuardianSignaturePad() {
+    const canvas = document.getElementById('guardianSignaturePad');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas size
+    canvas.width = canvas.offsetWidth;
+    canvas.height = 150;
+    
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#000';
+    
+    guardianSignaturePad = {
+        canvas: canvas,
+        ctx: ctx,
+        drawing: false,
+        isEmpty: true
+    };
+    
+    // Mouse events
+    canvas.addEventListener('mousedown', startGuardianDrawing);
+    canvas.addEventListener('mousemove', drawGuardian);
+    canvas.addEventListener('mouseup', stopGuardianDrawing);
+    canvas.addEventListener('mouseout', stopGuardianDrawing);
+    
+    // Touch events
+    canvas.addEventListener('touchstart', handleGuardianTouch);
+    canvas.addEventListener('touchmove', handleGuardianTouch);
+    canvas.addEventListener('touchend', stopGuardianDrawing);
+    
+    function startGuardianDrawing(e) {
+        guardianIsDrawing = true;
+        guardianSignaturePad.isEmpty = false;
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+    
+    function drawGuardian(e) {
+        if (!guardianIsDrawing) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        ctx.lineTo(x, y);
+        ctx.stroke();
+    }
+    
+    function stopGuardianDrawing() {
+        guardianIsDrawing = false;
+    }
+    
+    function handleGuardianTouch(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 
+                                        e.type === 'touchmove' ? 'mousemove' : 'mouseup', {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        canvas.dispatchEvent(mouseEvent);
+    }
+}
+
+function clearGuardianSignature() {
+    if (guardianSignaturePad) {
+        guardianSignaturePad.ctx.clearRect(0, 0, guardianSignaturePad.canvas.width, guardianSignaturePad.canvas.height);
+        guardianSignaturePad.isEmpty = true;
+    }
 }
 
 function openSigningModal(contractId) {
+    console.log('Opening signing modal for contract:', contractId);
+    console.log('Available contracts:', contracts);
+    console.log('User profile:', userProfile);
+    
     const contract = contracts.find(c => c.id == contractId);
-    if (!contract) return;
+    if (!contract) {
+        console.error('Contract not found with ID:', contractId);
+        alert('Contract not found. Please refresh the page and try again.');
+        return;
+    }
+    
+    console.log('Found contract:', contract);
     
     document.getElementById('modalContractTitle').textContent = contract.name;
     document.getElementById('modalTemplateId').value = contractId;
@@ -1106,7 +1244,12 @@ function openSigningModal(contractId) {
     document.getElementById('signingModal').style.display = 'block';
     
     // Initialize signature pad after modal is shown
-    setTimeout(initSignaturePad, 100);
+    setTimeout(() => {
+        initSignaturePad();
+        if (userProfile && userProfile.is_under_17) {
+            setTimeout(initGuardianSignaturePad, 100);
+        }
+    }, 100);
 }
 
 function closeSigningModal() {
@@ -1114,11 +1257,20 @@ function closeSigningModal() {
 }
 
 function viewContract(contractId) {
-    const contract = contracts.find(c => c.id == contractId);
-    if (!contract) return;
+    console.log('Viewing contract:', contractId);
+    console.log('Available contracts:', contracts);
+    
+    const contract = contracts.find(c => c.contract_record_id == contractId);
+    if (!contract || !contract.is_signed) {
+        console.error('Contract not found or not signed:', contractId, contract);
+        alert('Signed contract not found. Please refresh the page and try again.');
+        return;
+    }
+    
+    console.log('Found signed contract:', contract);
     
     // Set current viewing contract ID for PDF download
-    window.currentViewingContractId = contractId;
+    window.currentViewingContractId = contract.id; // Use template ID for PDF download
     
     document.getElementById('viewModalTitle').textContent = contract.name;
     
@@ -1150,7 +1302,80 @@ function viewContract(contractId) {
     
     document.getElementById('viewModalContent').innerHTML = formattedContent;
     
+    // Display signature details
+    displaySignatureDetails(contract);
+    
     document.getElementById('viewModal').style.display = 'block';
+}
+
+function displaySignatureDetails(contract) {
+    const signatureDetails = document.getElementById('signatureDetails');
+    
+    let detailsHTML = '<h3>Signature Details</h3>';
+    
+    // Employee signature section
+    detailsHTML += `
+        <div class="signature-info-grid">
+            <div class="signature-info-card">
+                <h4>Employee Information</h4>
+                <div class="info-row">
+                    <span class="info-label">Full Name:</span>
+                    <span class="info-value">${contract.signer_full_name || 'Not recorded'}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Position:</span>
+                    <span class="info-value">${contract.signer_position || 'Not recorded'}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Date of Birth:</span>
+                    <span class="info-value">${contract.signer_date_of_birth ? new Date(contract.signer_date_of_birth).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Not recorded'}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Signed:</span>
+                    <span class="info-value">${new Date(contract.signed_timestamp || contract.signed_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>
+                </div>
+            </div>
+            
+            <div class="signature-info-card">
+                <h4>Employee Signature</h4>
+                <div class="signature-display">
+                    ${contract.signature_data ? `<img src="${contract.signature_data}" alt="Employee Signature" style="max-width: 100%; height: auto; border: 1px solid var(--border-color); border-radius: 8px; background: white; padding: 10px;">` : '<p style="color: var(--text-secondary); font-style: italic;">No signature data available</p>'}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Guardian signature section if applicable
+    if (contract.is_under_17 && contract.guardian_full_name) {
+        detailsHTML += `
+            <div class="signature-info-grid">
+                <div class="signature-info-card">
+                    <h4>Parent/Guardian Information</h4>
+                    <div class="info-row">
+                        <span class="info-label">Guardian Name:</span>
+                        <span class="info-value">${contract.guardian_full_name}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Guardian Email:</span>
+                        <span class="info-value">${contract.guardian_email}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Consent Given:</span>
+                        <span class="info-value">${new Date(contract.signed_timestamp || contract.signed_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>
+                    </div>
+                </div>
+                
+                <div class="signature-info-card">
+                    <h4>Guardian Signature</h4>
+                    <div class="signature-display">
+                        ${contract.guardian_signature_data ? `<img src="${contract.guardian_signature_data}" alt="Guardian Signature" style="max-width: 100%; height: auto; border: 1px solid var(--border-color); border-radius: 8px; background: white; padding: 10px;">` : '<p style="color: var(--text-secondary); font-style: italic;">No guardian signature data available</p>'}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    signatureDetails.innerHTML = detailsHTML;
 }
 
 function closeViewModal() {
@@ -1168,6 +1393,30 @@ function submitSignature(form) {
     if (!signaturePad || signaturePad.isEmpty) {
         alert('Please provide your signature before submitting.');
         return false;
+    }
+    
+    // Check if guardian signature is required
+    const guardianSection = document.getElementById('guardianSection');
+    const isGuardianRequired = guardianSection.style.display !== 'none';
+    
+    if (isGuardianRequired) {
+        // Validate guardian fields
+        const guardianName = document.getElementById('guardianName').value.trim();
+        const guardianEmail = document.getElementById('guardianEmail').value.trim();
+        
+        if (!guardianName || !guardianEmail) {
+            alert('Please fill in all parent/guardian information.');
+            return false;
+        }
+        
+        if (!guardianSignaturePad || guardianSignaturePad.isEmpty) {
+            alert('Parent/guardian signature is required for employees under 17.');
+            return false;
+        }
+        
+        // Save guardian signature data
+        const guardianSignatureData = guardianSignaturePad.canvas.toDataURL();
+        document.getElementById('modalGuardianSignature').value = guardianSignatureData;
     }
     
     const signatureData = signaturePad.canvas.toDataURL();

@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
 
-echo "<h2>Contract Portal Login Test</h2>";
+echo "<h2>Nexi HR Portal Login Test</h2>";
 
 // Test if we can connect to the database in this context
 echo "<h3>1. Database Connection Test</h3>";

@@ -98,6 +98,7 @@ try {
             password_hash VARCHAR(255) NOT NULL,
             staff_id INTEGER,
             role VARCHAR(20) DEFAULT 'staff',
+            needs_password_reset BOOLEAN DEFAULT 0,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (staff_id) REFERENCES staff_profiles(id)
         )"
@@ -349,6 +350,84 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 break;
                 
+            case 'create_contract_user':
+                // Create new contract user
+                $staff_id = $_POST['staff_id'];
+                $email = $_POST['email'];
+                $password = $_POST['password'];
+                $selected_contracts = $_POST['selected_contracts'] ?? [];
+                
+                try {
+                    // Hash the password
+                    $password_hash = password_hash($password, PASSWORD_DEFAULT);
+                    
+                    // Insert contract user
+                    $stmt = $db->prepare("INSERT INTO contract_users (email, password_hash, staff_id, role, needs_password_reset) VALUES (?, ?, ?, 'staff', 1)");
+                    $stmt->execute([$email, $password_hash, $staff_id]);
+                    
+                    // Get the contract user ID
+                    $contract_user_id = $db->lastInsertId();
+                    
+                    // Assign selected contracts to the staff member
+                    foreach ($selected_contracts as $template_id) {
+                        $stmt = $db->prepare("INSERT OR IGNORE INTO staff_contracts (staff_id, template_id, is_signed) VALUES (?, ?, 0)");
+                        $stmt->execute([$staff_id, $template_id]);
+                    }
+                    
+                    header("Location: dashboard.php?success=Contract user created successfully. Login email: $email");
+                    exit;
+                } catch (PDOException $e) {
+                    $error_message = "Error creating contract user: " . $e->getMessage();
+                }
+                break;
+                
+            case 'download_signed_contract':
+                // Download signed contract PDF
+                if (isset($_POST['contract_id'])) {
+                    require_once __DIR__ . '/../includes/ContractEmailNotifier.php';
+                    
+                    try {
+                        // Get contract details
+                        $stmt = $db->prepare("
+                            SELECT ct.name, ct.content, ct.type, ct.id as template_id,
+                                   sc.id as contract_id, sc.is_signed, sc.signed_at, sc.signature_data,
+                                   sc.signer_full_name, sc.signer_position, sc.signer_date_of_birth,
+                                   sc.is_under_17, sc.guardian_full_name, sc.guardian_email, 
+                                   sc.guardian_signature_data, sc.signed_timestamp, sc.staff_id
+                            FROM contract_templates ct
+                            JOIN staff_contracts sc ON ct.id = sc.template_id 
+                            WHERE sc.id = ? AND sc.is_signed = 1
+                        ");
+                        $stmt->execute([$_POST['contract_id']]);
+                        $contract = $stmt->fetch();
+                        
+                        if ($contract) {
+                            // Use the same PDF generation as the contract system
+                            $notifier = new ContractEmailNotifier();
+                            $reflector = new ReflectionClass($notifier);
+                            $generatePDF = $reflector->getMethod('generateContractPDF');
+                            $generatePDF->setAccessible(true);
+                            
+                            $pdf_content = $generatePDF->invoke($notifier, $contract['template_id'], $contract['staff_id']);
+                            
+                            if ($pdf_content) {
+                                $filename = preg_replace('/[^a-zA-Z0-9_-]/', '_', $contract['name']) . '_signed.pdf';
+                                
+                                header('Content-Type: application/pdf');
+                                header('Content-Disposition: attachment; filename="' . $filename . '"');
+                                header('Content-Length: ' . strlen($pdf_content));
+                                echo $pdf_content;
+                                exit;
+                            }
+                        }
+                        
+                        $error_message = "Contract not found or not signed";
+                    } catch (Exception $e) {
+                        $error_message = "Error generating PDF: " . $e->getMessage();
+                    }
+                }
+                break;
+                
             case 'delete_contract_template':
                 // Delete contract template
                 $stmt = $db->prepare("DELETE FROM contract_templates WHERE id = ?");
@@ -381,6 +460,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+// Function to update contract completion status for all staff
+function updateContractCompletionStatus($db) {
+    try {
+        // Get total number of contract templates
+        $stmt = $db->prepare("SELECT COUNT(*) as total FROM contract_templates");
+        $stmt->execute();
+        $total_contracts = $stmt->fetch()['total'];
+        
+        if ($total_contracts == 0) return;
+        
+        // Get all staff members
+        $stmt = $db->prepare("SELECT id FROM staff_profiles");
+        $stmt->execute();
+        $staff_members = $stmt->fetchAll();
+        
+        foreach ($staff_members as $staff) {
+            // Count signed contracts for this staff member
+            $stmt = $db->prepare("
+                SELECT COUNT(*) as signed_count 
+                FROM staff_contracts 
+                WHERE staff_id = ? AND is_signed = 1
+            ");
+            $stmt->execute([$staff['id']]);
+            $signed_count = $stmt->fetch()['signed_count'];
+            
+            // Update contract_completed status
+            $is_completed = ($signed_count >= $total_contracts && $total_contracts > 0) ? 1 : 0;
+            $stmt = $db->prepare("UPDATE staff_profiles SET contract_completed = ? WHERE id = ?");
+            $stmt->execute([$is_completed, $staff['id']]);
+        }
+    } catch (PDOException $e) {
+        error_log("Error updating contract completion status: " . $e->getMessage());
+    }
+}
+
+// Update contract completion status for all staff
+updateContractCompletionStatus($db);
 
 // Fetch all staff members
 $stmt = $db->prepare("SELECT * FROM staff_profiles ORDER BY department, region, full_name");
@@ -1336,7 +1453,7 @@ include __DIR__ . '/../includes/header.php';
                 <i class="fas fa-file-contract"></i> Contract Management
             </button>
             <button class="tab-button" onclick="showTab('contract-portal-tab')">
-                <i class="fas fa-signature"></i> Contract Portal Access
+                <i class="fas fa-signature"></i> Nexi HR Portal Access
             </button>
         </div>
 
@@ -1524,10 +1641,10 @@ include __DIR__ . '/../includes/header.php';
             </div>
         </div>
 
-        <!-- Contract Portal Access Tab -->
+        <!-- Nexi HR Portal Access Tab -->
         <div id="contract-portal-tab" class="tab-content">
             <div class="portal-header">
-                <h2>Contract Portal Access</h2>
+                <h2>Nexi HR Portal Access</h2>
                 <p>View staff contract signing status and portal access information</p>
             </div>
 
@@ -1544,6 +1661,17 @@ include __DIR__ . '/../includes/header.php';
                     <div class="detail-row">
                         <strong>Password:</strong> test1212
                     </div>
+                </div>
+            </div>
+
+            <div class="contract-user-section">
+                <h3>Create Contract Users</h3>
+                <p>Create login accounts for staff members to access the Nexi HR Portal</p>
+                
+                <div class="contract-user-actions">
+                    <button onclick="openCreateContractUserModal()" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Create Contract User
+                    </button>
                 </div>
             </div>
 
@@ -1588,9 +1716,13 @@ include __DIR__ . '/../includes/header.php';
                                             <button onclick="viewSignedContract(<?php echo $staff_contract['id']; ?>, '<?php echo htmlspecialchars($template['name']); ?>')" class="btn btn-sm btn-success view-btn">
                                                 <i class="fas fa-eye"></i> View
                                             </button>
-                                            <button onclick="downloadContractPDF(<?php echo $staff_contract['id']; ?>)" class="btn btn-sm btn-secondary download-btn">
-                                                <i class="fas fa-download"></i> PDF
-                                            </button>
+                                            <form method="POST" action="" style="display: inline;">
+                                                <input type="hidden" name="action" value="download_signed_contract">
+                                                <input type="hidden" name="contract_id" value="<?php echo $staff_contract['id']; ?>">
+                                                <button type="submit" class="btn btn-sm btn-secondary download-btn">
+                                                    <i class="fas fa-download"></i> PDF
+                                                </button>
+                                            </form>
                                         <?php elseif ($staff_contract): ?>
                                             <span class="status assigned">
                                                 <i class="fas fa-clock"></i> Assigned
@@ -2108,6 +2240,75 @@ include __DIR__ . '/../includes/header.php';
     </div>
 </div>
 
+<!-- Create Contract User Modal -->
+<div id="createContractUserModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Create Contract User</h2>
+            <span class="close" onclick="closeCreateContractUserModal()">&times;</span>
+        </div>
+        
+        <form method="POST" action="">
+            <input type="hidden" name="action" value="create_contract_user">
+            
+            <div class="modal-body">
+                <div class="form-section">
+                    <h3>User Account Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Staff Member *</label>
+                            <select name="staff_id" class="form-control" required>
+                                <option value="">Select Staff Member</option>
+                                <?php foreach ($staff_members as $staff): ?>
+                                    <option value="<?php echo $staff['id']; ?>">
+                                        <?php echo htmlspecialchars($staff['full_name'] . ' (' . $staff['staff_id'] . ')'); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Login Email *</label>
+                            <input type="email" name="email" class="form-control" required placeholder="user@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Temporary Password *</label>
+                            <input type="password" name="password" class="form-control" required placeholder="Temporary password">
+                            <small class="form-text">User will be required to reset this password on first login</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Contract Assignments</h3>
+                    <p>Select which contracts this user needs to sign:</p>
+                    <div class="contract-checkboxes">
+                        <?php foreach ($contract_templates as $template): ?>
+                            <div class="checkbox-group">
+                                <input type="checkbox" 
+                                       name="selected_contracts[]" 
+                                       value="<?php echo $template['id']; ?>" 
+                                       id="contract_<?php echo $template['id']; ?>">
+                                <label for="contract_<?php echo $template['id']; ?>">
+                                    <?php echo htmlspecialchars($template['name']); ?>
+                                    <span class="contract-type">(<?php echo ucfirst($template['type']); ?>)</span>
+                                </label>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" onclick="closeCreateContractUserModal()" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create Contract User</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
 // Staff data for JavaScript operations
 const staffData = <?php echo json_encode($staff_members); ?>;
@@ -2145,6 +2346,15 @@ function openEditContractModal() {
 
 function closeEditContractModal() {
     document.getElementById('editContractModal').style.display = 'none';
+}
+
+// Contract User Management Functions
+function openCreateContractUserModal() {
+    document.getElementById('createContractUserModal').style.display = 'block';
+}
+
+function closeCreateContractUserModal() {
+    document.getElementById('createContractUserModal').style.display = 'none';
 }
 
 function openViewContractModal() {

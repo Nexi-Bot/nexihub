@@ -127,7 +127,7 @@ try {
         echo "</ul>";
     }
     
-    echo "<p><a href='contracts/login-test.php'>→ Test Contract Portal Login</a></p>";
+    echo "<p><a href='contracts/login-test.php'>→ Test Nexi HR Portal Login</a></p>";
     
 } catch (PDOException $e) {
     echo "<p>❌ Database error: " . $e->getMessage() . "</p>";
