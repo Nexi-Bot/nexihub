@@ -53,12 +53,23 @@ CREATE TABLE IF NOT EXISTS staff_profiles (
     password_reset_history TEXT,
     account_status VARCHAR(20) DEFAULT 'Active',
     internal_notes TEXT,
+    contract_completed BOOLEAN DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 )";
 
 try {
     $db->exec($createTableSQL);
+    
+    // Add contract_completed column if it doesn't exist
+    try {
+        $db->exec("ALTER TABLE staff_profiles ADD COLUMN contract_completed BOOLEAN DEFAULT 0");
+    } catch (PDOException $e) {
+        // Column already exists, ignore error
+        if (!str_contains($e->getMessage(), 'duplicate column name')) {
+            error_log("Error adding contract_completed column: " . $e->getMessage());
+        }
+    }
 } catch (PDOException $e) {
     error_log("Error creating staff_profiles table: " . $e->getMessage());
 }
@@ -115,8 +126,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         preferred_name, nexi_email, private_email, phone_number,
                         discord_username, discord_id, nationality, country_of_residence,
                         date_of_birth, two_fa_status, date_joined, elearning_status,
-                        time_off_balance, parent_contact, account_status, internal_notes
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        time_off_balance, parent_contact, account_status, internal_notes,
+                        contract_completed
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ");
                 
                 try {
@@ -142,7 +154,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         intval($_POST['time_off_balance']),
                         $_POST['parent_contact'],
                         $_POST['account_status'],
-                        $_POST['internal_notes']
+                        $_POST['internal_notes'],
+                        isset($_POST['contract_completed']) ? 1 : 0
                     ]);
                     header("Location: dashboard.php?success=Staff member added successfully");
                     exit;
@@ -160,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         discord_username = ?, discord_id = ?, nationality = ?, country_of_residence = ?,
                         date_of_birth = ?, two_fa_status = ?, date_joined = ?, elearning_status = ?,
                         time_off_balance = ?, parent_contact = ?, account_status = ?, internal_notes = ?,
-                        updated_at = CURRENT_TIMESTAMP
+                        contract_completed = ?, updated_at = CURRENT_TIMESTAMP
                     WHERE id = ?
                 ");
                 
@@ -187,6 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_POST['parent_contact'],
                         $_POST['account_status'],
                         $_POST['internal_notes'],
+                        isset($_POST['contract_completed']) ? 1 : 0,
                         $_POST['edit_staff_id']
                     ]);
                     header("Location: dashboard.php?success=Staff member updated successfully");
@@ -435,6 +449,16 @@ include __DIR__ . '/../includes/header.php';
 
 .two-fa-disabled {
     color: #ef4444;
+    font-weight: 600;
+}
+
+.contract-completed {
+    color: #10b981;
+    font-weight: 600;
+}
+
+.contract-pending {
+    color: #f59e0b;
     font-weight: 600;
 }
 
@@ -879,6 +903,12 @@ include __DIR__ . '/../includes/header.php';
                                                 <span class="detail-label">Date Joined:</span>
                                                 <span class="detail-value"><?php echo $staff['date_joined'] ? date('M j, Y', strtotime($staff['date_joined'])) : 'Not Set'; ?></span>
                                             </div>
+                                            <div class="detail-row">
+                                                <span class="detail-label">Contract:</span>
+                                                <span class="detail-value <?php echo $staff['contract_completed'] ? 'contract-completed' : 'contract-pending'; ?>">
+                                                    <?php echo $staff['contract_completed'] ? 'Completed' : 'Pending'; ?>
+                                                </span>
+                                            </div>
                                             <?php if ($staff['date_of_birth'] && calculateAge($staff['date_of_birth']) < 16): ?>
                                                 <div class="detail-row">
                                                     <span class="detail-label">Age:</span>
@@ -1078,6 +1108,13 @@ include __DIR__ . '/../includes/header.php';
                             <label for="two_fa_status" class="form-label">Two-Factor Authentication Enabled</label>
                         </div>
                     </div>
+                    
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" name="contract_completed" id="contract_completed">
+                            <label for="contract_completed" class="form-label">Contract Completed</label>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -1257,6 +1294,13 @@ include __DIR__ . '/../includes/header.php';
                             <label for="edit_two_fa_status" class="form-label">Two-Factor Authentication Enabled</label>
                         </div>
                     </div>
+                    
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" name="contract_completed" id="edit_contract_completed">
+                            <label for="edit_contract_completed" class="form-label">Contract Completed</label>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -1387,6 +1431,10 @@ function viewStaff(staffId) {
                     <span class="view-value">${staff.date_of_birth ? formatDate(staff.date_of_birth) : 'Not Set'}</span>
                 </div>
                 <div class="view-item">
+                    <span class="view-label">Contract Status:</span>
+                    <span class="view-value ${staff.contract_completed == '1' ? 'contract-completed' : 'contract-pending'}">${staff.contract_completed == '1' ? 'Completed' : 'Pending'}</span>
+                </div>
+                <div class="view-item">
                     <span class="view-label">Discord Username:</span>
                     <span class="view-value">${staff.discord_username || 'Not Set'}</span>
                 </div>
@@ -1503,6 +1551,7 @@ function editStaff(staffId) {
     document.getElementById('edit_parent_contact').value = staff.parent_contact || '';
     document.getElementById('edit_internal_notes').value = staff.internal_notes || '';
     document.getElementById('edit_two_fa_status').checked = staff.two_fa_status == '1';
+    document.getElementById('edit_contract_completed').checked = staff.contract_completed == '1';
     
     closeViewModal();
     openEditModal();
