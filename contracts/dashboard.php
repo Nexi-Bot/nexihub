@@ -1,0 +1,769 @@
+<?php
+require_once __DIR__ . '/../config/config.php';
+
+// Check if user is logged in
+if (!isset($_SESSION['contract_user_id'])) {
+    header('Location: index.php');
+    exit;
+}
+
+// Database connection
+try {
+    if (defined('DB_TYPE') && DB_TYPE === 'mysql') {
+        $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+        $db = new PDO($dsn, DB_USER, DB_PASS, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
+        ]);
+    } else {
+        $db = new PDO("sqlite:" . __DIR__ . "/../database/nexihub.db");
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    }
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+
+// Handle contract signing
+if ($_POST['action'] ?? '' === 'sign_contract') {
+    $template_id = $_POST['template_id'] ?? '';
+    $signature = $_POST['signature'] ?? '';
+    $staff_id = $_SESSION['contract_staff_id'];
+    
+    if ($template_id && $signature && $staff_id) {
+        try {
+            // Check if already signed
+            $stmt = $db->prepare("SELECT id FROM staff_contracts WHERE staff_id = ? AND template_id = ? AND is_signed = 1");
+            $stmt->execute([$staff_id, $template_id]);
+            
+            if (!$stmt->fetch()) {
+                // Insert or update contract
+                $stmt = $db->prepare("
+                    INSERT OR REPLACE INTO staff_contracts 
+                    (staff_id, template_id, signed_at, signature_data, is_signed) 
+                    VALUES (?, ?, ?, ?, 1)
+                ");
+                $stmt->execute([$staff_id, $template_id, date('Y-m-d H:i:s'), $signature]);
+                $success = "Contract signed successfully!";
+            } else {
+                $error = "This contract has already been signed.";
+            }
+        } catch (PDOException $e) {
+            $error = "Error signing contract: " . $e->getMessage();
+        }
+    } else {
+        $error = "Please provide your signature.";
+    }
+}
+
+// Handle logout
+if ($_GET['action'] ?? '' === 'logout') {
+    session_destroy();
+    header('Location: index.php');
+    exit;
+}
+
+// Get available contracts
+$contracts = [];
+try {
+    $stmt = $db->prepare("
+        SELECT ct.*, sc.is_signed, sc.signed_at 
+        FROM contract_templates ct
+        LEFT JOIN staff_contracts sc ON ct.id = sc.template_id AND sc.staff_id = ?
+        ORDER BY ct.name
+    ");
+    $stmt->execute([$_SESSION['contract_staff_id'] ?? 0]);
+    $contracts = $stmt->fetchAll();
+} catch (PDOException $e) {
+    $error = "Error fetching contracts: " . $e->getMessage();
+}
+
+$page_title = "Contract Portal - Dashboard";
+$page_description = "Review and sign your employment contracts";
+include __DIR__ . '/../includes/header.php';
+?>
+
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Contract Dashboard</h1>
+            <p class="hero-subtitle">Welcome, <?php echo htmlspecialchars($_SESSION['contract_user_email']); ?></p>
+            <p class="hero-description">
+                Review and digitally sign your employment contracts, NDAs, and company policy documents.
+            </p>
+            <div class="hero-actions">
+                <a href="?action=logout" class="btn btn-secondary">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z"/>
+                    </svg>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<?php if (isset($success)): ?>
+<section class="content-section">
+    <div class="container">
+        <div class="success-message">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M11,16.5L18,9.5L16.59,8.09L11,13.67L7.41,10.09L6,11.5L11,16.5Z"/>
+            </svg>
+            <div>
+                <h3>Success!</h3>
+                <p><?php echo htmlspecialchars($success); ?></p>
+            </div>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<?php if (isset($error)): ?>
+<section class="content-section">
+    <div class="container">
+        <div class="error-message">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,7A1,1 0 0,0 11,8V12A1,1 0 0,0 12,13A1,1 0 0,0 13,12V8A1,1 0 0,0 12,7M12,17A1,1 0 0,0 13,16A1,1 0 0,0 12,15A1,1 0 0,0 11,16A1,1 0 0,0 12,17Z"/>
+            </svg>
+            <div>
+                <h3>Error</h3>
+                <p><?php echo htmlspecialchars($error); ?></p>
+            </div>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
+<section class="content-section">
+    <div class="container">
+        <?php if (!empty($contracts)): ?>
+            <div class="contracts-overview">
+                <h2>Your Contracts</h2>
+                <p class="section-description">Review the details of each contract and provide your digital signature to complete the process.</p>
+            </div>
+            
+            <div class="products-grid">
+                <?php foreach ($contracts as $contract): ?>
+                    <div class="product-card contract-card" data-contract-id="<?php echo $contract['id']; ?>">
+                        <div class="product-icon contract-icon-<?php echo strtolower($contract['type']); ?>">
+                            <?php 
+                            switch(strtolower($contract['type'])) {
+                                case 'shareholder':
+                                    echo '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16,6L18.29,8.29L13.41,13.17L9.41,9.17L2,16.59L3.41,18L9.41,12L13.41,16L19.71,9.71L22,12V6H16Z"/></svg>';
+                                    break;
+                                case 'nda':
+                                    echo '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"/></svg>';
+                                    break;
+                                case 'conduct':
+                                    echo '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,17A1,1 0 0,1 11,16A1,1 0 0,1 12,15A1,1 0 0,1 13,16A1,1 0 0,1 12,17M12,7A3,3 0 0,1 15,10C15,11.31 14.17,12.42 13.06,12.81C12.67,12.95 12.5,13.34 12.5,13.75V14H11.5V13.75C11.5,12.9 12.1,12.23 12.94,12.06C13.63,11.92 14,11.27 14,10.5C14,9.67 13.33,9 12.5,9S11,9.67 11,10.5H10A2.5,2.5 0 0,1 12.5,8A2.5,2.5 0 0,1 15,10.5Z"/></svg>';
+                                    break;
+                                case 'policies':
+                                    echo '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>';
+                                    break;
+                                default:
+                                    echo '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>';
+                                    break;
+                            }
+                            ?>
+                        </div>
+                        <h3 class="product-title"><?php echo htmlspecialchars($contract['name']); ?></h3>
+                        
+                        <?php if ($contract['is_signed']): ?>
+                            <div class="contract-status signed">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M11,16.5L18,9.5L16.59,8.09L11,13.67L7.41,10.09L6,11.5L11,16.5Z"/>
+                                </svg>
+                                <span>Signed on <?php echo date('F j, Y g:i A', strtotime($contract['signed_at'])); ?></span>
+                            </div>
+                            
+                            <p class="product-description">
+                                Contract successfully signed and stored securely. You can review the signed document below.
+                            </p>
+                            
+                            <button onclick="viewContract(<?php echo $contract['id']; ?>)" class="product-link">
+                                View Signed Contract →
+                            </button>
+                        <?php else: ?>
+                            <div class="contract-status pending">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,7A1,1 0 0,0 11,8V12A1,1 0 0,0 12,13A1,1 0 0,0 13,12V8A1,1 0 0,0 12,7M12,17A1,1 0 0,0 13,16A1,1 0 0,0 12,15A1,1 0 0,0 11,16A1,1 0 0,0 12,17Z"/>
+                                </svg>
+                                <span>Signature Required</span>
+                            </div>
+                            
+                            <p class="product-description">
+                                <?php echo nl2br(htmlspecialchars(substr($contract['content'], 0, 120))); ?>...
+                            </p>
+                            
+                            <button onclick="openSigningModal(<?php echo $contract['id']; ?>)" class="product-link">
+                                Review & Sign Contract →
+                            </button>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <div class="empty-contracts">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                    </svg>
+                </div>
+                <h3>No Contracts Available</h3>
+                <p>There are currently no contracts assigned to your account. Please contact HR if you believe this is an error.</p>
+            </div>
+        <?php endif; ?>
+    </div>
+</section>
+
+<!-- Contract Signing Modal -->
+<div id="signingModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalContractTitle">Contract Details</h2>
+            <button class="modal-close" onclick="closeSigningModal()">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="contract-content" id="modalContractContent">
+                <!-- Contract content will be populated here -->
+            </div>
+            
+            <div class="signature-section">
+                <h3>Digital Signature</h3>
+                <p>By signing below, you acknowledge that you have read, understood, and agree to the terms of this contract.</p>
+                
+                <form method="POST" onsubmit="return submitSignature(this)">
+                    <input type="hidden" name="action" value="sign_contract">
+                    <input type="hidden" name="template_id" id="modalTemplateId">
+                    <input type="hidden" name="signature" id="modalSignature">
+                    
+                    <div class="signature-pad-container">
+                        <canvas id="signaturePad" width="600" height="200"></canvas>
+                        <div class="signature-instructions">
+                            Draw your signature above using your mouse or touch screen
+                        </div>
+                    </div>
+                    
+                    <div class="signature-controls">
+                        <button type="button" onclick="clearSignature()" class="btn btn-secondary">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/>
+                            </svg>
+                            Clear Signature
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M14.6,16.6L19.2,12L14.6,7.4L13.2,8.8L15.67,11.25H5V12.75H15.67L13.2,15.2L14.6,16.6Z"/>
+                            </svg>
+                            Sign Contract
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contract View Modal -->
+<div id="viewModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="viewModalTitle">Contract Details</h2>
+            <button class="modal-close" onclick="closeViewModal()">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="contract-content" id="viewModalContent">
+                <!-- Contract content will be populated here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.contracts-overview {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.contracts-overview h2 {
+    color: var(--text-primary);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+}
+
+.section-description {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.contract-card {
+    position: relative;
+}
+
+.contract-icon-shareholder {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.contract-icon-nda {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.contract-icon-conduct {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.contract-icon-policies {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.contract-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.contract-status.signed {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.contract-status.pending {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.contract-status svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.empty-contracts {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-secondary);
+}
+
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 2rem;
+    background: var(--background-light);
+    border: 2px solid var(--border-color);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+}
+
+.empty-icon svg {
+    width: 40px;
+    height: 40px;
+}
+
+.empty-contracts h3 {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    margin: 0 0 1rem 0;
+}
+
+.empty-contracts p {
+    font-size: 1.1rem;
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.success-message,
+.error-message {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+}
+
+.success-message {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.error-message {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.success-message svg,
+.error-message svg {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.success-message h3,
+.error-message h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.success-message p,
+.error-message p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+}
+
+.modal-content {
+    background: var(--background-light);
+    margin: 2% auto;
+    border-radius: 24px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--background-dark);
+    border-radius: 24px 24px 0 0;
+}
+
+.modal-header h2 {
+    color: var(--text-primary);
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.modal-close {
+    width: 40px;
+    height: 40px;
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.modal-close svg {
+    width: 20px;
+    height: 20px;
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.contract-content {
+    background: var(--background-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    line-height: 1.8;
+    color: var(--text-primary);
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.signature-section h3 {
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.signature-section p {
+    color: var(--text-secondary);
+    margin: 0 0 2rem 0;
+    line-height: 1.6;
+}
+
+.signature-pad-container {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+#signaturePad {
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    background: white;
+    cursor: crosshair;
+    width: 100%;
+    height: 200px;
+}
+
+.signature-instructions {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #999;
+    font-size: 0.9rem;
+    pointer-events: none;
+    text-align: center;
+}
+
+.signature-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(230, 79, 33, 0.3);
+}
+
+.btn-secondary {
+    background: var(--background-dark);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+    background: var(--border-color);
+}
+
+.btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+    }
+    
+    .modal-header,
+    .modal-body {
+        padding: 1.5rem;
+    }
+    
+    .contracts-overview h2 {
+        font-size: 2rem;
+    }
+    
+    .signature-controls {
+        flex-direction: column;
+    }
+    
+    #signaturePad {
+        height: 150px;
+    }
+}
+</style>
+
+<script>
+const contracts = <?php echo json_encode($contracts); ?>;
+let isDrawing = false;
+let signaturePad;
+
+function initSignaturePad() {
+    const canvas = document.getElementById('signaturePad');
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas size
+    canvas.width = canvas.offsetWidth;
+    canvas.height = 200;
+    
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#000';
+    
+    signaturePad = {
+        canvas: canvas,
+        ctx: ctx,
+        drawing: false,
+        isEmpty: true
+    };
+    
+    // Mouse events
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+    
+    // Touch events
+    canvas.addEventListener('touchstart', handleTouch);
+    canvas.addEventListener('touchmove', handleTouch);
+    canvas.addEventListener('touchend', stopDrawing);
+    
+    function startDrawing(e) {
+        isDrawing = true;
+        signaturePad.isEmpty = false;
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+    
+    function draw(e) {
+        if (!isDrawing) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        ctx.lineTo(x, y);
+        ctx.stroke();
+    }
+    
+    function stopDrawing() {
+        isDrawing = false;
+    }
+    
+    function handleTouch(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 
+                                        e.type === 'touchmove' ? 'mousemove' : 'mouseup', {
+            clientX: touch.clientX,
+            clientY: touch.clientY
+        });
+        canvas.dispatchEvent(mouseEvent);
+    }
+}
+
+function openSigningModal(contractId) {
+    const contract = contracts.find(c => c.id == contractId);
+    if (!contract) return;
+    
+    document.getElementById('modalContractTitle').textContent = contract.name;
+    document.getElementById('modalTemplateId').value = contractId;
+    document.getElementById('modalContractContent').innerHTML = contract.content.replace(/\n/g, '<br>');
+    
+    document.getElementById('signingModal').style.display = 'block';
+    
+    // Initialize signature pad after modal is shown
+    setTimeout(initSignaturePad, 100);
+}
+
+function closeSigningModal() {
+    document.getElementById('signingModal').style.display = 'none';
+}
+
+function viewContract(contractId) {
+    const contract = contracts.find(c => c.id == contractId);
+    if (!contract) return;
+    
+    document.getElementById('viewModalTitle').textContent = contract.name;
+    document.getElementById('viewModalContent').innerHTML = contract.content.replace(/\n/g, '<br>');
+    
+    document.getElementById('viewModal').style.display = 'block';
+}
+
+function closeViewModal() {
+    document.getElementById('viewModal').style.display = 'none';
+}
+
+function clearSignature() {
+    if (signaturePad) {
+        signaturePad.ctx.clearRect(0, 0, signaturePad.canvas.width, signaturePad.canvas.height);
+        signaturePad.isEmpty = true;
+    }
+}
+
+function submitSignature(form) {
+    if (!signaturePad || signaturePad.isEmpty) {
+        alert('Please provide your signature before submitting.');
+        return false;
+    }
+    
+    const signatureData = signaturePad.canvas.toDataURL();
+    document.getElementById('modalSignature').value = signatureData;
+    
+    return true;
+}
+
+// Close modals when clicking outside
+window.onclick = function(event) {
+    const signingModal = document.getElementById('signingModal');
+    const viewModal = document.getElementById('viewModal');
+    
+    if (event.target === signingModal) {
+        closeSigningModal();
+    } else if (event.target === viewModal) {
+        closeViewModal();
+    }
+}
+</script>
+
+<?php include __DIR__ . '/../includes/footer.php'; ?>

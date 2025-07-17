@@ -70,6 +70,43 @@ try {
             error_log("Error adding contract_completed column: " . $e->getMessage());
         }
     }
+    
+    // Create contract management tables
+    $contractTablesSQL = [
+        "CREATE TABLE IF NOT EXISTS contract_templates (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name VARCHAR(100) NOT NULL,
+            type VARCHAR(50) NOT NULL,
+            content TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )",
+        "CREATE TABLE IF NOT EXISTS staff_contracts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            staff_id INTEGER NOT NULL,
+            template_id INTEGER NOT NULL,
+            signed_at DATETIME,
+            signature_data TEXT,
+            is_signed BOOLEAN DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (staff_id) REFERENCES staff_profiles(id),
+            FOREIGN KEY (template_id) REFERENCES contract_templates(id)
+        )",
+        "CREATE TABLE IF NOT EXISTS contract_users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email VARCHAR(100) UNIQUE NOT NULL,
+            password_hash VARCHAR(255) NOT NULL,
+            staff_id INTEGER,
+            role VARCHAR(20) DEFAULT 'staff',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (staff_id) REFERENCES staff_profiles(id)
+        )"
+    ];
+    
+    foreach ($contractTablesSQL as $sql) {
+        $db->exec($sql);
+    }
+    
 } catch (PDOException $e) {
     error_log("Error creating staff_profiles table: " . $e->getMessage());
 }
@@ -100,6 +137,63 @@ if (!$oliverExists) {
         ]);
     } catch (PDOException $e) {
         error_log("Error inserting Oliver Reaney: " . $e->getMessage());
+    }
+}
+
+// Initialize default contract templates if they don't exist
+$checkTemplates = $db->prepare("SELECT COUNT(*) FROM contract_templates");
+$checkTemplates->execute();
+$templateCount = $checkTemplates->fetchColumn();
+
+if ($templateCount == 0) {
+    $defaultTemplates = [
+        [
+            'name' => 'Voluntary/Shareholder Agreement',
+            'type' => 'shareholder',
+            'content' => 'This is a Voluntary/Shareholder Agreement template. By signing this document, you agree to the terms and conditions outlined herein regarding your role as a voluntary contributor and potential shareholder at Nexi Hub. This agreement establishes your rights, responsibilities, and compensation structure.'
+        ],
+        [
+            'name' => 'Non-Disclosure Agreement (NDA)',
+            'type' => 'nda',
+            'content' => 'This Non-Disclosure Agreement (NDA) establishes confidentiality requirements for your work at Nexi Hub. You agree to maintain the confidentiality of all proprietary information, trade secrets, and sensitive business data you may encounter during your engagement with the company.'
+        ],
+        [
+            'name' => 'Code of Conduct',
+            'type' => 'conduct',
+            'content' => 'This Code of Conduct outlines the behavioral expectations and professional standards required of all Nexi Hub team members. By signing this document, you commit to maintaining the highest standards of professional conduct, respect, and integrity in all business interactions.'
+        ],
+        [
+            'name' => 'Company Policies',
+            'type' => 'policies',
+            'content' => 'This document outlines all company policies including but not limited to: workplace safety, anti-harassment, data protection, remote work guidelines, communication standards, and general operational procedures that all team members must follow.'
+        ]
+    ];
+    
+    $insertTemplate = $db->prepare("INSERT INTO contract_templates (name, type, content) VALUES (?, ?, ?)");
+    foreach ($defaultTemplates as $template) {
+        try {
+            $insertTemplate->execute([$template['name'], $template['type'], $template['content']]);
+        } catch (PDOException $e) {
+            error_log("Error inserting contract template: " . $e->getMessage());
+        }
+    }
+}
+
+// Initialize contract portal user if it doesn't exist
+$checkContractUser = $db->prepare("SELECT COUNT(*) FROM contract_users WHERE email = ?");
+$checkContractUser->execute(['contract@nexihub.uk']);
+$contractUserExists = $checkContractUser->fetchColumn();
+
+if (!$contractUserExists) {
+    $insertContractUser = $db->prepare("INSERT INTO contract_users (email, password_hash, role) VALUES (?, ?, ?)");
+    try {
+        $insertContractUser->execute([
+            'contract@nexihub.uk',
+            '$2y$12$sXiFjaox6dAUXIHvjb6mbuCeXBc3caww3V.p63jllXvJey8bZ/.3q',
+            'staff'
+        ]);
+    } catch (PDOException $e) {
+        error_log("Error inserting contract user: " . $e->getMessage());
     }
 }
 
@@ -221,6 +315,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $error_message = "Error deleting staff member: " . $e->getMessage();
                 }
                 break;
+                
+            case 'add_contract_template':
+                // Add new contract template
+                $stmt = $db->prepare("INSERT INTO contract_templates (name, type, content) VALUES (?, ?, ?)");
+                try {
+                    $stmt->execute([
+                        $_POST['contract_name'],
+                        $_POST['contract_type'],
+                        $_POST['contract_content']
+                    ]);
+                    header("Location: dashboard.php?success=Contract template added successfully");
+                    exit;
+                } catch (PDOException $e) {
+                    $error_message = "Error adding contract template: " . $e->getMessage();
+                }
+                break;
+                
+            case 'update_contract_template':
+                // Update contract template
+                $stmt = $db->prepare("UPDATE contract_templates SET name = ?, type = ?, content = ? WHERE id = ?");
+                try {
+                    $stmt->execute([
+                        $_POST['contract_name'],
+                        $_POST['contract_type'],
+                        $_POST['contract_content'],
+                        $_POST['contract_id']
+                    ]);
+                    header("Location: dashboard.php?success=Contract template updated successfully");
+                    exit;
+                } catch (PDOException $e) {
+                    $error_message = "Error updating contract template: " . $e->getMessage();
+                }
+                break;
+                
+            case 'delete_contract_template':
+                // Delete contract template
+                $stmt = $db->prepare("DELETE FROM contract_templates WHERE id = ?");
+                try {
+                    $stmt->execute([$_POST['contract_id']]);
+                    header("Location: dashboard.php?success=Contract template deleted successfully");
+                    exit;
+                } catch (PDOException $e) {
+                    $error_message = "Error deleting contract template: " . $e->getMessage();
+                }
+                break;
+                
+            case 'assign_contract':
+                // Assign contract to staff member
+                $stmt = $db->prepare("
+                    INSERT OR IGNORE INTO staff_contracts (staff_id, template_id, is_signed) 
+                    VALUES (?, ?, 0)
+                ");
+                try {
+                    $stmt->execute([
+                        $_POST['staff_id'],
+                        $_POST['template_id']
+                    ]);
+                    header("Location: dashboard.php?success=Contract assigned to staff member");
+                    exit;
+                } catch (PDOException $e) {
+                    $error_message = "Error assigning contract: " . $e->getMessage();
+                }
+                break;
         }
     }
 }
@@ -229,6 +386,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $stmt = $db->prepare("SELECT * FROM staff_profiles ORDER BY department, region, full_name");
 $stmt->execute();
 $staff_members = $stmt->fetchAll();
+
+// Fetch all contract templates
+$stmt = $db->prepare("SELECT * FROM contract_templates ORDER BY name");
+$stmt->execute();
+$contract_templates = $stmt->fetchAll();
+
+// Fetch contract assignments and signatures
+$stmt = $db->prepare("
+    SELECT 
+        sp.id as staff_id,
+        sp.full_name,
+        ct.id as template_id,
+        ct.name as template_name,
+        ct.type as template_type,
+        sc.is_signed,
+        sc.signed_at,
+        sc.signature_data
+    FROM staff_profiles sp
+    LEFT JOIN staff_contracts sc ON sp.id = sc.staff_id
+    LEFT JOIN contract_templates ct ON sc.template_id = ct.id
+    ORDER BY sp.full_name, ct.name
+");
+$stmt->execute();
+$contract_assignments = $stmt->fetchAll();
+
+// Group contract assignments by staff
+$contracts_by_staff = [];
+foreach ($contract_assignments as $assignment) {
+    $staff_id = $assignment['staff_id'];
+    if (!isset($contracts_by_staff[$staff_id])) {
+        $contracts_by_staff[$staff_id] = [];
+    }
+    if ($assignment['template_id']) {
+        $contracts_by_staff[$staff_id][] = $assignment;
+    }
+}
 
 // Group staff by department and region
 $staff_by_department = [];
@@ -759,6 +952,324 @@ include __DIR__ . '/../includes/header.php';
     background: var(--border-color);
 }
 
+/* Tab Navigation Styles */
+.tab-navigation {
+    display: flex;
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    padding: 0.5rem;
+    gap: 0.5rem;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.tab-button:hover {
+    background: var(--background-dark);
+    color: var(--text-primary);
+}
+
+.tab-button.active {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px rgba(230, 79, 33, 0.3);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Contract Management Styles */
+.contracts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.contract-card {
+    background: var(--background-light);
+    border-radius: 16px;
+    padding: 0;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.contract-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px var(--shadow-medium);
+    border-color: var(--primary-color);
+}
+
+.contract-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--background-dark);
+}
+
+.contract-header h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+}
+
+.contract-type-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.contract-type-badge.shareholder {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.contract-type-badge.nda {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.contract-type-badge.conduct {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+}
+
+.contract-type-badge.policies {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    color: white;
+}
+
+.contract-content {
+    padding: 1.5rem;
+}
+
+.contract-preview {
+    background: var(--background-dark);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.contract-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+/* Portal Access Styles */
+.portal-header {
+    background: var(--background-light);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.portal-header h2 {
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.portal-header p {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.portal-info-card {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.portal-info-card h3 {
+    color: var(--primary-color);
+    margin: 0 0 1rem 0;
+    font-size: 1.3rem;
+}
+
+.login-details {
+    display: grid;
+    gap: 1rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--background-dark);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.detail-row strong {
+    color: var(--text-primary);
+    min-width: 120px;
+}
+
+.detail-row a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.detail-row a:hover {
+    text-decoration: underline;
+}
+
+.contract-status-section {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+}
+
+.contract-status-section h3 {
+    color: var(--text-primary);
+    margin: 0 0 1.5rem 0;
+    font-size: 1.3rem;
+}
+
+.staff-contracts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.staff-contract-card {
+    background: var(--background-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.staff-contract-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 8px 20px var(--shadow-light);
+}
+
+.staff-contract-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.staff-contract-header h4 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.contract-progress {
+    text-align: right;
+}
+
+.progress-text {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.progress-bar {
+    width: 100px;
+    height: 6px;
+    background: var(--border-color);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    transition: width 0.3s ease;
+}
+
+.contract-list {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.contract-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--background-light);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.contract-name {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.3rem 0.75rem;
+    border-radius: 12px;
+}
+
+.status.signed {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.status.assigned {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.status.not-assigned {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.assign-btn {
+    margin-left: 0.5rem;
+    padding: 0.3rem 0.75rem !important;
+    font-size: 0.75rem !important;
+}
+
 @media (max-width: 768px) {
     .dashboard-header h1 {
         font-size: 2rem;
@@ -816,6 +1327,19 @@ include __DIR__ . '/../includes/header.php';
             <p>Secure Staff Information Management System - Region-Based Dashboard</p>
         </div>
 
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-button active" onclick="showTab('staff-tab')">
+                <i class="fas fa-users"></i> Staff Management
+            </button>
+            <button class="tab-button" onclick="showTab('contracts-tab')">
+                <i class="fas fa-file-contract"></i> Contract Management
+            </button>
+            <button class="tab-button" onclick="showTab('contract-portal-tab')">
+                <i class="fas fa-signature"></i> Contract Portal Access
+            </button>
+        </div>
+
         <?php if ($success_message): ?>
             <div class="alert alert-success">
                 <i class="fas fa-check-circle"></i> <?php echo $success_message; ?>
@@ -828,14 +1352,16 @@ include __DIR__ . '/../includes/header.php';
             </div>
         <?php endif; ?>
 
-        <div class="dashboard-actions">
-            <div class="dashboard-stats">
-                <i class="fas fa-users"></i> Total Staff: <strong><?php echo count($staff_members); ?></strong>
+        <!-- Staff Management Tab -->
+        <div id="staff-tab" class="tab-content active">
+            <div class="dashboard-actions">
+                <div class="dashboard-stats">
+                    <i class="fas fa-users"></i> Total Staff: <strong><?php echo count($staff_members); ?></strong>
+                </div>
+                <button onclick="openAddModal()" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add New Staff Member
+                </button>
             </div>
-            <button onclick="openAddModal()" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Add New Staff Member
-            </button>
-        </div>
 
         <?php if (!empty($staff_members)): ?>
             <?php foreach ($staff_by_department as $department => $regions): ?>
@@ -944,6 +1470,141 @@ include __DIR__ . '/../includes/header.php';
                 <p>Click "Add New Staff Member" to get started.</p>
             </div>
         <?php endif; ?>
+        </div>
+
+        <!-- Contract Management Tab -->
+        <div id="contracts-tab" class="tab-content">
+            <div class="dashboard-actions">
+                <div class="dashboard-stats">
+                    <i class="fas fa-file-contract"></i> Total Templates: <strong><?php echo count($contract_templates); ?></strong>
+                </div>
+                <button onclick="openAddContractModal()" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Contract Template
+                </button>
+            </div>
+
+            <div class="contracts-grid">
+                <?php foreach ($contract_templates as $template): ?>
+                    <div class="contract-card">
+                        <div class="contract-header">
+                            <h3><?php echo htmlspecialchars($template['name']); ?></h3>
+                            <span class="contract-type-badge <?php echo strtolower($template['type']); ?>">
+                                <?php echo ucfirst($template['type']); ?>
+                            </span>
+                        </div>
+                        
+                        <div class="contract-content">
+                            <div class="contract-preview">
+                                <?php echo nl2br(htmlspecialchars(substr($template['content'], 0, 200))); ?>
+                                <?php if (strlen($template['content']) > 200): ?>...<?php endif; ?>
+                            </div>
+                            
+                            <div class="contract-actions">
+                                <button onclick="viewContract(<?php echo $template['id']; ?>)" class="btn btn-success btn-sm">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button onclick="editContract(<?php echo $template['id']; ?>)" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button onclick="deleteContract(<?php echo $template['id']; ?>, '<?php echo htmlspecialchars($template['name']); ?>')" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+                
+                <?php if (empty($contract_templates)): ?>
+                    <div class="empty-state">
+                        <i class="fas fa-file-contract"></i>
+                        <h3>No Contract Templates Found</h3>
+                        <p>Create your first contract template to get started.</p>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- Contract Portal Access Tab -->
+        <div id="contract-portal-tab" class="tab-content">
+            <div class="portal-header">
+                <h2>Contract Portal Access</h2>
+                <p>View staff contract signing status and portal access information</p>
+            </div>
+
+            <div class="portal-info-card">
+                <h3>Portal Login Information</h3>
+                <div class="login-details">
+                    <div class="detail-row">
+                        <strong>Portal URL:</strong> 
+                        <a href="<?php echo SITE_URL; ?>/contracts/" target="_blank"><?php echo SITE_URL; ?>/contracts/</a>
+                    </div>
+                    <div class="detail-row">
+                        <strong>Login Email:</strong> contract@nexihub.uk
+                    </div>
+                    <div class="detail-row">
+                        <strong>Password:</strong> test1212
+                    </div>
+                </div>
+            </div>
+
+            <div class="contract-status-section">
+                <h3>Staff Contract Status</h3>
+                <div class="staff-contracts-grid">
+                    <?php foreach ($staff_members as $staff): ?>
+                        <?php 
+                        $staff_contracts = $contracts_by_staff[$staff['id']] ?? [];
+                        $total_contracts = count($contract_templates);
+                        $signed_contracts = array_filter($staff_contracts, function($c) { return $c['is_signed']; });
+                        $signed_count = count($signed_contracts);
+                        ?>
+                        <div class="staff-contract-card">
+                            <div class="staff-contract-header">
+                                <h4><?php echo htmlspecialchars($staff['full_name']); ?></h4>
+                                <div class="contract-progress">
+                                    <span class="progress-text"><?php echo $signed_count; ?>/<?php echo $total_contracts; ?> signed</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: <?php echo $total_contracts ? ($signed_count / $total_contracts * 100) : 0; ?>%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="contract-list">
+                                <?php foreach ($contract_templates as $template): ?>
+                                    <?php 
+                                    $staff_contract = null;
+                                    foreach ($staff_contracts as $sc) {
+                                        if ($sc['template_id'] == $template['id']) {
+                                            $staff_contract = $sc;
+                                            break;
+                                        }
+                                    }
+                                    ?>
+                                    <div class="contract-item">
+                                        <span class="contract-name"><?php echo htmlspecialchars($template['name']); ?></span>
+                                        <?php if ($staff_contract && $staff_contract['is_signed']): ?>
+                                            <span class="status signed">
+                                                <i class="fas fa-check-circle"></i> Signed
+                                            </span>
+                                        <?php elseif ($staff_contract): ?>
+                                            <span class="status assigned">
+                                                <i class="fas fa-clock"></i> Assigned
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="status not-assigned">
+                                                <i class="fas fa-times-circle"></i> Not Assigned
+                                            </span>
+                                            <button onclick="assignContract(<?php echo $staff['id']; ?>, <?php echo $template['id']; ?>)" class="btn btn-sm btn-secondary assign-btn">
+                                                Assign
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -1331,9 +1992,250 @@ include __DIR__ . '/../includes/header.php';
     </div>
 </div>
 
+<!-- Add Contract Modal -->
+<div id="addContractModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Add Contract Template</h2>
+            <span class="close" onclick="closeAddContractModal()">&times;</span>
+        </div>
+        
+        <form method="POST" action="">
+            <input type="hidden" name="action" value="add_contract_template">
+            
+            <div class="modal-body">
+                <div class="form-section">
+                    <h3>Contract Information</h3>
+                    <div class="form-group">
+                        <label class="form-label">Contract Name *</label>
+                        <input type="text" name="contract_name" class="form-control" required placeholder="e.g., Employee NDA">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Contract Type *</label>
+                        <select name="contract_type" class="form-control" required>
+                            <option value="">Select Type</option>
+                            <option value="shareholder">Voluntary/Shareholder Agreement</option>
+                            <option value="nda">Non-Disclosure Agreement</option>
+                            <option value="conduct">Code of Conduct</option>
+                            <option value="policies">Company Policies</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Contract Content *</label>
+                        <textarea name="contract_content" class="form-control" rows="10" required placeholder="Enter the full contract text..."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" onclick="closeAddContractModal()" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Contract Template</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Contract Modal -->
+<div id="editContractModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Edit Contract Template</h2>
+            <span class="close" onclick="closeEditContractModal()">&times;</span>
+        </div>
+        
+        <form method="POST" action="">
+            <input type="hidden" name="action" value="update_contract_template">
+            <input type="hidden" name="contract_id" id="edit_contract_id">
+            
+            <div class="modal-body">
+                <div class="form-section">
+                    <h3>Contract Information</h3>
+                    <div class="form-group">
+                        <label class="form-label">Contract Name *</label>
+                        <input type="text" name="contract_name" id="edit_contract_name" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Contract Type *</label>
+                        <select name="contract_type" id="edit_contract_type" class="form-control" required>
+                            <option value="">Select Type</option>
+                            <option value="shareholder">Voluntary/Shareholder Agreement</option>
+                            <option value="nda">Non-Disclosure Agreement</option>
+                            <option value="conduct">Code of Conduct</option>
+                            <option value="policies">Company Policies</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Contract Content *</label>
+                        <textarea name="contract_content" id="edit_contract_content" class="form-control" rows="10" required></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" onclick="closeEditContractModal()" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update Contract Template</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- View Contract Modal -->
+<div id="viewContractModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="viewContractTitle">Contract Template</h2>
+            <span class="close" onclick="closeViewContractModal()">&times;</span>
+        </div>
+        
+        <div class="modal-body" id="viewContractBody">
+            <!-- Content will be populated by JavaScript -->
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" onclick="closeViewContractModal()" class="btn btn-secondary">Close</button>
+            <button type="button" onclick="editContractFromView()" class="btn btn-primary" id="editContractFromViewBtn">Edit Contract</button>
+        </div>
+    </div>
+</div>
+
 <script>
 // Staff data for JavaScript operations
 const staffData = <?php echo json_encode($staff_members); ?>;
+const contractData = <?php echo json_encode($contract_templates); ?>;
+
+// Tab Navigation Functions
+function showTab(tabId) {
+    // Hide all tab contents
+    const tabs = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    
+    // Remove active class from all tab buttons
+    const buttons = document.querySelectorAll('.tab-button');
+    buttons.forEach(button => button.classList.remove('active'));
+    
+    // Show selected tab
+    document.getElementById(tabId).classList.add('active');
+    
+    // Add active class to clicked button
+    event.target.classList.add('active');
+}
+
+// Contract Management Functions
+function openAddContractModal() {
+    document.getElementById('addContractModal').style.display = 'block';
+}
+
+function closeAddContractModal() {
+    document.getElementById('addContractModal').style.display = 'none';
+}
+
+function openEditContractModal() {
+    document.getElementById('editContractModal').style.display = 'block';
+}
+
+function closeEditContractModal() {
+    document.getElementById('editContractModal').style.display = 'none';
+}
+
+function openViewContractModal() {
+    document.getElementById('viewContractModal').style.display = 'block';
+}
+
+function closeViewContractModal() {
+    document.getElementById('viewContractModal').style.display = 'none';
+}
+
+function viewContract(contractId) {
+    const contract = contractData.find(c => c.id == contractId);
+    if (!contract) {
+        alert('Contract not found');
+        return;
+    }
+    
+    document.getElementById('viewContractTitle').textContent = contract.name;
+    document.getElementById('viewContractBody').innerHTML = `
+        <div class="form-section">
+            <h3>Contract Details</h3>
+            <div class="contract-details">
+                <div class="detail-row">
+                    <span class="detail-label">Name:</span>
+                    <span class="detail-value">${contract.name}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Type:</span>
+                    <span class="detail-value">${contract.type.charAt(0).toUpperCase() + contract.type.slice(1)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Created:</span>
+                    <span class="detail-value">${new Date(contract.created_at).toLocaleDateString()}</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-section">
+            <h3>Contract Content</h3>
+            <div class="contract-full-content">
+                ${contract.content.replace(/\n/g, '<br>')}
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('editContractFromViewBtn').onclick = () => editContract(contractId);
+    openViewContractModal();
+}
+
+function editContract(contractId) {
+    const contract = contractData.find(c => c.id == contractId);
+    if (!contract) {
+        alert('Contract not found');
+        return;
+    }
+    
+    document.getElementById('edit_contract_id').value = contract.id;
+    document.getElementById('edit_contract_name').value = contract.name;
+    document.getElementById('edit_contract_type').value = contract.type;
+    document.getElementById('edit_contract_content').value = contract.content;
+    
+    closeViewContractModal();
+    openEditContractModal();
+}
+
+function editContractFromView() {
+    const contractId = document.getElementById('edit_contract_id').value;
+    editContract(contractId);
+}
+
+function deleteContract(contractId, contractName) {
+    if (confirm(`Are you sure you want to delete "${contractName}"?\n\nThis action cannot be undone and will remove all associated staff assignments.`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.innerHTML = `
+            <input type="hidden" name="action" value="delete_contract_template">
+            <input type="hidden" name="contract_id" value="${contractId}">
+        `;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+function assignContract(staffId, templateId) {
+    if (confirm('Are you sure you want to assign this contract to the staff member?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.innerHTML = `
+            <input type="hidden" name="action" value="assign_contract">
+            <input type="hidden" name="staff_id" value="${staffId}">
+            <input type="hidden" name="template_id" value="${templateId}">
+        `;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Staff Management Functions
 
 function openAddModal() {
     document.getElementById('addModal').style.display = 'block';
@@ -1590,6 +2492,9 @@ window.onclick = function(event) {
     const addModal = document.getElementById('addModal');
     const editModal = document.getElementById('editModal');
     const viewModal = document.getElementById('viewModal');
+    const addContractModal = document.getElementById('addContractModal');
+    const editContractModal = document.getElementById('editContractModal');
+    const viewContractModal = document.getElementById('viewContractModal');
     
     if (event.target === addModal) {
         closeAddModal();
@@ -1597,6 +2502,12 @@ window.onclick = function(event) {
         closeEditModal();
     } else if (event.target === viewModal) {
         closeViewModal();
+    } else if (event.target === addContractModal) {
+        closeAddContractModal();
+    } else if (event.target === editContractModal) {
+        closeEditContractModal();
+    } else if (event.target === viewContractModal) {
+        closeViewContractModal();
     }
 }
 
@@ -1677,6 +2588,46 @@ function formatDateTime(dateTimeString) {
     .view-value {
         text-align: left;
     }
+}
+
+/* Contract Specific Styles */
+.contract-details {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.contract-full-content {
+    background: var(--background-dark);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    line-height: 1.8;
+    color: var(--text-primary);
+    max-height: 400px;
+    overflow-y: auto;
+    font-size: 0.95rem;
+}
+
+.contract-details .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--background-dark);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.contract-details .detail-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-width: 100px;
+}
+
+.contract-details .detail-value {
+    color: var(--text-primary);
+    text-align: right;
 }
 </style>
 
