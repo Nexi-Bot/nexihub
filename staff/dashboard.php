@@ -9,10 +9,15 @@ $page_description = "Nexi Hub Staff Management System";
 // Use the global $pdo connection from config.php
 $db = $pdo;
 
+// Detect database type for proper SQL syntax
+$is_mysql = ($db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'mysql');
+$auto_increment = $is_mysql ? 'AUTO_INCREMENT' : 'AUTOINCREMENT';
+$int_primary = $is_mysql ? 'INT AUTO_INCREMENT PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT';
+
 // Create staff table if it doesn't exist
 $createTableSQL = "
 CREATE TABLE IF NOT EXISTS staff_profiles (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id $int_primary,
     staff_id VARCHAR(20) UNIQUE NOT NULL,
     manager VARCHAR(100),
     full_name VARCHAR(100) NOT NULL,
@@ -32,7 +37,7 @@ CREATE TABLE IF NOT EXISTS staff_profiles (
     two_fa_status BOOLEAN DEFAULT 0,
     date_joined DATE,
     elearning_status VARCHAR(50) DEFAULT 'Not Started',
-    time_off_balance INTEGER DEFAULT 0,
+    time_off_balance " . ($is_mysql ? 'INT' : 'INTEGER') . " DEFAULT 0,
     parent_contact TEXT,
     payroll_info TEXT,
     password_reset_history TEXT,
@@ -40,7 +45,7 @@ CREATE TABLE IF NOT EXISTS staff_profiles (
     internal_notes TEXT,
     contract_completed BOOLEAN DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP" . ($is_mysql ? " ON UPDATE CURRENT_TIMESTAMP" : "") . "
 )";
 
 try {
@@ -51,7 +56,7 @@ try {
         $db->exec("ALTER TABLE staff_profiles ADD COLUMN contract_completed BOOLEAN DEFAULT 0");
     } catch (PDOException $e) {
         // Column already exists, ignore error
-        if (!str_contains($e->getMessage(), 'duplicate column name')) {
+        if (!str_contains($e->getMessage(), 'duplicate column name') && !str_contains($e->getMessage(), 'Duplicate column name')) {
             error_log("Error adding contract_completed column: " . $e->getMessage());
         }
     }
@@ -59,33 +64,33 @@ try {
     // Create contract management tables
     $contractTablesSQL = [
         "CREATE TABLE IF NOT EXISTS contract_templates (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id $int_primary,
             name VARCHAR(100) NOT NULL,
             type VARCHAR(50) NOT NULL,
             content TEXT NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP" . ($is_mysql ? " ON UPDATE CURRENT_TIMESTAMP" : "") . "
         )",
         "CREATE TABLE IF NOT EXISTS staff_contracts (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            staff_id INTEGER NOT NULL,
-            template_id INTEGER NOT NULL,
+            id $int_primary,
+            staff_id " . ($is_mysql ? 'INT' : 'INTEGER') . " NOT NULL,
+            template_id " . ($is_mysql ? 'INT' : 'INTEGER') . " NOT NULL,
             signed_at DATETIME,
             signature_data TEXT,
             is_signed BOOLEAN DEFAULT 0,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP" . ($is_mysql ? ",
             FOREIGN KEY (staff_id) REFERENCES staff_profiles(id),
-            FOREIGN KEY (template_id) REFERENCES contract_templates(id)
+            FOREIGN KEY (template_id) REFERENCES contract_templates(id)" : "") . "
         )",
         "CREATE TABLE IF NOT EXISTS contract_users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id $int_primary,
             email VARCHAR(100) UNIQUE NOT NULL,
             password_hash VARCHAR(255) NOT NULL,
-            staff_id INTEGER,
+            staff_id " . ($is_mysql ? 'INT' : 'INTEGER') . ",
             role VARCHAR(20) DEFAULT 'staff',
             needs_password_reset BOOLEAN DEFAULT 0,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (staff_id) REFERENCES staff_profiles(id)
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP" . ($is_mysql ? ",
+            FOREIGN KEY (staff_id) REFERENCES staff_profiles(id)" : "") . "
         )"
     ];
     
