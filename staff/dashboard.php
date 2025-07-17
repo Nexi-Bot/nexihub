@@ -1585,6 +1585,12 @@ include __DIR__ . '/../includes/header.php';
                                             <span class="status signed">
                                                 <i class="fas fa-check-circle"></i> Signed
                                             </span>
+                                            <button onclick="viewSignedContract(<?php echo $staff_contract['id']; ?>, '<?php echo htmlspecialchars($template['name']); ?>')" class="btn btn-sm btn-success view-btn">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                            <button onclick="downloadContractPDF(<?php echo $staff_contract['id']; ?>)" class="btn btn-sm btn-secondary download-btn">
+                                                <i class="fas fa-download"></i> PDF
+                                            </button>
                                         <?php elseif ($staff_contract): ?>
                                             <span class="status assigned">
                                                 <i class="fas fa-clock"></i> Assigned
@@ -2450,7 +2456,7 @@ function editStaff(staffId) {
     document.getElementById('edit_elearning_status').value = staff.elearning_status || 'Not Started';
     document.getElementById('edit_time_off_balance').value = staff.time_off_balance || 0;
     document.getElementById('edit_account_status').value = staff.account_status || 'Active';
-    document.getElementById('edit_parent_contact').value = staff.parent_contact || '';
+    document.getElementById('edit_parent_contact').value = staff.parent_contact || '';        
     document.getElementById('edit_internal_notes').value = staff.internal_notes || '';
     document.getElementById('edit_two_fa_status').checked = staff.two_fa_status == '1';
     document.getElementById('edit_contract_completed').checked = staff.contract_completed == '1';
@@ -2468,75 +2474,145 @@ function deleteStaff(staffId, staffName) {
     if (confirm(`Are you sure you want to delete ${staffName}?\n\nThis action cannot be undone and will permanently remove all staff data.`)) {
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '';
-        
-        const actionInput = document.createElement('input');
-        actionInput.type = 'hidden';
-        actionInput.name = 'action';
-        actionInput.value = 'delete_staff';
-        
-        const idInput = document.createElement('input');
-        idInput.type = 'hidden';
-        idInput.name = 'delete_staff_id';
-        idInput.value = staffId;
-        
-        form.appendChild(actionInput);
-        form.appendChild(idInput);
+        form.innerHTML = `
+            <input type="hidden" name="action" value="delete_staff">
+            <input type="hidden" name="delete_staff_id" value="${staffId}">
+        `;
         document.body.appendChild(form);
         form.submit();
     }
 }
 
-// Close modals when clicking outside of them
-window.onclick = function(event) {
-    const addModal = document.getElementById('addModal');
-    const editModal = document.getElementById('editModal');
-    const viewModal = document.getElementById('viewModal');
-    const addContractModal = document.getElementById('addContractModal');
-    const editContractModal = document.getElementById('editContractModal');
-    const viewContractModal = document.getElementById('viewContractModal');
+// Contract viewing and download functions
+function viewSignedContract(contractId, contractName) {
+    // Create a modal to display contract details
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Signed Contract: ${contractName}</h2>
+                <button onclick="this.closest('.modal').remove()" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; padding: 2rem;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary-color);"></i>
+                    <p>Loading contract details...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="downloadContractPDF(${contractId})" class="btn btn-primary">
+                    <i class="fas fa-download"></i> Download PDF
+                </button>
+                <button onclick="this.closest('.modal').remove()" class="btn btn-secondary">Close</button>
+            </div>
+        </div>
+    `;
     
-    if (event.target === addModal) {
-        closeAddModal();
-    } else if (event.target === editModal) {
-        closeEditModal();
-    } else if (event.target === viewModal) {
-        closeViewModal();
-    } else if (event.target === addContractModal) {
-        closeAddContractModal();
-    } else if (event.target === editContractModal) {
-        closeEditContractModal();
-    } else if (event.target === viewContractModal) {
-        closeViewContractModal();
-    }
-}
-
-// Helper functions
-function calculateAge(dateOfBirth) {
-    if (!dateOfBirth) return 'N/A';
-    const dob = new Date(dateOfBirth);
-    const now = new Date();
-    const diffTime = Math.abs(now - dob);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return Math.floor(diffDays / 365);
-}
-
-function formatDate(dateString) {
-    if (!dateString) return 'Not Set';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-}
-
-function formatDateTime(dateTimeString) {
-    if (!dateTimeString) return 'Not Set';
-    const date = new Date(dateTimeString);
-    return date.toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+    document.body.appendChild(modal);
+    
+    // Fetch contract details via AJAX
+    fetch(`../contracts/dashboard.php?action=get_contract&contract_id=${contractId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const contract = data.contract;
+                const modalBody = modal.querySelector('.modal-body');
+                modalBody.innerHTML = `
+                    <div class="contract-view-content">
+                        <div class="contract-info-section">
+                            <h3>Contract Information</h3>
+                            <div class="contract-details">
+                                <div class="detail-row">
+                                    <span class="detail-label">Signer Name:</span>
+                                    <span class="detail-value">${contract.signer_full_name || 'Not recorded'}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Position:</span>
+                                    <span class="detail-value">${contract.signer_position || 'Not recorded'}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Date of Birth:</span>
+                                    <span class="detail-value">${contract.signer_date_of_birth || 'Not recorded'}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Signed On:</span>
+                                    <span class="detail-value">${new Date(contract.signed_timestamp || contract.signed_at).toLocaleString()}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${contract.is_under_17 && contract.guardian_full_name ? `
+                        <div class="guardian-info-section">
+                            <h3>Guardian Information</h3>
+                            <div class="contract-details">
+                                <div class="detail-row">
+                                    <span class="detail-label">Guardian Name:</span>
+                                    <span class="detail-value">${contract.guardian_full_name}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Guardian Email:</span>
+                                    <span class="detail-value">${contract.guardian_email}</span>
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="signature-display-section">
+                            <h3>Signatures</h3>
+                            <div class="signatures-grid">
+                                <div class="signature-box">
+                                    <h4>Employee Signature</h4>
+                                    ${contract.signature_data ? `<img src="${contract.signature_data}" alt="Employee Signature" class="signature-image">` : '<p>Signature not available</p>'}
+                                </div>
+                                ${contract.is_under_17 && contract.guardian_signature_data ? `
+                                <div class="signature-box guardian-signature">
+                                    <h4>Guardian Signature</h4>
+                                    <img src="${contract.guardian_signature_data}" alt="Guardian Signature" class="signature-image">
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                modal.querySelector('.modal-body').innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--danger-color);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p>Error loading contract details: ${data.message}</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            modal.querySelector('.modal-body').innerHTML = `
+                <div style="text-align: center; padding: 2rem; color: var(--danger-color);">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <p>Error loading contract: ${error.message}</p>
+                </div>
+            `;
+        });
+    
+    // Close modal when clicking outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
     });
+}
+
+function downloadContractPDF(contractId) {
+    // Create a temporary link to download the PDF
+    const link = document.createElement('a');
+    link.href = `../contracts/download-pdf.php?contract_id=${contractId}`;
+    link.download = '';
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 </script>
 

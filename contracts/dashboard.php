@@ -28,25 +28,72 @@ try {
 if ($_POST['action'] ?? '' === 'sign_contract') {
     $template_id = $_POST['template_id'] ?? '';
     $signature = $_POST['signature'] ?? '';
+    $guardian_signature = $_POST['guardian_signature'] ?? '';
     $staff_id = $_SESSION['contract_staff_id'];
     
     if ($template_id && $signature && $staff_id) {
         try {
-            // Check if already signed
-            $stmt = $db->prepare("SELECT id FROM staff_contracts WHERE staff_id = ? AND template_id = ? AND is_signed = 1");
-            $stmt->execute([$staff_id, $template_id]);
+            // Get staff profile data
+            $stmt = $db->prepare("SELECT full_name, job_title, date_of_birth FROM staff_profiles WHERE id = ?");
+            $stmt->execute([$staff_id]);
+            $staff_profile = $stmt->fetch();
             
-            if (!$stmt->fetch()) {
-                // Insert or update contract
-                $stmt = $db->prepare("
-                    INSERT OR REPLACE INTO staff_contracts 
-                    (staff_id, template_id, signed_at, signature_data, is_signed) 
-                    VALUES (?, ?, ?, ?, 1)
-                ");
-                $stmt->execute([$staff_id, $template_id, date('Y-m-d H:i:s'), $signature]);
-                $success = "Contract signed successfully!";
+            if ($staff_profile) {
+                // Calculate age
+                $dob = new DateTime($staff_profile['date_of_birth']);
+                $today = new DateTime();
+                $age = $today->diff($dob)->y;
+                $is_under_17 = $age <= 16;
+                
+                // Check if guardian info is required and provided
+                if ($is_under_17) {
+                    $guardian_name = $_POST['guardian_name'] ?? '';
+                    $guardian_email = $_POST['guardian_email'] ?? '';
+                    
+                    if (!$guardian_name || !$guardian_email || !$guardian_signature) {
+                        $error = "Guardian information and signature are required for signers 16 years or younger.";
+                    }
+                }
+                
+                if (!isset($error)) {
+                    // Check if already signed
+                    $stmt = $db->prepare("SELECT id FROM staff_contracts WHERE staff_id = ? AND template_id = ? AND is_signed = 1");
+                    $stmt->execute([$staff_id, $template_id]);
+                    
+                    if (!$stmt->fetch()) {
+                        $signed_timestamp = date('Y-m-d H:i:s');
+                        
+                        // Insert or update contract with all signature data
+                        $stmt = $db->prepare("
+                            INSERT OR REPLACE INTO staff_contracts 
+                            (staff_id, template_id, signed_at, signature_data, is_signed, 
+                             signer_full_name, signer_position, signer_date_of_birth, is_under_17,
+                             guardian_full_name, guardian_email, guardian_signature_data, signed_timestamp) 
+                            VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?)
+                        ");
+                        
+                        $stmt->execute([
+                            $staff_id, 
+                            $template_id, 
+                            $signed_timestamp, 
+                            $signature, 
+                            $staff_profile['full_name'],
+                            $staff_profile['job_title'],
+                            $staff_profile['date_of_birth'],
+                            $is_under_17 ? 1 : 0,
+                            $is_under_17 ? ($_POST['guardian_name'] ?? '') : null,
+                            $is_under_17 ? ($_POST['guardian_email'] ?? '') : null,
+                            $is_under_17 ? $guardian_signature : null,
+                            $signed_timestamp
+                        ]);
+                        
+                        $success = "Contract signed successfully!";
+                    } else {
+                        $error = "This contract has already been signed.";
+                    }
+                }
             } else {
-                $error = "This contract has already been signed.";
+                $error = "Staff profile not found.";
             }
         } catch (PDOException $e) {
             $error = "Error signing contract: " . $e->getMessage();
@@ -63,11 +110,32 @@ if ($_GET['action'] ?? '' === 'logout') {
     exit;
 }
 
+// Get user profile data for auto-filling forms
+$user_profile = null;
+try {
+    $stmt = $db->prepare("SELECT full_name, job_title, date_of_birth FROM staff_profiles WHERE id = ?");
+    $stmt->execute([$_SESSION['contract_staff_id']]);
+    $user_profile = $stmt->fetch();
+    
+    if ($user_profile && $user_profile['date_of_birth']) {
+        $dob = new DateTime($user_profile['date_of_birth']);
+        $today = new DateTime();
+        $user_profile['age'] = $today->diff($dob)->y;
+        $user_profile['is_under_17'] = $user_profile['age'] <= 16;
+    }
+} catch (PDOException $e) {
+    // Handle error silently for now
+}
+
 // Get available contracts
 $contracts = [];
 try {
     $stmt = $db->prepare("
-        SELECT ct.*, sc.is_signed, sc.signed_at 
+        SELECT ct.*, 
+               sc.is_signed, sc.signed_at, sc.signature_data,
+               sc.signer_full_name, sc.signer_position, sc.signer_date_of_birth,
+               sc.is_under_17, sc.guardian_full_name, sc.guardian_email, 
+               sc.guardian_signature_data, sc.signed_timestamp
         FROM contract_templates ct
         LEFT JOIN staff_contracts sc ON ct.id = sc.template_id AND sc.staff_id = ?
         ORDER BY ct.name
@@ -76,6 +144,46 @@ try {
     $contracts = $stmt->fetchAll();
 } catch (PDOException $e) {
     $error = "Error fetching contracts: " . $e->getMessage();
+}
+
+// Handle AJAX requests for contract details
+if ($_GET['action'] ?? '' === 'get_contract') {
+    header('Content-Type: application/json');
+    
+    $contract_id = $_GET['contract_id'] ?? '';
+    
+    if (!$contract_id) {
+        echo json_encode(['success' => false, 'message' => 'Contract ID required']);
+        exit;
+    }
+    
+    try {
+        // Get contract details with signature information
+        $stmt = $db->prepare("
+            SELECT ct.name, ct.content, ct.type,
+                   sc.is_signed, sc.signed_at, sc.signature_data,
+                   sc.signer_full_name, sc.signer_position, sc.signer_date_of_birth,
+                   sc.is_under_17, sc.guardian_full_name, sc.guardian_email, 
+                   sc.guardian_signature_data, sc.signed_timestamp,
+                   sp.full_name as staff_name
+            FROM contract_templates ct
+            JOIN staff_contracts sc ON ct.id = sc.template_id 
+            JOIN staff_profiles sp ON sc.staff_id = sp.id
+            WHERE sc.id = ? AND sc.is_signed = 1
+        ");
+        $stmt->execute([$contract_id]);
+        $contract = $stmt->fetch();
+        
+        if ($contract) {
+            echo json_encode(['success' => true, 'contract' => $contract]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Contract not found or not signed']);
+        }
+    } catch (PDOException $e) {
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+    }
+    
+    exit;
 }
 
 $page_title = "Contract Portal - Dashboard";
@@ -219,7 +327,7 @@ include __DIR__ . '/../includes/header.php';
 
 <!-- Contract Signing Modal -->
 <div id="signingModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content large-modal">
         <div class="modal-header">
             <h2 id="modalContractTitle">Contract Details</h2>
             <button class="modal-close" onclick="closeSigningModal()">
@@ -238,31 +346,83 @@ include __DIR__ . '/../includes/header.php';
                 <h3>Digital Signature</h3>
                 <p>By signing below, you acknowledge that you have read, understood, and agree to the terms of this contract.</p>
                 
-                <form method="POST" onsubmit="return submitSignature(this)">
+                <form method="POST" onsubmit="return submitSignature(this)" id="signatureForm">
                     <input type="hidden" name="action" value="sign_contract">
                     <input type="hidden" name="template_id" id="modalTemplateId">
                     <input type="hidden" name="signature" id="modalSignature">
+                    <input type="hidden" name="guardian_signature" id="modalGuardianSignature">
                     
-                    <div class="signature-pad-container">
-                        <canvas id="signaturePad" width="600" height="200"></canvas>
-                        <div class="signature-instructions">
-                            Draw your signature above using your mouse or touch screen
+                    <!-- Signer Information -->
+                    <div class="signer-info-section">
+                        <h4>Signer Information</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Full Legal Name</label>
+                                <input type="text" id="signerFullName" value="<?php echo htmlspecialchars($user_profile['full_name'] ?? ''); ?>" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Position</label>
+                                <input type="text" id="signerPosition" value="<?php echo htmlspecialchars($user_profile['job_title'] ?? ''); ?>" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Date of Birth</label>
+                                <input type="date" id="signerDOB" value="<?php echo $user_profile['date_of_birth'] ?? ''; ?>" readonly>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="signature-controls">
-                        <button type="button" onclick="clearSignature()" class="btn btn-secondary">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/>
-                            </svg>
-                            Clear Signature
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M14.6,16.6L19.2,12L14.6,7.4L13.2,8.8L15.67,11.25H5V12.75H15.67L13.2,15.2L14.6,16.6Z"/>
-                            </svg>
-                            Sign Contract
-                        </button>
+                    <!-- Guardian Information (shown only if under 17) -->
+                    <div class="guardian-info-section" id="guardianSection" style="display: none;">
+                        <h4>Parent/Guardian Information</h4>
+                        <p class="info-text">As you are 16 years or younger, parent/guardian consent and signature are required.</p>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Parent/Guardian Full Name *</label>
+                                <input type="text" name="guardian_name" id="guardianName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Parent/Guardian Email *</label>
+                                <input type="email" name="guardian_email" id="guardianEmail" required>
+                            </div>
+                        </div>
+                        
+                        <div class="signature-pad-container">
+                            <label>Parent/Guardian Signature *</label>
+                            <canvas id="guardianSignaturePad" width="600" height="150"></canvas>
+                            <div class="signature-instructions">
+                                Parent/Guardian: Draw your signature above using your mouse or touch screen
+                            </div>
+                            <button type="button" onclick="clearGuardianSignature()" class="btn btn-secondary btn-small">
+                                Clear Guardian Signature
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Main Signature -->
+                    <div class="main-signature-section">
+                        <h4>Your Signature</h4>
+                        <div class="signature-pad-container">
+                            <canvas id="signaturePad" width="600" height="200"></canvas>
+                            <div class="signature-instructions">
+                                Draw your signature above using your mouse or touch screen
+                            </div>
+                        </div>
+                        
+                        <div class="signature-controls">
+                            <button type="button" onclick="clearSignature()" class="btn btn-secondary">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/>
+                                </svg>
+                                Clear Signature
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M14.6,16.6L19.2,12L14.6,7.4L13.2,8.8L15.67,11.25H5V12.75H15.67L13.2,15.2L14.6,16.6Z"/>
+                                </svg>
+                                Sign Contract
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -272,19 +432,31 @@ include __DIR__ . '/../includes/header.php';
 
 <!-- Contract View Modal -->
 <div id="viewModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content large-modal">
         <div class="modal-header">
-            <h2 id="viewModalTitle">Contract Details</h2>
-            <button class="modal-close" onclick="closeViewModal()">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
-                </svg>
-            </button>
+            <h2 id="viewModalTitle">Signed Contract</h2>
+            <div class="modal-header-actions">
+                <button onclick="downloadSignedPDF()" class="btn btn-secondary btn-small">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                    </svg>
+                    Download PDF
+                </button>
+                <button class="modal-close" onclick="closeViewModal()">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                    </svg>
+                </button>
+            </div>
         </div>
         
         <div class="modal-body">
             <div class="contract-content" id="viewModalContent">
                 <!-- Contract content will be populated here -->
+            </div>
+            
+            <div class="signature-details" id="signatureDetails">
+                <!-- Signature details will be populated here -->
             </div>
         </div>
     </div>
@@ -464,6 +636,10 @@ include __DIR__ . '/../includes/header.php';
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
+.large-modal {
+    max-width: 1200px;
+}
+
 .modal-header {
     display: flex;
     justify-content: space-between;
@@ -472,6 +648,12 @@ include __DIR__ . '/../includes/header.php';
     border-bottom: 1px solid var(--border-color);
     background: var(--background-dark);
     border-radius: 24px 24px 0 0;
+}
+
+.modal-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .modal-header h2 {
@@ -604,28 +786,190 @@ include __DIR__ . '/../includes/header.php';
     height: 16px;
 }
 
-@media (max-width: 768px) {
-    .modal-content {
-        width: 95%;
-        margin: 5% auto;
-    }
-    
-    .modal-header,
-    .modal-body {
-        padding: 1.5rem;
-    }
-    
-    .contracts-overview h2 {
-        font-size: 2rem;
-    }
-    
-    .signature-controls {
-        flex-direction: column;
-    }
-    
-    #signaturePad {
-        height: 150px;
-    }
+.signer-info-section,
+.guardian-info-section,
+.main-signature-section {
+    background: var(--background-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.signer-info-section h4,
+.guardian-info-section h4,
+.main-signature-section h4 {
+    color: var(--text-primary);
+    margin: 0 0 1.5rem 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--background-light);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.form-group input[readonly] {
+    background: var(--background-dark);
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.info-text {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.guardian-info-section {
+    border: 2px solid var(--secondary-color);
+    background: linear-gradient(135deg, rgba(230, 79, 33, 0.05), rgba(243, 131, 91, 0.05));
+}
+
+#guardianSignaturePad {
+    border: 2px solid var(--secondary-color);
+    border-radius: 16px;
+    background: white;
+    cursor: crosshair;
+    width: 100%;
+    height: 150px;
+    margin-top: 0.5rem;
+}
+
+.btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+.signature-details {
+    background: var(--background-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+.signature-details h3 {
+    color: var(--text-primary);
+    margin: 0 0 2rem 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.signature-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.signature-info-card {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.signature-info-card h4 {
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.info-value {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.signature-display {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.signature-box {
+    background: white;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.signature-box h5 {
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.signature-image {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.guardian-signature-box {
+    border-color: var(--secondary-color);
+    background: linear-gradient(135deg, rgba(230, 79, 33, 0.05), rgba(243, 131, 91, 0.05));
 }
 </style>
 
@@ -724,6 +1068,9 @@ function viewContract(contractId) {
     const contract = contracts.find(c => c.id == contractId);
     if (!contract) return;
     
+    // Set current viewing contract ID for PDF download
+    window.currentViewingContractId = contractId;
+    
     document.getElementById('viewModalTitle').textContent = contract.name;
     document.getElementById('viewModalContent').innerHTML = contract.content.replace(/\n/g, '<br>');
     
@@ -751,6 +1098,17 @@ function submitSignature(form) {
     document.getElementById('modalSignature').value = signatureData;
     
     return true;
+}
+
+function downloadSignedPDF() {
+    // Get the current contract ID from the modal
+    const contractId = window.currentViewingContractId;
+    
+    if (contractId) {
+        window.open(`download-pdf.php?contract_id=${contractId}`, '_blank');
+    } else {
+        alert('Unable to determine contract ID for PDF generation.');
+    }
 }
 
 // Close modals when clicking outside
