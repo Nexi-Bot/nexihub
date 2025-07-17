@@ -10,9 +10,8 @@ $page_description = "Platform usage statistics and insights";
 require_once __DIR__ . '/../config/api_config.php';
 require_once __DIR__ . '/../includes/RealDataAnalytics.php';
 
-// Database connection
-$db = new PDO("sqlite:" . __DIR__ . "/../database/nexihub.db");
-$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+// Use the global $pdo connection from config.php
+$db = $pdo;
 
 // Initialize analytics provider
 $analytics_provider = new RealDataAnalytics($db);

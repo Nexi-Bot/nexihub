@@ -6,23 +6,8 @@ requireAuth(); // Enable when ready
 $page_title = "Staff Management Dashboard";
 $page_description = "Nexi Hub Staff Management System";
 
-// Database connection
-try {
-    if (defined('DB_TYPE') && DB_TYPE === 'mysql') {
-        $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
-        $db = new PDO($dsn, DB_USER, DB_PASS, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
-        ]);
-    } else {
-        $db = new PDO("sqlite:" . __DIR__ . "/../database/nexihub.db");
-        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    }
-} catch (PDOException $e) {
-    error_log("Database connection failed: " . $e->getMessage());
-    die("Database connection failed");
-}
+// Use the global $pdo connection from config.php
+$db = $pdo;
 
 // Create staff table if it doesn't exist
 $createTableSQL = "

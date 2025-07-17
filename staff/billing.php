@@ -51,8 +51,7 @@ if ($stripe && $stripe->isConfigured()) {
     ];
 } else {
     // Fallback to database if Stripe not configured
-    $db = new PDO("sqlite:" . __DIR__ . "/../database/nexihub.db");
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $db = $pdo;
     
     $transactions = $db->query("
         SELECT amount, description, date as created, status, 'USD' as currency
