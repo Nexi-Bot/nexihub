@@ -6,11 +6,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $email = filter_var($_POST['email'] ?? '', FILTER_VALIDATE_EMAIL);
+$password = $_POST['password'] ?? '';
 $error = '';
 
 try {
     if (!$email) {
         throw new Exception('Please provide your email address');
+    }
+
+    if (!$password) {
+        throw new Exception('Please provide your password');
     }
 
     // Check if Discord authentication was completed first
@@ -24,12 +29,17 @@ try {
     }
 
     // Check if user exists and is active
-    $stmt = $pdo->prepare("SELECT id, email, name, discord_id, two_fa_secret, two_fa_enabled FROM staff WHERE email = ? AND is_active = 1");
+    $stmt = $pdo->prepare("SELECT id, email, name, discord_id, two_fa_secret, two_fa_enabled, password_hash FROM staff WHERE email = ? AND is_active = 1");
     $stmt->execute([$email]);
     $staff = $stmt->fetch();
 
     if (!$staff) {
         throw new Exception('Email address not found in staff directory');
+    }
+
+    // Verify password
+    if (!isset($staff['password_hash']) || !password_verify($password, $staff['password_hash'])) {
+        throw new Exception('Invalid password');
     }
 
     // For development/testing, allow any Discord user to link to ollie.r@nexihub.uk
