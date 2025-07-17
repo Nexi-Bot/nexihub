@@ -67,7 +67,7 @@ try {
             id $int_primary,
             name VARCHAR(100) NOT NULL,
             type VARCHAR(50) NOT NULL,
-            content TEXT NOT NULL,
+            content LONGTEXT NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP" . ($is_mysql ? " ON UPDATE CURRENT_TIMESTAMP" : "") . "
         )",
@@ -96,6 +96,53 @@ try {
     
     foreach ($contractTablesSQL as $sql) {
         $db->exec($sql);
+    }
+
+    // Add shareholder tracking columns to staff_profiles
+    try {
+        $db->exec("ALTER TABLE staff_profiles ADD COLUMN is_shareholder BOOLEAN DEFAULT 0");
+        $db->exec("ALTER TABLE staff_profiles ADD COLUMN shareholder_percentage DECIMAL(5,2) DEFAULT 0.00");
+        $db->exec("ALTER TABLE staff_profiles ADD COLUMN staff_type ENUM('volunteer', 'shareholder') DEFAULT 'volunteer'");
+    } catch (PDOException $e) {
+        // Columns may already exist
+    }
+
+    // Insert the 5 contract templates
+    $contractTemplates = [
+        [
+            'name' => 'Voluntary Contract of Employment',
+            'type' => 'employment',
+            'content' => generateVoluntaryContract()
+        ],
+        [
+            'name' => 'Staff Code of Conduct',
+            'type' => 'conduct',
+            'content' => generateCodeOfConduct()
+        ],
+        [
+            'name' => 'Non-Disclosure Agreement (NDA)',
+            'type' => 'nda',
+            'content' => generateNDA()
+        ],
+        [
+            'name' => 'Company Policies and Procedures',
+            'type' => 'policies',
+            'content' => generateCompanyPolicies()
+        ],
+        [
+            'name' => 'Shareholder Agreement',
+            'type' => 'shareholder',
+            'content' => generateShareholderAgreement()
+        ]
+    ];
+
+    foreach ($contractTemplates as $template) {
+        try {
+            $stmt = $db->prepare("INSERT IGNORE INTO contract_templates (name, type, content) VALUES (?, ?, ?)");
+            $stmt->execute([$template['name'], $template['type'], $template['content']]);
+        } catch (PDOException $e) {
+            // Template may already exist
+        }
     }
     
 } catch (PDOException $e) {
