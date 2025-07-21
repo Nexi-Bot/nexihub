@@ -68,6 +68,7 @@ try {
             name VARCHAR(100) NOT NULL,
             type VARCHAR(50) NOT NULL,
             content LONGTEXT NOT NULL,
+            is_assignable BOOLEAN DEFAULT 1,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP" . ($is_mysql ? " ON UPDATE CURRENT_TIMESTAMP" : "") . "
         )",
@@ -106,42 +107,60 @@ try {
     } catch (PDOException $e) {
         // Columns may already exist
     }
+    
+    // Add is_assignable column to contract_templates if it doesn't exist
+    try {
+        $db->exec("ALTER TABLE contract_templates ADD COLUMN is_assignable BOOLEAN DEFAULT 1");
+    } catch (PDOException $e) {
+        // Column already exists, ignore error
+        if (!str_contains($e->getMessage(), 'duplicate column name') && !str_contains($e->getMessage(), 'Duplicate column name')) {
+            error_log("Error adding is_assignable column: " . $e->getMessage());
+        }
+    }
 
-    // Insert the 5 contract templates (will be updated with actual content)
-    $contractTemplates = [
-        [
-            'name' => 'Voluntary Contract of Employment',
-            'type' => 'employment',
-            'content' => '<h1>Voluntary Contract of Employment</h1><p>Contract content will be loaded here...</p>'
-        ],
-        [
-            'name' => 'Staff Code of Conduct',
-            'type' => 'conduct',
-            'content' => '<h1>Staff Code of Conduct</h1><p>Code of conduct content will be loaded here...</p>'
-        ],
-        [
-            'name' => 'Non-Disclosure Agreement (NDA)',
-            'type' => 'nda',
-            'content' => '<h1>Non-Disclosure Agreement</h1><p>NDA content will be loaded here...</p>'
-        ],
-        [
-            'name' => 'Company Policies and Procedures',
-            'type' => 'policies',
-            'content' => '<h1>Company Policies and Procedures</h1><p>Policies content will be loaded here...</p>'
-        ],
-        [
-            'name' => 'Shareholder Agreement',
-            'type' => 'shareholder',
-            'content' => '<h1>Shareholder Agreement</h1><p>Shareholder agreement content will be loaded here...</p>'
-        ]
-    ];
+    // Check if we have assignable contract templates
+    $checkAssignableTemplates = $db->prepare("SELECT COUNT(*) FROM contract_templates WHERE is_assignable = 1");
+    $checkAssignableTemplates->execute();
+    $assignableCount = $checkAssignableTemplates->fetchColumn();
+    
+    // Only insert templates if we have no assignable ones (initial setup)
+    if ($assignableCount == 0) {
+        // Insert the 5 contract templates (these will be replaced with proper content via migration script)
+        $contractTemplates = [
+            [
+                'name' => 'Voluntary Contract of Employment',
+                'type' => 'employment',
+                'content' => '<h1>Voluntary Contract of Employment</h1><p>Contract content will be loaded here...</p>'
+            ],
+            [
+                'name' => 'Staff Code of Conduct',
+                'type' => 'conduct',
+                'content' => '<h1>Staff Code of Conduct</h1><p>Code of conduct content will be loaded here...</p>'
+            ],
+            [
+                'name' => 'Non-Disclosure Agreement (NDA)',
+                'type' => 'nda',
+                'content' => '<h1>Non-Disclosure Agreement</h1><p>NDA content will be loaded here...</p>'
+            ],
+            [
+                'name' => 'Company Policies and Procedures',
+                'type' => 'policies',
+                'content' => '<h1>Company Policies and Procedures</h1><p>Policies content will be loaded here...</p>'
+            ],
+            [
+                'name' => 'Shareholder Agreement',
+                'type' => 'shareholder',
+                'content' => '<h1>Shareholder Agreement</h1><p>Shareholder agreement content will be loaded here...</p>'
+            ]
+        ];
 
-    foreach ($contractTemplates as $template) {
-        try {
-            $stmt = $db->prepare("INSERT IGNORE INTO contract_templates (name, type, content) VALUES (?, ?, ?)");
-            $stmt->execute([$template['name'], $template['type'], $template['content']]);
-        } catch (PDOException $e) {
-            // Template may already exist
+        foreach ($contractTemplates as $template) {
+            try {
+                $stmt = $db->prepare("INSERT IGNORE INTO contract_templates (name, type, content, is_assignable) VALUES (?, ?, ?, 1)");
+                $stmt->execute([$template['name'], $template['type'], $template['content']]);
+            } catch (PDOException $e) {
+                // Template may already exist
+            }
         }
     }
     
@@ -178,44 +197,7 @@ if (!$oliverExists) {
     }
 }
 
-// Initialize default contract templates if they don't exist
-$checkTemplates = $db->prepare("SELECT COUNT(*) FROM contract_templates");
-$checkTemplates->execute();
-$templateCount = $checkTemplates->fetchColumn();
-
-if ($templateCount == 0) {
-    $defaultTemplates = [
-        [
-            'name' => 'Voluntary/Shareholder Agreement',
-            'type' => 'shareholder',
-            'content' => 'This is a Voluntary/Shareholder Agreement template. By signing this document, you agree to the terms and conditions outlined herein regarding your role as a voluntary contributor and potential shareholder at Nexi Hub. This agreement establishes your rights, responsibilities, and compensation structure.'
-        ],
-        [
-            'name' => 'Non-Disclosure Agreement (NDA)',
-            'type' => 'nda',
-            'content' => 'This Non-Disclosure Agreement (NDA) establishes confidentiality requirements for your work at Nexi Hub. You agree to maintain the confidentiality of all proprietary information, trade secrets, and sensitive business data you may encounter during your engagement with the company.'
-        ],
-        [
-            'name' => 'Code of Conduct',
-            'type' => 'conduct',
-            'content' => 'This Code of Conduct outlines the behavioral expectations and professional standards required of all Nexi Hub team members. By signing this document, you commit to maintaining the highest standards of professional conduct, respect, and integrity in all business interactions.'
-        ],
-        [
-            'name' => 'Company Policies',
-            'type' => 'policies',
-            'content' => 'This document outlines all company policies including but not limited to: workplace safety, anti-harassment, data protection, remote work guidelines, communication standards, and general operational procedures that all team members must follow.'
-        ]
-    ];
-    
-    $insertTemplate = $db->prepare("INSERT INTO contract_templates (name, type, content) VALUES (?, ?, ?)");
-    foreach ($defaultTemplates as $template) {
-        try {
-            $insertTemplate->execute([$template['name'], $template['type'], $template['content']]);
-        } catch (PDOException $e) {
-            error_log("Error inserting contract template: " . $e->getMessage());
-        }
-    }
-}
+// Contract templates are now properly initialized - removed duplicate initialization code
 
 // Initialize contract portal user if it doesn't exist
 $checkContractUser = $db->prepare("SELECT COUNT(*) FROM contract_users WHERE email = ?");
@@ -542,7 +524,7 @@ $stmt->execute();
 $staff_members = $stmt->fetchAll();
 
 // Fetch all contract templates
-$stmt = $db->prepare("SELECT * FROM contract_templates ORDER BY name");
+$stmt = $db->prepare("SELECT * FROM contract_templates WHERE is_assignable = 1 ORDER BY name");
 $stmt->execute();
 $contract_templates = $stmt->fetchAll();
 
