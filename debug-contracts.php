@@ -1,66 +1,61 @@
 <?php
-// Debug the contract dashboard redirect issue
-require_once 'config/config.php';
+require_once __DIR__ . '/config/config.php';
 
-echo "<!DOCTYPE html><html><head><title>Contract Debug</title></head><body>";
-echo "<h2>Nexi HR Portal Debug</h2>";
+echo "=== CONTRACT DEBUG REPORT ===\n\n";
 
-// Force set session data
-$_SESSION['contract_user_id'] = 2;
-$_SESSION['contract_user_email'] = 'contract@nexihub.uk';
-$_SESSION['contract_user_role'] = 'staff';
-$_SESSION['contract_staff_id'] = 1;
+echo "1. Database Connection Info:\n";
+echo "Driver: " . $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) . "\n";
+echo "Database: " . ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite' ? 'SQLite' : 'MySQL') . "\n\n";
 
-echo "<h3>Session Data:</h3>";
-echo "<pre>";
-print_r($_SESSION);
-echo "</pre>";
-
-echo "<h3>Testing Contract Dashboard Access:</h3>";
-
-// Check if the contract dashboard file exists
-$dashboard_path = __DIR__ . '/contracts/dashboard.php';
-echo "<p>Dashboard file path: $dashboard_path</p>";
-echo "<p>Dashboard file exists: " . (file_exists($dashboard_path) ? 'YES' : 'NO') . "</p>";
-
-// Test the session check logic from the dashboard
-if (!isset($_SESSION['contract_user_id'])) {
-    echo "<p style='color: red;'>❌ Session check FAILED - contract_user_id not set</p>";
+echo "2. Contract Templates Table Schema:\n";
+if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+    $stmt = $pdo->query("PRAGMA table_info(contract_templates)");
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        echo "- {$row['name']} ({$row['type']}) " . ($row['notnull'] ? 'NOT NULL' : 'NULL') . "\n";
+    }
 } else {
-    echo "<p style='color: green;'>✅ Session check PASSED - contract_user_id = " . $_SESSION['contract_user_id'] . "</p>";
+    $stmt = $pdo->query("DESCRIBE contract_templates");
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        echo "- {$row['Field']} ({$row['Type']}) " . ($row['Null'] === 'NO' ? 'NOT NULL' : 'NULL') . "\n";
+    }
 }
 
-echo "<h3>Navigation:</h3>";
-echo "<p><a href='/contracts/dashboard.php' target='_blank'>Test Contract Dashboard (new tab)</a></p>";
-echo "<p><a href='contracts/dashboard.php' target='_blank'>Test Contract Dashboard - relative (new tab)</a></p>";
+echo "\n3. All Contract Templates (RAW):\n";
+$stmt = $pdo->prepare("SELECT id, name, type, is_assignable, created_at FROM contract_templates ORDER BY id");
+$stmt->execute();
+$all_contracts = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Create a direct inclusion test
-echo "<h3>Direct Include Test:</h3>";
-echo "<div style='border: 1px solid #ccc; padding: 10px; margin: 10px 0;'>";
-echo "<h4>Including contracts/dashboard.php directly:</h4>";
-
-ob_start();
-try {
-    // Set up the expected environment
-    $_GET = []; $_POST = [];
-    
-    // Capture any output from the dashboard
-    include 'contracts/dashboard.php';
-    $dashboard_output = ob_get_contents();
-} catch (Exception $e) {
-    echo "<p style='color: red;'>Error including dashboard: " . $e->getMessage() . "</p>";
-    $dashboard_output = '';
-}
-ob_end_clean();
-
-if (!empty($dashboard_output)) {
-    echo "<p style='color: green;'>✅ Dashboard loaded successfully!</p>";
-    echo "<p>Output length: " . strlen($dashboard_output) . " characters</p>";
-} else {
-    echo "<p style='color: red;'>❌ Dashboard did not produce output or redirected</p>";
+echo "Total contracts found: " . count($all_contracts) . "\n";
+foreach ($all_contracts as $contract) {
+    echo "ID: {$contract['id']}, Name: '{$contract['name']}', Type: {$contract['type']}, Assignable: " . ($contract['is_assignable'] ? 'Yes' : 'No') . ", Created: {$contract['created_at']}\n";
 }
 
-echo "</div>";
+echo "\n4. Assignable Contracts Only:\n";
+$stmt = $pdo->prepare("SELECT id, name, type FROM contract_templates WHERE is_assignable = 1 ORDER BY name");
+$stmt->execute();
+$assignable = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-echo "</body></html>";
+echo "Assignable contracts found: " . count($assignable) . "\n";
+foreach ($assignable as $contract) {
+    echo "- {$contract['name']} (Type: {$contract['type']})\n";
+}
+
+echo "\n5. Testing Dashboard Query:\n";
+$stmt = $pdo->prepare("SELECT * FROM contract_templates WHERE is_assignable = 1 ORDER BY name");
+$stmt->execute();
+$dashboard_contracts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+echo "Dashboard query result count: " . count($dashboard_contracts) . "\n";
+
+echo "\n6. Checking for Duplicates:\n";
+$names = [];
+foreach ($all_contracts as $contract) {
+    if (isset($names[$contract['name']])) {
+        echo "DUPLICATE FOUND: '{$contract['name']}' appears multiple times!\n";
+    } else {
+        $names[$contract['name']] = true;
+    }
+}
+
+echo "\nDone.\n";
 ?>

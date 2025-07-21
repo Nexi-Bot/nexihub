@@ -118,51 +118,7 @@ try {
         }
     }
 
-    // Check if we have assignable contract templates
-    $checkAssignableTemplates = $db->prepare("SELECT COUNT(*) FROM contract_templates WHERE is_assignable = 1");
-    $checkAssignableTemplates->execute();
-    $assignableCount = $checkAssignableTemplates->fetchColumn();
-    
-    // Only insert templates if we have no assignable ones (initial setup)
-    if ($assignableCount == 0) {
-        // Insert the 5 contract templates (these will be replaced with proper content via migration script)
-        $contractTemplates = [
-            [
-                'name' => 'Voluntary Contract of Employment',
-                'type' => 'employment',
-                'content' => '<h1>Voluntary Contract of Employment</h1><p>Contract content will be loaded here...</p>'
-            ],
-            [
-                'name' => 'Staff Code of Conduct',
-                'type' => 'conduct',
-                'content' => '<h1>Staff Code of Conduct</h1><p>Code of conduct content will be loaded here...</p>'
-            ],
-            [
-                'name' => 'Non-Disclosure Agreement (NDA)',
-                'type' => 'nda',
-                'content' => '<h1>Non-Disclosure Agreement</h1><p>NDA content will be loaded here...</p>'
-            ],
-            [
-                'name' => 'Company Policies and Procedures',
-                'type' => 'policies',
-                'content' => '<h1>Company Policies and Procedures</h1><p>Policies content will be loaded here...</p>'
-            ],
-            [
-                'name' => 'Shareholder Agreement',
-                'type' => 'shareholder',
-                'content' => '<h1>Shareholder Agreement</h1><p>Shareholder agreement content will be loaded here...</p>'
-            ]
-        ];
-
-        foreach ($contractTemplates as $template) {
-            try {
-                $stmt = $db->prepare("INSERT IGNORE INTO contract_templates (name, type, content, is_assignable) VALUES (?, ?, ?, 1)");
-                $stmt->execute([$template['name'], $template['type'], $template['content']]);
-            } catch (PDOException $e) {
-                // Template may already exist
-            }
-        }
-    }
+    // Contract templates are managed separately - no auto-initialization needed
     
 } catch (PDOException $e) {
     error_log("Error creating staff_profiles table: " . $e->getMessage());
