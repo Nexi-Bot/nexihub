@@ -75,22 +75,40 @@ if ($_POST['action'] ?? '' === 'sign_contract') {
                     if (!$stmt->fetch()) {
                         $signed_timestamp = date('Y-m-d H:i:s');
                         
-                        // Insert or update contract with signature data
+                        // Insert or update contract with signature data and all signer information
                         $stmt = $db->prepare("
                             INSERT INTO staff_contracts 
-                            (staff_id, template_id, signed_at, signature_data, is_signed) 
-                            VALUES (?, ?, ?, ?, 1)
+                            (staff_id, template_id, signed_at, signature_data, is_signed, 
+                             signer_full_name, signer_position, signer_date_of_birth, is_under_17,
+                             guardian_full_name, guardian_email, guardian_signature_data, signed_timestamp) 
+                            VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?)
                             ON DUPLICATE KEY UPDATE
                             signed_at = VALUES(signed_at),
                             signature_data = VALUES(signature_data),
-                            is_signed = VALUES(is_signed)
+                            is_signed = VALUES(is_signed),
+                            signer_full_name = VALUES(signer_full_name),
+                            signer_position = VALUES(signer_position),
+                            signer_date_of_birth = VALUES(signer_date_of_birth),
+                            is_under_17 = VALUES(is_under_17),
+                            guardian_full_name = VALUES(guardian_full_name),
+                            guardian_email = VALUES(guardian_email),
+                            guardian_signature_data = VALUES(guardian_signature_data),
+                            signed_timestamp = VALUES(signed_timestamp)
                         ");
                         
                         $stmt->execute([
                             $staff_id, 
                             $template_id, 
                             $signed_timestamp, 
-                            $signature
+                            $signature,
+                            $staff_profile['full_name'],
+                            $staff_profile['job_title'],
+                            $staff_profile['date_of_birth'],
+                            $is_under_17 ? 1 : 0,
+                            $is_under_17 ? ($_POST['guardian_name'] ?? null) : null,
+                            $is_under_17 ? ($_POST['guardian_email'] ?? null) : null,
+                            $is_under_17 ? $guardian_signature : null,
+                            $signed_timestamp
                         ]);
                         
                         // Get contract name for email notification
@@ -152,23 +170,23 @@ try {
     // Handle error silently for now
 }
 
-// Get available contracts - prioritize signed contracts and avoid duplicates
+// Get available contracts - only show contracts assigned to this staff member
 $contracts = [];
 try {
     $stmt = $db->prepare("
         SELECT ct.*,
-               COALESCE(signed_sc.id, unsigned_sc.id) as contract_record_id,
-               COALESCE(signed_sc.is_signed, unsigned_sc.is_signed, 0) as is_signed,
-               signed_sc.signed_at, signed_sc.signature_data
+               sc.id as contract_record_id,
+               sc.is_signed,
+               sc.signed_at, sc.signature_data,
+               sc.signer_full_name, sc.signer_position, sc.signer_date_of_birth,
+               sc.is_under_17, sc.guardian_full_name, sc.guardian_email,
+               sc.guardian_signature_data, sc.signed_timestamp
         FROM contract_templates ct
-        LEFT JOIN staff_contracts signed_sc ON ct.id = signed_sc.template_id 
-            AND signed_sc.staff_id = ? AND signed_sc.is_signed = 1
-        LEFT JOIN staff_contracts unsigned_sc ON ct.id = unsigned_sc.template_id 
-            AND unsigned_sc.staff_id = ? AND unsigned_sc.is_signed = 0
-            AND signed_sc.id IS NULL  -- Only show unsigned if no signed version exists
-        ORDER BY ct.name
+        INNER JOIN staff_contracts sc ON ct.id = sc.template_id 
+        WHERE sc.staff_id = ?
+        ORDER BY ct.name, sc.is_signed ASC
     ");
-    $stmt->execute([$_SESSION['contract_staff_id'] ?? 0, $_SESSION['contract_staff_id'] ?? 0]);
+    $stmt->execute([$_SESSION['contract_staff_id'] ?? 0]);
     $contracts = $stmt->fetchAll();
 } catch (PDOException $e) {
     $error = "Error fetching contracts: " . $e->getMessage();
@@ -190,6 +208,9 @@ if ($_GET['action'] ?? '' === 'get_contract') {
         $stmt = $db->prepare("
             SELECT ct.name, ct.content, ct.type,
                    sc.is_signed, sc.signed_at, sc.signature_data,
+                   sc.signer_full_name, sc.signer_position, sc.signer_date_of_birth,
+                   sc.is_under_17, sc.guardian_full_name, sc.guardian_email,
+                   sc.guardian_signature_data, sc.signed_timestamp,
                    sp.full_name as staff_name, sp.job_title as staff_position,
                    sp.date_of_birth as staff_dob
             FROM contract_templates ct
@@ -1309,19 +1330,23 @@ function displaySignatureDetails(contract) {
                 <h4>Employee Information</h4>
                 <div class="info-row">
                     <span class="info-label">Full Name:</span>
-                    <span class="info-value">${contract.staff_name || 'Not recorded'}</span>
+                    <span class="info-value">${contract.signer_full_name || contract.staff_name || 'Not recorded'}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Position:</span>
-                    <span class="info-value">${contract.staff_position || 'Not recorded'}</span>
+                    <span class="info-value">${contract.signer_position || contract.staff_position || 'Not recorded'}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Date of Birth:</span>
-                    <span class="info-value">${contract.staff_dob ? new Date(contract.staff_dob).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Not recorded'}</span>
+                    <span class="info-value">${(contract.signer_date_of_birth || contract.staff_dob) ? new Date(contract.signer_date_of_birth || contract.staff_dob).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Not recorded'}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Age at Signing:</span>
+                    <span class="info-value">${contract.is_under_17 ? 'Under 17 (Guardian consent required)' : '17 or older'}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Signed:</span>
-                    <span class="info-value">${new Date(contract.signed_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>
+                    <span class="info-value">${new Date(contract.signed_timestamp || contract.signed_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</span>
                 </div>
             </div>
             
@@ -1332,9 +1357,37 @@ function displaySignatureDetails(contract) {
                 </div>
             </div>
         </div>
+        
+        ${contract.is_under_17 && contract.guardian_full_name ? `
+        <div class="signature-info-grid">
+            <div class="signature-info-card">
+                <h4>Guardian Information</h4>
+                <div class="info-row">
+                    <span class="info-label">Guardian Name:</span>
+                    <span class="info-value">${contract.guardian_full_name}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Guardian Email:</span>
+                    <span class="info-value">${contract.guardian_email}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Consent Required:</span>
+                    <span class="info-value">Yes (Employee under 17)</span>
+                </div>
+            </div>
+            
+            <div class="signature-info-card">
+                <h4>Guardian Signature</h4>
+                <div class="signature-display">
+                    ${contract.guardian_signature_data ? `<img src="${contract.guardian_signature_data}" alt="Guardian Signature" style="max-width: 100%; height: auto; border: 1px solid var(--border-color); border-radius: 8px; background: white; padding: 10px;">` : '<p style="color: var(--text-secondary); font-style: italic;">No guardian signature available</p>'}
+                </div>
+            </div>
+        </div>
+        ` : ''}
     `;
     
     signatureDetails.innerHTML = detailsHTML;
+}
 }
 
 function closeViewModal() {

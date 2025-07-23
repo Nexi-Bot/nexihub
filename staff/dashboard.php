@@ -494,7 +494,15 @@ $stmt = $db->prepare("
         ct.type as template_type,
         sc.is_signed,
         sc.signed_at,
-        sc.signature_data
+        sc.signature_data,
+        sc.signer_full_name,
+        sc.signer_position,
+        sc.signer_date_of_birth,
+        sc.is_under_17,
+        sc.guardian_full_name,
+        sc.guardian_email,
+        sc.guardian_signature_data,
+        sc.signed_timestamp
     FROM staff_profiles sp
     LEFT JOIN staff_contracts sc ON sp.id = sc.staff_id
     LEFT JOIN contract_templates ct ON sc.template_id = ct.id
