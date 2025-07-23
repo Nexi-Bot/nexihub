@@ -6,9 +6,15 @@ class ConsentPopup {
         this.init();
     }
     init() {
+        console.log('ConsentPopup: Initializing...');
+        console.log('ConsentPopup: Session consent:', this.hasSessionConsent());
+        console.log('ConsentPopup: Permanent consent:', this.hasPermanentConsent());
         if (!this.hasSessionConsent()) {
+            console.log('ConsentPopup: No session consent found, creating popup...');
             this.createPopup();
             this.showPopup();
+        } else {
+            console.log('ConsentPopup: Session consent already exists, skipping popup');
         }
     }
     hasSessionConsent() {
@@ -158,9 +164,16 @@ class ConsentPopup {
         }).catch(err => {});
     }
 }
-document.addEventListener('DOMContentLoaded', () => { new ConsentPopup(); });
+document.addEventListener('DOMContentLoaded', () => { 
+    console.log('ConsentPopup: DOM loaded, creating ConsentPopup instance...');
+    new ConsentPopup(); 
+});
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => new ConsentPopup());
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('ConsentPopup: DOM still loading, waiting for DOMContentLoaded...');
+        new ConsentPopup();
+    });
 } else {
+    console.log('ConsentPopup: DOM already loaded, creating ConsentPopup instance immediately...');
     new ConsentPopup();
 }

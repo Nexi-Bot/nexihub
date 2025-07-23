@@ -345,7 +345,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                     // Assign selected contracts to the staff member
                     foreach ($selected_contracts as $template_id) {
-                        $stmt = $db->prepare("INSERT OR IGNORE INTO staff_contracts (staff_id, template_id, is_signed) VALUES (?, ?, 0)");
+                        $stmt = $db->prepare("INSERT IGNORE INTO staff_contracts (staff_id, template_id, is_signed) VALUES (?, ?, 0)");
                         $stmt->execute([$staff_id, $template_id]);
                     }
                     
@@ -418,7 +418,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             case 'assign_contract':
                 // Assign contract to staff member
                 $stmt = $db->prepare("
-                    INSERT OR IGNORE INTO staff_contracts (staff_id, template_id, is_signed) 
+                    INSERT IGNORE INTO staff_contracts (staff_id, template_id, is_signed) 
                     VALUES (?, ?, 0)
                 ");
                 try {

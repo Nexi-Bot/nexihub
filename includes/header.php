@@ -9,8 +9,10 @@
     <link rel="shortcut icon" href="/assets/nexi.ico">
     <link rel="apple-touch-icon" href="/assets/nexi.ico">
     <link rel="stylesheet" href="/assets/style.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="/assets/css/consent-popup.css?v=<?php echo time(); ?>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="/assets/js/consent-popup.js?v=<?php echo time(); ?>" defer></script>
 </head>
 <body>
     <header class="header">
