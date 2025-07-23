@@ -1,6 +1,6 @@
 <?php
 // Database Configuration
-define('DB_TYPE', 'sqlite'); // Set to 'mysql' or 'sqlite'
+define('DB_TYPE', 'mysql'); // Set to 'mysql' or 'sqlite'
 define('DB_HOST', '65.21.61.192');
 define('DB_PORT', '3306');
 define('DB_USER', 'u25473_Y8CkMsMHyp');

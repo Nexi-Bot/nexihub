@@ -6,15 +6,9 @@ class ConsentPopup {
         this.init();
     }
     init() {
-        console.log('ConsentPopup: Initializing...');
-        console.log('ConsentPopup: Session consent:', this.hasSessionConsent());
-        console.log('ConsentPopup: Permanent consent:', this.hasPermanentConsent());
         if (!this.hasSessionConsent()) {
-            console.log('ConsentPopup: No session consent found, creating popup...');
             this.createPopup();
             this.showPopup();
-        } else {
-            console.log('ConsentPopup: Session consent already exists, skipping popup');
         }
     }
     hasSessionConsent() {
@@ -39,7 +33,7 @@ class ConsentPopup {
                     </div>
                 </div>
                 <div class="consent-popup-content">
-                    <h3 class="consent-heading">🍪 Cookies & Legal Consent</h3>
+                    <h3 class="consent-heading">Cookies & Legal Consent</h3>
                     <p class="consent-text">
                         We use <strong>essential cookies</strong> and tracking technologies to enhance your experience and analyze our services. 
                         By continuing to use our website, you acknowledge and agree to our comprehensive legal framework.
@@ -47,21 +41,21 @@ class ConsentPopup {
                     <div class="consent-legal-info">
                         <div class="consent-info-grid">
                             <div class="consent-info-item">
-                                <div class="consent-icon">🔒</div>
+                                <div class="consent-icon">S</div>
                                 <div class="consent-info-content">
                                     <h4>Privacy & Data Protection</h4>
                                     <p>Your data is protected under UK GDPR and our comprehensive privacy policies</p>
                                 </div>
                             </div>
                             <div class="consent-info-item">
-                                <div class="consent-icon">📋</div>
+                                <div class="consent-icon">T</div>
                                 <div class="consent-info-content">
                                     <h4>Terms of Service</h4>
                                     <p>Our terms govern your use of all NEXI BOT services and platforms</p>
                                 </div>
                             </div>
                             <div class="consent-info-item">
-                                <div class="consent-icon">⚖️</div>
+                                <div class="consent-icon">L</div>
                                 <div class="consent-info-content">
                                     <h4>Legal Compliance</h4>
                                     <p>All services comply with UK law and international standards</p>
@@ -85,11 +79,11 @@ class ConsentPopup {
                         Accept All & Continue
                     </button>
                     <button id="consent-session" class="consent-btn consent-btn-session">
-                        <span class="consent-btn-icon">⏱️</span>
+                        <span class="consent-btn-icon">○</span>
                         Accept for This Session
                     </button>
                     <a href="/legal" class="consent-btn consent-btn-learn-more" target="_blank">
-                        <span class="consent-btn-icon">📖</span>
+                        <span class="consent-btn-icon">i</span>
                         Learn More
                     </a>
                 </div>
@@ -165,15 +159,12 @@ class ConsentPopup {
     }
 }
 document.addEventListener('DOMContentLoaded', () => { 
-    console.log('ConsentPopup: DOM loaded, creating ConsentPopup instance...');
     new ConsentPopup(); 
 });
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('ConsentPopup: DOM still loading, waiting for DOMContentLoaded...');
         new ConsentPopup();
     });
 } else {
-    console.log('ConsentPopup: DOM already loaded, creating ConsentPopup instance immediately...');
     new ConsentPopup();
 }
