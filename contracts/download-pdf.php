@@ -181,10 +181,10 @@ function generateContractPDF($contract) {
     // Clean and format the contract content
     $content = $contract['content'];
     
-    // Remove HTML tags and CSS styling completely
+    // Remove all HTML tags and get just the text content
     $content = strip_tags($content);
     
-    // Remove any remaining CSS or HTML entities
+    // Remove any HTML entities
     $content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
     
     // Remove any markdown symbols and format properly
@@ -195,29 +195,29 @@ function generateContractPDF($contract) {
     
     // Clean up whitespace and formatting
     $content = preg_replace('/\s+/', ' ', $content); // Replace multiple spaces with single space
-    $content = preg_replace('/\n\s*\n/', "\n\n", $content); // Fix line breaks
+    $content = preg_replace('/\r?\n\s*\r?\n/', "\n\n", $content); // Fix paragraph breaks
     $content = trim($content);
     
-    // Convert to proper legal formatting
-    $lines = explode("\n", $content);
+    // Split content into paragraphs for better formatting
+    $paragraphs = explode("\n\n", $content);
     
-    foreach ($lines as $line) {
-        $line = trim($line);
-        if (empty($line)) continue;
+    foreach ($paragraphs as $paragraph) {
+        $paragraph = trim($paragraph);
+        if (empty($paragraph)) continue;
         
         // Check if it's a section header (all caps or starts with ARTICLE/SECTION)
-        if (preg_match('/^(ARTICLE|SECTION|\d+\.\d+|\d+\.)\s+/', $line) || 
-            (strlen($line) < 100 && strtoupper($line) === $line && !preg_match('/[.!?]$/', $line))) {
+        if (preg_match('/^(ARTICLE|SECTION|\d+\.\d+|\d+\.)\s+/', $paragraph) || 
+            (strlen($paragraph) < 100 && strtoupper($paragraph) === $paragraph && !preg_match('/[.!?]$/', $paragraph))) {
             $pdf->Ln(3);
             $pdf->SetFont('helvetica', 'B', 11);
             $pdf->SetTextColor($primary_color[0], $primary_color[1], $primary_color[2]);
-            $pdf->MultiCell(0, 6, $line, 0, 'L');
+            $pdf->MultiCell(0, 6, $paragraph, 0, 'L');
             $pdf->SetFont('helvetica', '', 11);
             $pdf->SetTextColor($dark_gray[0], $dark_gray[1], $dark_gray[2]);
             $pdf->Ln(2);
         } else {
             // Regular paragraph text
-            $pdf->MultiCell(0, 5.5, $line, 0, 'L');
+            $pdf->MultiCell(0, 5.5, $paragraph, 0, 'L');
             $pdf->Ln(1);
         }
     }
