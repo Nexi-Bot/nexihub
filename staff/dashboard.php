@@ -103,9 +103,18 @@ try {
     try {
         $db->exec("ALTER TABLE staff_profiles ADD COLUMN is_shareholder BOOLEAN DEFAULT 0");
         $db->exec("ALTER TABLE staff_profiles ADD COLUMN shareholder_percentage DECIMAL(5,2) DEFAULT 0.00");
-        $db->exec("ALTER TABLE staff_profiles ADD COLUMN staff_type ENUM('volunteer', 'shareholder') DEFAULT 'volunteer'");
+        
+        // Add staff_type column with proper syntax for both MySQL and SQLite
+        if ($is_mysql) {
+            $db->exec("ALTER TABLE staff_profiles ADD COLUMN staff_type VARCHAR(20) DEFAULT 'volunteer'");
+        } else {
+            $db->exec("ALTER TABLE staff_profiles ADD COLUMN staff_type TEXT DEFAULT 'volunteer'");
+        }
     } catch (PDOException $e) {
         // Columns may already exist
+        if (!str_contains($e->getMessage(), 'duplicate column name') && !str_contains($e->getMessage(), 'Duplicate column name')) {
+            error_log("Error adding shareholder columns: " . $e->getMessage());
+        }
     }
     
     // Add is_assignable column to contract_templates if it doesn't exist
@@ -197,11 +206,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         discord_username, discord_id, nationality, country_of_residence,
                         date_of_birth, two_fa_status, date_joined, elearning_status,
                         time_off_balance, parent_contact, account_status, internal_notes,
-                        contract_completed
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        contract_completed, staff_type, is_shareholder, shareholder_percentage
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ");
                 
                 try {
+                    $staff_type = $_POST['staff_type'] ?? 'volunteer';
+                    $is_shareholder = ($staff_type === 'shareholder') ? 1 : 0;
+                    $shareholder_percentage = ($staff_type === 'shareholder') ? floatval($_POST['shareholder_percentage'] ?? 0) : 0.00;
+                    
                     $stmt->execute([
                         $_POST['staff_id'],
                         $_POST['manager'],
@@ -225,7 +238,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_POST['parent_contact'],
                         $_POST['account_status'],
                         $_POST['internal_notes'],
-                        isset($_POST['contract_completed']) ? 1 : 0
+                        isset($_POST['contract_completed']) ? 1 : 0,
+                        $staff_type,
+                        $is_shareholder,
+                        $shareholder_percentage
                     ]);
                     header("Location: dashboard.php?success=Staff member added successfully");
                     exit;
@@ -243,11 +259,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         discord_username = ?, discord_id = ?, nationality = ?, country_of_residence = ?,
                         date_of_birth = ?, two_fa_status = ?, date_joined = ?, elearning_status = ?,
                         time_off_balance = ?, parent_contact = ?, account_status = ?, internal_notes = ?,
-                        contract_completed = ?, updated_at = CURRENT_TIMESTAMP
+                        contract_completed = ?, staff_type = ?, is_shareholder = ?, shareholder_percentage = ?, 
+                        updated_at = CURRENT_TIMESTAMP
                     WHERE id = ?
                 ");
                 
                 try {
+                    $staff_type = $_POST['staff_type'] ?? 'volunteer';
+                    $is_shareholder = ($staff_type === 'shareholder') ? 1 : 0;
+                    $shareholder_percentage = ($staff_type === 'shareholder') ? floatval($_POST['shareholder_percentage'] ?? 0) : 0.00;
+                    
                     $stmt->execute([
                         $_POST['manager'],
                         $_POST['full_name'],
@@ -271,6 +292,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_POST['account_status'],
                         $_POST['internal_notes'],
                         isset($_POST['contract_completed']) ? 1 : 0,
+                        $staff_type,
+                        $is_shareholder,
+                        $shareholder_percentage,
                         $_POST['edit_staff_id']
                     ]);
                     header("Location: dashboard.php?success=Staff member updated successfully");
@@ -752,6 +776,16 @@ include __DIR__ . '/../includes/header.php';
 
 .contract-pending {
     color: #f59e0b;
+    font-weight: 600;
+}
+
+.staff-shareholder {
+    color: #e64f21;
+    font-weight: 600;
+}
+
+.staff-volunteer {
+    color: #6b7280;
     font-weight: 600;
 }
 
@@ -1535,6 +1569,18 @@ include __DIR__ . '/../includes/header.php';
                                                     <?php echo $staff['contract_completed'] ? 'Completed' : 'Pending'; ?>
                                                 </span>
                                             </div>
+                                            <div class="detail-row">
+                                                <span class="detail-label">Staff Type:</span>
+                                                <span class="detail-value <?php echo ($staff['staff_type'] ?? 'volunteer') === 'shareholder' ? 'staff-shareholder' : 'staff-volunteer'; ?>">
+                                                    <?php 
+                                                    $staff_type = $staff['staff_type'] ?? 'volunteer';
+                                                    echo ucfirst($staff_type);
+                                                    if ($staff_type === 'shareholder' && !empty($staff['shareholder_percentage'])) {
+                                                        echo ' (' . number_format(floatval($staff['shareholder_percentage']), 2) . '%)';
+                                                    }
+                                                    ?>
+                                                </span>
+                                            </div>
                                             <?php if ($staff['date_of_birth'] && calculateAge($staff['date_of_birth']) < 16): ?>
                                                 <div class="detail-row">
                                                     <span class="detail-label">Age:</span>
@@ -1897,6 +1943,20 @@ include __DIR__ . '/../includes/header.php';
                             <label for="contract_completed" class="form-label">Contract Completed</label>
                         </div>
                     </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Staff Type</label>
+                            <select name="staff_type" id="staff_type" class="form-control" onchange="toggleShareholderPercentage()">
+                                <option value="volunteer">Volunteer</option>
+                                <option value="shareholder">Shareholder</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="shareholder_percentage_group" style="display: none;">
+                            <label class="form-label">Shareholder Percentage (%)</label>
+                            <input type="number" name="shareholder_percentage" id="shareholder_percentage" class="form-control" min="0" max="100" step="0.01" value="0.00">
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -2081,6 +2141,20 @@ include __DIR__ . '/../includes/header.php';
                         <div class="checkbox-group">
                             <input type="checkbox" name="contract_completed" id="edit_contract_completed">
                             <label for="edit_contract_completed" class="form-label">Contract Completed</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Staff Type</label>
+                            <select name="staff_type" id="edit_staff_type" class="form-control" onchange="toggleEditShareholderPercentage()">
+                                <option value="volunteer">Volunteer</option>
+                                <option value="shareholder">Shareholder</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="edit_shareholder_percentage_group" style="display: none;">
+                            <label class="form-label">Shareholder Percentage (%)</label>
+                            <input type="number" name="shareholder_percentage" id="edit_shareholder_percentage" class="form-control" min="0" max="100" step="0.01" value="0.00">
                         </div>
                     </div>
                 </div>
@@ -2460,6 +2534,53 @@ function closeViewModal() {
     document.getElementById('viewModal').style.display = 'none';
 }
 
+// Toggle shareholder percentage field visibility
+function toggleShareholderPercentage() {
+    const staffType = document.getElementById('staff_type').value;
+    const percentageGroup = document.getElementById('shareholder_percentage_group');
+    const percentageInput = document.getElementById('shareholder_percentage');
+    
+    if (staffType === 'shareholder') {
+        percentageGroup.style.display = 'block';
+        percentageInput.required = true;
+    } else {
+        percentageGroup.style.display = 'none';
+        percentageInput.required = false;
+        percentageInput.value = '0.00';
+    }
+}
+
+function toggleEditShareholderPercentage() {
+    const staffType = document.getElementById('edit_staff_type').value;
+    const percentageGroup = document.getElementById('edit_shareholder_percentage_group');
+    const percentageInput = document.getElementById('edit_shareholder_percentage');
+    
+    if (staffType === 'shareholder') {
+        percentageGroup.style.display = 'block';
+        percentageInput.required = true;
+    } else {
+        percentageGroup.style.display = 'none';
+        percentageInput.required = false;
+        percentageInput.value = '0.00';
+    }
+}
+
+// Initialize form visibility on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize add form
+    toggleShareholderPercentage();
+});
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modals = document.getElementsByClassName('modal');
+    for (let modal of modals) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    }
+}
+
 function viewStaff(staffId) {
     const staff = staffData.find(s => s.id == staffId);
     if (!staff) {
@@ -2578,6 +2699,13 @@ function viewStaff(staffId) {
                     <span class="view-value ${staff.two_fa_status ? 'two-fa-enabled' : 'two-fa-disabled'}">${staff.two_fa_status ? 'Enabled' : 'Disabled'}</span>
                 </div>
                 <div class="view-item">
+                    <span class="view-label">Staff Type:</span>
+                    <span class="view-value ${(staff.staff_type || 'volunteer') === 'shareholder' ? 'staff-shareholder' : 'staff-volunteer'}">
+                        ${(staff.staff_type || 'volunteer').charAt(0).toUpperCase() + (staff.staff_type || 'volunteer').slice(1)}
+                        ${(staff.staff_type || 'volunteer') === 'shareholder' && staff.shareholder_percentage ? ` (${parseFloat(staff.shareholder_percentage).toFixed(2)}%)` : ''}
+                    </span>
+                </div>
+                <div class="view-item">
                     <span class="view-label">Last Login:</span>
                     <span class="view-value">${staff.last_login ? formatDateTime(staff.last_login) : 'Never'}</span>
                 </div>
@@ -2653,6 +2781,13 @@ function editStaff(staffId) {
     document.getElementById('edit_internal_notes').value = staff.internal_notes || '';
     document.getElementById('edit_two_fa_status').checked = staff.two_fa_status == '1';
     document.getElementById('edit_contract_completed').checked = staff.contract_completed == '1';
+    
+    // Set shareholder fields
+    document.getElementById('edit_staff_type').value = staff.staff_type || 'volunteer';
+    document.getElementById('edit_shareholder_percentage').value = staff.shareholder_percentage || '0.00';
+    
+    // Toggle percentage field visibility based on staff type
+    toggleEditShareholderPercentage();
     
     closeViewModal();
     openEditModal();
