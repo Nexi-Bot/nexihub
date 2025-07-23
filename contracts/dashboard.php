@@ -1388,7 +1388,6 @@ function displaySignatureDetails(contract) {
     
     signatureDetails.innerHTML = detailsHTML;
 }
-}
 
 function closeViewModal() {
     document.getElementById('viewModal').style.display = 'none';
