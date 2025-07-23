@@ -43,15 +43,17 @@ try {
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
-    // Get signed contract data
+    // Get signed contract data with staff profile information
     $stmt = $db->prepare("
         SELECT ct.name, ct.content, ct.type, ct.id as template_id,
                sc.id as contract_id, sc.is_signed, sc.signed_at, sc.signature_data,
                sc.signer_full_name, sc.signer_position, sc.signer_date_of_birth,
                sc.is_under_17, sc.guardian_full_name, sc.guardian_email, 
-               sc.guardian_signature_data, sc.signed_timestamp
+               sc.guardian_signature_data, sc.signed_timestamp,
+               sp.shareholder_percentage, sp.is_shareholder
         FROM contract_templates ct
         JOIN staff_contracts sc ON ct.id = sc.template_id 
+        LEFT JOIN staff_profiles sp ON sc.staff_id = sp.id
         WHERE (ct.id = ? OR sc.id = ?) AND sc.staff_id = ? AND sc.is_signed = 1
     ");
     $stmt->execute([$contract_id, $contract_id, $staff_id]);
@@ -268,7 +270,14 @@ function generateContractPDF($contract) {
     $pdf->SetXY($col1_x, $current_y);
     $pdf->Cell(40, 4, 'Signatory Name:', 0, 0, 'L');
     $pdf->SetFont('helvetica', 'B', 10);
-    $pdf->Cell(0, 4, $contract['signer_full_name'] ?? 'Not recorded', 0, 1, 'L');
+    
+    // For shareholder agreements, include percentage
+    if (strtolower($contract['type']) === 'shareholder' && $contract['is_shareholder'] && $contract['shareholder_percentage']) {
+        $name_with_percentage = ($contract['signer_full_name'] ?? 'Not recorded') . ' (' . $contract['shareholder_percentage'] . '% Shareholder)';
+        $pdf->Cell(0, 4, $name_with_percentage, 0, 1, 'L');
+    } else {
+        $pdf->Cell(0, 4, $contract['signer_full_name'] ?? 'Not recorded', 0, 1, 'L');
+    }
     
     $pdf->SetXY($col1_x, $pdf->GetY());
     $pdf->SetFont('helvetica', '', 10);

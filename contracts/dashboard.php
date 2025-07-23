@@ -177,9 +177,11 @@ try {
                sc.signed_at, sc.signature_data,
                sc.signer_full_name, sc.signer_position, sc.signer_date_of_birth,
                sc.is_under_17, sc.guardian_full_name, sc.guardian_email,
-               sc.guardian_signature_data, sc.signed_timestamp
+               sc.guardian_signature_data, sc.signed_timestamp,
+               sp.shareholder_percentage, sp.is_shareholder
         FROM contract_templates ct
         INNER JOIN staff_contracts sc ON ct.id = sc.template_id 
+        LEFT JOIN staff_profiles sp ON sc.staff_id = sp.id
         WHERE sc.staff_id = ?
         ORDER BY ct.name, sc.is_signed DESC, sc.id DESC
     ");
@@ -222,7 +224,7 @@ if ($_GET['action'] ?? '' === 'get_contract') {
                    sc.is_under_17, sc.guardian_full_name, sc.guardian_email,
                    sc.guardian_signature_data, sc.signed_timestamp,
                    sp.full_name as staff_name, sp.job_title as staff_position,
-                   sp.date_of_birth as staff_dob
+                   sp.date_of_birth as staff_dob, sp.shareholder_percentage, sp.is_shareholder
             FROM contract_templates ct
             JOIN staff_contracts sc ON ct.id = sc.template_id 
             JOIN staff_profiles sp ON sc.staff_id = sp.id
@@ -332,7 +334,12 @@ include __DIR__ . '/../includes/header.php';
                             }
                             ?>
                         </div>
-                        <h3 class="product-title"><?php echo htmlspecialchars($contract['name']); ?></h3>
+                        <h3 class="product-title">
+                            <?php echo htmlspecialchars($contract['name']); ?>
+                            <?php if (strtolower($contract['type']) === 'shareholder' && $contract['is_shareholder'] && $contract['shareholder_percentage']): ?>
+                                <span class="shareholder-percentage">(<?php echo $contract['shareholder_percentage']; ?>% Share)</span>
+                            <?php endif; ?>
+                        </h3>
                         
                         <?php if ($contract['is_signed']): ?>
                             <div class="contract-status signed">
@@ -587,6 +594,14 @@ include __DIR__ . '/../includes/header.php';
     width: 16px;
     height: 16px;
     flex-shrink: 0;
+}
+
+.shareholder-percentage {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--secondary-color);
+    margin-top: 0.25rem;
 }
 
 .empty-contracts {

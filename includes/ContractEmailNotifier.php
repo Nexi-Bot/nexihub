@@ -92,9 +92,9 @@ class ContractEmailNotifier {
                 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             }
             
-            // Count total contracts
-            $stmt = $db->prepare("SELECT COUNT(*) as total FROM contract_templates");
-            $stmt->execute();
+            // Count ONLY contracts assigned to this specific staff member
+            $stmt = $db->prepare("SELECT COUNT(*) as total FROM staff_contracts WHERE staff_id = ?");
+            $stmt->execute([$staff_id]);
             $total = $stmt->fetch()['total'];
             
             // Count signed contracts for this staff member
@@ -110,7 +110,7 @@ class ContractEmailNotifier {
             
         } catch (PDOException $e) {
             error_log("Database error getting contract stats: " . $e->getMessage());
-            return ['signed' => 0, 'total' => 4, 'remaining' => 4];
+            return ['signed' => 0, 'total' => 0, 'remaining' => 0];
         }
     }
     
@@ -138,9 +138,11 @@ class ContractEmailNotifier {
                        sc.id as contract_id, sc.is_signed, sc.signed_at, sc.signature_data,
                        sc.signer_full_name, sc.signer_position, sc.signer_date_of_birth,
                        sc.is_under_17, sc.guardian_full_name, sc.guardian_email, 
-                       sc.guardian_signature_data, sc.signed_timestamp
+                       sc.guardian_signature_data, sc.signed_timestamp,
+                       sp.shareholder_percentage, sp.is_shareholder
                 FROM contract_templates ct
                 JOIN staff_contracts sc ON ct.id = sc.template_id 
+                LEFT JOIN staff_profiles sp ON sc.staff_id = sp.id
                 WHERE ct.id = ? AND sc.staff_id = ? AND sc.is_signed = 1
                 ORDER BY sc.signed_timestamp DESC
                 LIMIT 1
