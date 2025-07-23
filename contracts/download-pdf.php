@@ -1,4 +1,9 @@
 <?php
+// Clean any existing output buffers
+while (ob_get_level()) {
+    ob_end_clean();
+}
+
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -47,9 +52,9 @@ try {
                sc.guardian_signature_data, sc.signed_timestamp
         FROM contract_templates ct
         JOIN staff_contracts sc ON ct.id = sc.template_id 
-        WHERE ct.id = ? AND sc.staff_id = ? AND sc.is_signed = 1
+        WHERE (ct.id = ? OR sc.id = ?) AND sc.staff_id = ? AND sc.is_signed = 1
     ");
-    $stmt->execute([$contract_id, $staff_id]);
+    $stmt->execute([$contract_id, $contract_id, $staff_id]);
     $contract = $stmt->fetch();
 
     if (!$contract) {
@@ -59,6 +64,11 @@ try {
 
     // Generate and output PDF
     $pdf = generateContractPDF($contract);
+    
+    // Clean any output buffers before sending PDF
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
     
     if ($format === 'raw') {
         // Return raw PDF content for email system
@@ -171,14 +181,24 @@ function generateContractPDF($contract) {
     // Clean and format the contract content
     $content = $contract['content'];
     
+    // Remove HTML tags and CSS styling completely
+    $content = strip_tags($content);
+    
+    // Remove any remaining CSS or HTML entities
+    $content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
+    
     // Remove any markdown symbols and format properly
     $content = preg_replace('/^#+\s*/m', '', $content); // Remove markdown headers
     $content = preg_replace('/\*\*(.*?)\*\*/', '$1', $content); // Remove bold markdown
     $content = preg_replace('/\*(.*?)\*/', '$1', $content); // Remove italic markdown
     $content = preg_replace('/•/', '• ', $content); // Fix bullet points
     
+    // Clean up whitespace and formatting
+    $content = preg_replace('/\s+/', ' ', $content); // Replace multiple spaces with single space
+    $content = preg_replace('/\n\s*\n/', "\n\n", $content); // Fix line breaks
+    $content = trim($content);
+    
     // Convert to proper legal formatting
-    $content = str_replace("\n\n", "\n", $content); // Remove double line breaks
     $lines = explode("\n", $content);
     
     foreach ($lines as $line) {

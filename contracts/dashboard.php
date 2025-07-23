@@ -75,30 +75,24 @@ if ($_POST['action'] ?? '' === 'sign_contract') {
                     if (!$stmt->fetch()) {
                         $signed_timestamp = date('Y-m-d H:i:s');
                         
-                        // Insert or update contract with signature data and all signer information
+                        // Update the existing contract with signature data
                         $stmt = $db->prepare("
-                            INSERT INTO staff_contracts 
-                            (staff_id, template_id, signed_at, signature_data, is_signed, 
-                             signer_full_name, signer_position, signer_date_of_birth, is_under_17,
-                             guardian_full_name, guardian_email, guardian_signature_data, signed_timestamp) 
-                            VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?)
-                            ON DUPLICATE KEY UPDATE
-                            signed_at = VALUES(signed_at),
-                            signature_data = VALUES(signature_data),
-                            is_signed = VALUES(is_signed),
-                            signer_full_name = VALUES(signer_full_name),
-                            signer_position = VALUES(signer_position),
-                            signer_date_of_birth = VALUES(signer_date_of_birth),
-                            is_under_17 = VALUES(is_under_17),
-                            guardian_full_name = VALUES(guardian_full_name),
-                            guardian_email = VALUES(guardian_email),
-                            guardian_signature_data = VALUES(guardian_signature_data),
-                            signed_timestamp = VALUES(signed_timestamp)
+                            UPDATE staff_contracts SET
+                            signed_at = ?,
+                            signature_data = ?,
+                            is_signed = 1,
+                            signer_full_name = ?,
+                            signer_position = ?,
+                            signer_date_of_birth = ?,
+                            is_under_17 = ?,
+                            guardian_full_name = ?,
+                            guardian_email = ?,
+                            guardian_signature_data = ?,
+                            signed_timestamp = ?
+                            WHERE staff_id = ? AND template_id = ?
                         ");
                         
                         $stmt->execute([
-                            $staff_id, 
-                            $template_id, 
                             $signed_timestamp, 
                             $signature,
                             $staff_profile['full_name'],
@@ -108,7 +102,9 @@ if ($_POST['action'] ?? '' === 'sign_contract') {
                             $is_under_17 ? ($_POST['guardian_name'] ?? null) : null,
                             $is_under_17 ? ($_POST['guardian_email'] ?? null) : null,
                             $is_under_17 ? $guardian_signature : null,
-                            $signed_timestamp
+                            $signed_timestamp,
+                            $staff_id, 
+                            $template_id
                         ]);
                         
                         // Get contract name for email notification
@@ -171,6 +167,7 @@ try {
 }
 
 // Get available contracts - only show contracts assigned to this staff member
+// Group by template_id to avoid duplicates and show only the latest record for each contract
 $contracts = [];
 try {
     $stmt = $db->prepare("
@@ -184,10 +181,23 @@ try {
         FROM contract_templates ct
         INNER JOIN staff_contracts sc ON ct.id = sc.template_id 
         WHERE sc.staff_id = ?
-        ORDER BY ct.name, sc.is_signed ASC
+        ORDER BY ct.name, sc.is_signed DESC, sc.id DESC
     ");
     $stmt->execute([$_SESSION['contract_staff_id'] ?? 0]);
-    $contracts = $stmt->fetchAll();
+    $all_contracts = $stmt->fetchAll();
+    
+    // Group contracts by template_id to avoid showing duplicates
+    $contract_groups = [];
+    foreach ($all_contracts as $contract) {
+        $template_id = $contract['id'];
+        
+        // Only keep the first record for each template (signed status takes priority due to ORDER BY)
+        if (!isset($contract_groups[$template_id])) {
+            $contract_groups[$template_id] = $contract;
+        }
+    }
+    
+    $contracts = array_values($contract_groups);
 } catch (PDOException $e) {
     $error = "Error fetching contracts: " . $e->getMessage();
 }
