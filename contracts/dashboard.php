@@ -2,10 +2,12 @@
 // Include config first (which handles session initialization)
 require_once __DIR__ . '/../config/config.php';
 
-// Prevent caching to ensure fresh data
-header('Cache-Control: no-cache, no-store, must-revalidate');
+// FORCE FRESH DATA - PREVENT ALL CACHING
+header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
 header('Pragma: no-cache');
-header('Expires: 0');
+header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
+header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+header('ETag: "' . md5(time()) . '"');
 
 // Prevent session timeout for contract system
 $_SESSION['LAST_ACTIVITY'] = time();
