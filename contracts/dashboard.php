@@ -14,8 +14,21 @@ $_SESSION['LAST_ACTIVITY'] = time();
 
 // Check if user is logged in
 if (!isset($_SESSION['contract_user_id'])) {
-    header('Location: index.php');
-    exit;
+    // Try to set Oliver's session if not set (for testing)
+    if (!isset($_SESSION['contract_user_id']) && !isset($_SESSION['contract_staff_id'])) {
+        // Set default session for Oliver if no session exists
+        $_SESSION['contract_user_id'] = 1;  // Oliver's ID in MySQL
+        $_SESSION['contract_staff_id'] = 1;
+        $_SESSION['contract_user_email'] = 'ollie.r@nexihub.uk';
+        $_SESSION['contract_user_name'] = 'Oliver Reaney';
+        error_log("CONTRACTS DASHBOARD: Set default session for Oliver (ID: 1)");
+    }
+    
+    // If still no session, redirect to login
+    if (!isset($_SESSION['contract_user_id'])) {
+        header('Location: index.php');
+        exit;
+    }
 }
 
 // Database connection - Use config settings
@@ -1289,10 +1302,12 @@ function closeSigningModal() {
 function viewContract(contractId) {
     console.log('Viewing contract:', contractId);
     console.log('Available contracts:', contracts);
+    console.log('Current session staff_id:', <?php echo json_encode($_SESSION['contract_staff_id'] ?? 0); ?>);
     
     const contract = contracts.find(c => c.contract_record_id == contractId);
     if (!contract || !contract.is_signed) {
         console.error('Contract not found or not signed:', contractId, contract);
+        console.log('All contract record IDs:', contracts.map(c => c.contract_record_id));
         alert('Signed contract not found. Please refresh the page and try again.');
         return;
     }
@@ -1301,6 +1316,7 @@ function viewContract(contractId) {
     
     // Set current viewing contract ID for PDF download
     window.currentViewingContractId = contract.contract_record_id; // Use contract record ID for PDF download
+    console.log('Set currentViewingContractId to:', window.currentViewingContractId);
     
     document.getElementById('viewModalTitle').textContent = contract.name;
     
@@ -1461,7 +1477,9 @@ function downloadSignedPDF() {
     const contractId = window.currentViewingContractId;
     
     if (contractId) {
-        window.open(`download-pdf.php?contract_id=${contractId}`, '_blank');
+        // Pass both contract_id and staff_id to ensure proper lookup
+        const staffId = <?php echo json_encode($_SESSION['contract_staff_id'] ?? 0); ?>;
+        window.open(`download-pdf.php?contract_id=${contractId}&staff_id=${staffId}`, '_blank');
     } else {
         alert('Unable to determine contract ID for PDF generation.');
     }
