@@ -219,7 +219,7 @@ if ($_GET['action'] ?? '' === 'get_contract') {
     $contract_id = $_GET['contract_id'] ?? '';
     
     if (!$contract_id) {
-        echo json_encode(['success' => false, 'message' => 'Contract ID required']);
+        echo json_encode(['success' => false, 'message' => 'Contract ID required'], JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE);
         exit;
     }
     
@@ -242,12 +242,12 @@ if ($_GET['action'] ?? '' === 'get_contract') {
         $contract = $stmt->fetch();
         
         if ($contract) {
-            echo json_encode(['success' => true, 'contract' => $contract]);
+            echo json_encode(['success' => true, 'contract' => $contract], JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Contract not found or not signed']);
+            echo json_encode(['success' => false, 'message' => 'Contract not found or not signed'], JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE);
         }
     } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE);
     }
     
     exit;
@@ -1067,8 +1067,8 @@ include __DIR__ . '/../includes/header.php';
 </style>
 
 <script>
-const contracts = <?php echo json_encode($contracts); ?>;
-const userProfile = <?php echo json_encode($user_profile); ?>;
+const contracts = <?php echo json_encode($contracts, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE); ?>;
+const userProfile = <?php echo json_encode($user_profile, JSON_HEX_QUOT | JSON_HEX_APOS | JSON_UNESCAPED_UNICODE); ?>;
 
 // Debug: Log contracts data to console
 console.log('=== CONTRACTS DEBUG ===');
