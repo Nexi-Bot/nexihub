@@ -262,34 +262,101 @@ class ContractEmailNotifier {
         // Clean and format the contract content
         $content = $contract['content'];
         
-        // Remove any markdown symbols and format properly
-        $content = preg_replace('/^#+\s*/m', '', $content); // Remove markdown headers
-        $content = preg_replace('/\*\*(.*?)\*\*/', '$1', $content); // Remove bold markdown
-        $content = preg_replace('/\*(.*?)\*/', '$1', $content); // Remove italic markdown
-        $content = preg_replace('/•/', '• ', $content); // Fix bullet points
-        
-        // Convert to proper legal formatting
-        $content = str_replace("\n\n", "\n", $content); // Remove double line breaks
-        $lines = explode("\n", $content);
-        
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if (empty($line)) continue;
+        // Remove HTML structure and extract clean text content
+        if (strpos($content, '<html') !== false || strpos($content, '<!DOCTYPE') !== false) {
+            // Full HTML document - extract body content
+            libxml_use_internal_errors(true);
+            $dom = new DOMDocument();
+            $dom->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
             
-            // Check if it's a section header (all caps or starts with ARTICLE/SECTION)
-            if (preg_match('/^(ARTICLE|SECTION|\d+\.\d+|\d+\.)\s+/', $line) || 
-                (strlen($line) < 100 && strtoupper($line) === $line && !preg_match('/[.!?]$/', $line))) {
+            // Remove all style tags and their content
+            $styles = $dom->getElementsByTagName('style');
+            $stylesToRemove = [];
+            foreach ($styles as $style) {
+                $stylesToRemove[] = $style;
+            }
+            foreach ($stylesToRemove as $style) {
+                $style->parentNode->removeChild($style);
+            }
+            
+            // Remove script tags if any
+            $scripts = $dom->getElementsByTagName('script');
+            $scriptsToRemove = [];
+            foreach ($scripts as $script) {
+                $scriptsToRemove[] = $script;
+            }
+            foreach ($scriptsToRemove as $script) {
+                $script->parentNode->removeChild($script);
+            }
+            
+            // Get body content or full document if no body
+            $body = $dom->getElementsByTagName('body')->item(0);
+            if ($body) {
+                $content = $dom->saveHTML($body);
+                $content = preg_replace('/^<body[^>]*>|<\/body>$/', '', $content);
+            } else {
+                $content = $dom->saveHTML();
+            }
+        }
+        
+        // Remove all remaining HTML tags
+        $content = strip_tags($content);
+        
+        // Clean up HTML entities
+        $content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
+        
+        // Clean up excessive whitespace
+        $content = preg_replace('/\s+/', ' ', $content);
+        $content = preg_replace('/\n\s*\n/', "\n\n", $content);
+        $content = trim($content);
+        
+        // Split into meaningful sections
+        $sections = preg_split('/\n{2,}/', $content);
+        $paragraphs = [];
+        
+        foreach ($sections as $section) {
+            $section = trim($section);
+            if (!empty($section)) {
+                // Split long sections into smaller paragraphs if needed
+                if (strlen($section) > 400) {
+                    $sentences = preg_split('/(?<=[.!?])\s+/', $section);
+                    $currentParagraph = '';
+                    foreach ($sentences as $sentence) {
+                        if (strlen($currentParagraph . $sentence) > 400 && !empty($currentParagraph)) {
+                            $paragraphs[] = trim($currentParagraph);
+                            $currentParagraph = $sentence;
+                        } else {
+                            $currentParagraph .= ($currentParagraph ? ' ' : '') . $sentence;
+                        }
+                    }
+                    if (!empty($currentParagraph)) {
+                        $paragraphs[] = trim($currentParagraph);
+                    }
+                } else {
+                    $paragraphs[] = $section;
+                }
+            }
+        }
+        
+        foreach ($paragraphs as $paragraph) {
+            $paragraph = trim($paragraph);
+            if (empty($paragraph)) continue;
+            
+            // Check if it's a section header (short text, likely a heading)
+            if (strlen($paragraph) < 100 && 
+                (preg_match('/^(ARTICLE|SECTION|\d+\.\d+|\d+\.|NON-DISCLOSURE|AGREEMENT|PARTIES|DEFINITION)/i', $paragraph) ||
+                 preg_match('/^[A-Z\s\-:]{5,}$/', $paragraph))) {
                 $pdf->Ln(3);
                 $pdf->SetFont('helvetica', 'B', 11);
                 $pdf->SetTextColor($primary_color[0], $primary_color[1], $primary_color[2]);
-                $pdf->MultiCell(0, 6, $line, 0, 'L');
+                $pdf->MultiCell(0, 6, $paragraph, 0, 'L');
                 $pdf->SetFont('helvetica', '', 11);
                 $pdf->SetTextColor($dark_gray[0], $dark_gray[1], $dark_gray[2]);
                 $pdf->Ln(2);
             } else {
                 // Regular paragraph text
-                $pdf->MultiCell(0, 5.5, $line, 0, 'L');
-                $pdf->Ln(1);
+                $pdf->MultiCell(0, 5.5, $paragraph, 0, 'L');
+                $pdf->Ln(3);
             }
         }
 
@@ -339,7 +406,14 @@ class ContractEmailNotifier {
         $pdf->SetXY($col1_x, $current_y);
         $pdf->Cell(40, 4, 'Signatory Name:', 0, 0, 'L');
         $pdf->SetFont('helvetica', 'B', 10);
-        $pdf->Cell(0, 4, $contract['signer_full_name'] ?? 'Not recorded', 0, 1, 'L');
+        
+        // For shareholder agreements, include percentage
+        if (strtolower($contract['type']) === 'shareholder' && $contract['is_shareholder'] && $contract['shareholder_percentage']) {
+            $name_with_percentage = ($contract['signer_full_name'] ?? 'Not recorded') . ' (' . $contract['shareholder_percentage'] . '% Shareholder)';
+            $pdf->Cell(0, 4, $name_with_percentage, 0, 1, 'L');
+        } else {
+            $pdf->Cell(0, 4, $contract['signer_full_name'] ?? 'Not recorded', 0, 1, 'L');
+        }
         
         $pdf->SetXY($col1_x, $pdf->GetY());
         $pdf->SetFont('helvetica', '', 10);
