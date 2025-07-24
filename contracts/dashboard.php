@@ -1069,6 +1069,20 @@ include __DIR__ . '/../includes/header.php';
 <script>
 const contracts = <?php echo json_encode($contracts); ?>;
 const userProfile = <?php echo json_encode($user_profile); ?>;
+
+// Debug: Log contracts data to console
+console.log('=== CONTRACTS DEBUG ===');
+console.log('Total contracts loaded:', contracts.length);
+contracts.forEach((contract, index) => {
+    console.log(`Contract ${index}:`, {
+        contract_record_id: contract.contract_record_id,
+        name: contract.name,
+        is_signed: contract.is_signed,
+        is_signed_type: typeof contract.is_signed,
+        signed_at: contract.signed_at
+    });
+});
+console.log('=== END CONTRACTS DEBUG ===');
 let isDrawing = false;
 let guardianIsDrawing = false;
 let signaturePad;
@@ -1304,11 +1318,20 @@ function viewContract(contractId) {
     console.log('Available contracts:', contracts);
     console.log('Current session staff_id:', <?php echo json_encode($_SESSION['contract_staff_id'] ?? 0); ?>);
     
-    const contract = contracts.find(c => c.contract_record_id == contractId);
-    if (!contract || !contract.is_signed) {
-        console.error('Contract not found or not signed:', contractId, contract);
+    // Convert contractId to string for comparison (in case of type mismatch)
+    const contract = contracts.find(c => String(c.contract_record_id) === String(contractId));
+    if (!contract) {
+        console.error('Contract not found with ID:', contractId);
         console.log('All contract record IDs:', contracts.map(c => c.contract_record_id));
-        alert('Signed contract not found. Please refresh the page and try again.');
+        alert('Contract not found. Please refresh the page and try again.');
+        return;
+    }
+    
+    // Check if signed (handle both string "1" and integer 1)
+    const isSigned = (contract.is_signed == 1 || contract.is_signed === "1");
+    if (!isSigned) {
+        console.error('Contract not signed:', contractId, 'is_signed value:', contract.is_signed);
+        alert('This contract is not signed yet.');
         return;
     }
     
@@ -1475,12 +1498,17 @@ function submitSignature(form) {
 function downloadSignedPDF() {
     // Get the current contract ID from the modal
     const contractId = window.currentViewingContractId;
+    const staffId = <?php echo json_encode($_SESSION['contract_staff_id'] ?? 0); ?>;
+    
+    console.log('Downloading PDF for contract:', contractId, 'staff_id:', staffId);
     
     if (contractId) {
         // Pass both contract_id and staff_id to ensure proper lookup
-        const staffId = <?php echo json_encode($_SESSION['contract_staff_id'] ?? 0); ?>;
-        window.open(`download-pdf.php?contract_id=${contractId}&staff_id=${staffId}`, '_blank');
+        const url = `download-pdf.php?contract_id=${contractId}&staff_id=${staffId}`;
+        console.log('Opening PDF URL:', url);
+        window.open(url, '_blank');
     } else {
+        console.error('Missing contract ID for PDF download:', contractId);
         alert('Unable to determine contract ID for PDF generation.');
     }
 }
