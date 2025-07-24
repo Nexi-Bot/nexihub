@@ -306,6 +306,243 @@ $page_title = $current_module['title'] . " - Nexi Hub E-Learning";
 include __DIR__ . '/../includes/header.php';
 ?>
 
+<style>
+/* E-Learning Module Styles */
+.module-container {
+    background: var(--background-dark);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.module-header {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.breadcrumb a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.module-info {
+    margin-top: 1rem;
+}
+
+.module-meta {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.module-number {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.module-title {
+    color: var(--text-primary);
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0.5rem 0;
+}
+
+.module-duration {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.module-content {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.module-content h2 {
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    margin: 0 0 1rem 0;
+}
+
+.module-content h3 {
+    color: var(--text-primary);
+    font-size: 1.4rem;
+    margin: 1.5rem 0 1rem 0;
+}
+
+.module-content h4 {
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    margin: 1rem 0 0.5rem 0;
+}
+
+.module-content p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0 0 1rem 0;
+}
+
+.module-content ul, .module-content ol {
+    color: var(--text-secondary);
+    margin: 0 0 1rem 1.5rem;
+}
+
+.module-content li {
+    margin: 0.5rem 0;
+    line-height: 1.5;
+}
+
+.mission-box {
+    background: rgba(230, 79, 33, 0.1);
+    border: 1px solid rgba(230, 79, 33, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    text-align: center;
+}
+
+.mission-box p {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.key-points {
+    background: var(--background-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.quiz-section {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.quiz-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.quiz-header h2 {
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.quiz-header p {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.quiz-container {
+    margin: 1.5rem 0;
+}
+
+.quiz-info {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 12px;
+    padding: 1rem;
+    color: #3b82f6;
+    text-align: center;
+}
+
+.quiz-info i {
+    margin-right: 0.5rem;
+}
+
+.quiz-actions {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    box-shadow: 0 4px 15px rgba(230, 79, 33, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(230, 79, 33, 0.4);
+}
+
+.completed-section {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+.completion-message i {
+    font-size: 3rem;
+    color: #10b981;
+    margin-bottom: 1rem;
+}
+
+.completion-message h3 {
+    color: var(--text-primary);
+    font-size: 1.8rem;
+    margin: 0 0 1rem 0;
+}
+
+.completion-message p {
+    color: var(--text-secondary);
+    margin: 0.5rem 0;
+}
+
+.navigation-actions {
+    margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+    .module-container {
+        padding: 1rem 0;
+    }
+    
+    .module-header, .module-content, .quiz-section, .completed-section {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .module-title {
+        font-size: 1.5rem;
+    }
+}
+</style>
+
 <link rel="stylesheet" href="/elearning/assets/elearning.css">
 
 <div class="module-container">
@@ -366,7 +603,7 @@ include __DIR__ . '/../includes/header.php';
                 </div>
                 
                 <div class="navigation-actions">
-                    <?php if ($module_id < 5): ?>
+                    <?php if ($module_id < 7): ?>
                     <a href="/elearning/module.php?id=<?php echo $module_id + 1; ?>" class="btn btn-primary">
                         <i class="fas fa-arrow-right"></i>
                         Next Module
@@ -392,7 +629,7 @@ function completeModule(moduleId) {
     // Simple completion - in a real implementation, you'd have an actual quiz
     const score = Math.floor(Math.random() * 21) + 80; // Random score between 80-100
     
-    fetch('/elearning/complete-module.php', {
+    fetch('../elearning/complete-module.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
