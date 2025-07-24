@@ -629,7 +629,7 @@ function completeModule(moduleId) {
     // Simple completion - in a real implementation, you'd have an actual quiz
     const score = Math.floor(Math.random() * 21) + 80; // Random score between 80-100
     
-    fetch('../elearning/complete-module.php', {
+    fetch('complete-module.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
