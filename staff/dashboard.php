@@ -3344,6 +3344,379 @@ include __DIR__ . '/../includes/header.php';
     </div>
 </div>
 
+<!-- Staff Management Modals -->
+
+<!-- Add Staff Modal -->
+<div id="addModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add New Staff Member</h2>
+            <button onclick="closeAddModal()" class="modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form method="POST" action="">
+            <input type="hidden" name="action" value="create">
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="staff_id">Staff ID *</label>
+                        <input type="text" id="staff_id" name="staff_id" required placeholder="e.g., NXH001">
+                    </div>
+                    <div class="form-group">
+                        <label for="full_name">Full Name *</label>
+                        <input type="text" id="full_name" name="full_name" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="job_title">Job Title</label>
+                        <input type="text" id="job_title" name="job_title">
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <input type="text" id="department" name="department">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="manager">Manager</label>
+                        <input type="text" id="manager" name="manager">
+                    </div>
+                    <div class="form-group">
+                        <label for="region">Region</label>
+                        <select id="region" name="region">
+                            <option value="">Select Region</option>
+                            <option value="UK">UK</option>
+                            <option value="US">US</option>
+                            <option value="EU">EU</option>
+                            <option value="APAC">APAC</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nexi_email">Nexi Email</label>
+                        <input type="email" id="nexi_email" name="nexi_email">
+                    </div>
+                    <div class="form-group">
+                        <label for="private_email">Private Email</label>
+                        <input type="email" id="private_email" name="private_email">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone_number">Phone Number</label>
+                        <input type="tel" id="phone_number" name="phone_number">
+                    </div>
+                    <div class="form-group">
+                        <label for="discord_username">Discord Username</label>
+                        <input type="text" id="discord_username" name="discord_username">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nationality">Nationality</label>
+                        <input type="text" id="nationality" name="nationality">
+                    </div>
+                    <div class="form-group">
+                        <label for="country_of_residence">Country of Residence</label>
+                        <input type="text" id="country_of_residence" name="country_of_residence">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date_of_birth">Date of Birth</label>
+                        <input type="date" id="date_of_birth" name="date_of_birth">
+                    </div>
+                    <div class="form-group">
+                        <label for="date_joined">Date Joined</label>
+                        <input type="date" id="date_joined" name="date_joined">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="time_off_balance">Time Off Balance (days)</label>
+                        <input type="number" id="time_off_balance" name="time_off_balance" value="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="account_status">Account Status</label>
+                        <select id="account_status" name="account_status">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Suspended">Suspended</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="closeAddModal()" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Add Staff Member</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Staff Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Staff Member</h2>
+            <button onclick="closeEditModal()" class="modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form method="POST" action="">
+            <input type="hidden" name="action" value="update">
+            <input type="hidden" id="editId" name="id">
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editStaffId">Staff ID *</label>
+                        <input type="text" id="editStaffId" name="staff_id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editFullName">Full Name *</label>
+                        <input type="text" id="editFullName" name="full_name" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editJobTitle">Job Title</label>
+                        <input type="text" id="editJobTitle" name="job_title">
+                    </div>
+                    <div class="form-group">
+                        <label for="editDepartment">Department</label>
+                        <input type="text" id="editDepartment" name="department">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editManager">Manager</label>
+                        <input type="text" id="editManager" name="manager">
+                    </div>
+                    <div class="form-group">
+                        <label for="editRegion">Region</label>
+                        <select id="editRegion" name="region">
+                            <option value="">Select Region</option>
+                            <option value="UK">UK</option>
+                            <option value="US">US</option>
+                            <option value="EU">EU</option>
+                            <option value="APAC">APAC</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editPreferredName">Preferred Name</label>
+                        <input type="text" id="editPreferredName" name="preferred_name">
+                    </div>
+                    <div class="form-group">
+                        <label for="editNexiEmail">Nexi Email</label>
+                        <input type="email" id="editNexiEmail" name="nexi_email">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editPrivateEmail">Private Email</label>
+                        <input type="email" id="editPrivateEmail" name="private_email">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPhoneNumber">Phone Number</label>
+                        <input type="tel" id="editPhoneNumber" name="phone_number">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editDiscordUsername">Discord Username</label>
+                        <input type="text" id="editDiscordUsername" name="discord_username">
+                    </div>
+                    <div class="form-group">
+                        <label for="editDiscordId">Discord ID</label>
+                        <input type="text" id="editDiscordId" name="discord_id">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editNationality">Nationality</label>
+                        <input type="text" id="editNationality" name="nationality">
+                    </div>
+                    <div class="form-group">
+                        <label for="editCountryOfResidence">Country of Residence</label>
+                        <input type="text" id="editCountryOfResidence" name="country_of_residence">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editDateOfBirth">Date of Birth</label>
+                        <input type="date" id="editDateOfBirth" name="date_of_birth">
+                    </div>
+                    <div class="form-group">
+                        <label for="editDateJoined">Date Joined</label>
+                        <input type="date" id="editDateJoined" name="date_joined">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editTimeOffBalance">Time Off Balance (days)</label>
+                        <input type="number" id="editTimeOffBalance" name="time_off_balance" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="editAccountStatus">Account Status</label>
+                        <select id="editAccountStatus" name="account_status">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Suspended">Suspended</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="editTwoFaStatus" name="two_fa_status" value="1">
+                            <label for="editTwoFaStatus">Two-Factor Authentication Enabled</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="editContractCompleted" name="contract_completed" value="1">
+                            <label for="editContractCompleted">Contract Completed</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="closeEditModal()" class="btn btn-secondary">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update Staff Member</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- View Staff Modal -->
+<div id="viewModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Staff Details</h2>
+            <button onclick="closeViewModal()" class="modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="staff-view-grid">
+                <div class="view-item">
+                    <div class="view-label">Staff ID:</div>
+                    <div class="view-value" id="viewStaffId">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-label">Full Name:</div>
+                    <div class="view-value" id="viewFullName">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-label">Job Title:</div>
+                    <div class="view-value" id="viewJobTitle">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-label">Department:</div>
+                    <div class="view-value" id="viewDepartment">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-label">Manager:</div>
+                    <div class="view-value" id="viewManager">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-label">Region:</div>
+                    <div class="view-value" id="viewRegion">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-label">Nexi Email:</div>
+                    <div class="view-value" id="viewNexiEmail">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-label">Private Email:</div>
+                    <div class="view-value" id="viewPrivateEmail">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-label">Phone Number:</div>
+                    <div class="view-value" id="viewPhoneNumber">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-label">Discord Username:</div>
+                    <div class="view-value" id="viewDiscordUsername">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-label">Nationality:</div>
+                    <div class="view-value" id="viewNationality">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-label">Country:</div>
+                    <div class="view-value" id="viewCountryOfResidence">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-label">Date of Birth:</div>
+                    <div class="view-value" id="viewDateOfBirth">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-label">Date Joined:</div>
+                    <div class="view-value" id="viewDateJoined">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-label">Account Status:</div>
+                    <div class="view-value" id="viewAccountStatus">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-label">Two-Factor Auth:</div>
+                    <div class="view-value" id="viewTwoFaStatus">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-label">Time Off Balance:</div>
+                    <div class="view-value" id="viewTimeOffBalance">-</div>
+                </div>
+                <div class="view-item">
+                    <div class="view-label">Contract Completed:</div>
+                    <div class="view-value" id="viewContractCompleted">-</div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeViewModal()" class="btn btn-secondary">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- View Contract Modal -->
+<div id="viewContractModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Contract Details</h2>
+            <button onclick="closeViewContractModal()" class="modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="view-item">
+                <div class="view-label">Contract Name:</div>
+                <div class="view-value" id="viewContractName">-</div>
+            </div>
+            <div class="view-item">
+                <div class="view-label">Type:</div>
+                <div class="view-value" id="viewContractType">-</div>
+            </div>
+            <div class="view-item">
+                <div class="view-label">Assignable:</div>
+                <div class="view-value" id="viewContractAssignable">-</div>
+            </div>
+            <div class="view-item-full">
+                <div class="view-label">Content:</div>
+                <div class="view-value" id="viewContractContent">-</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeViewContractModal()" class="btn btn-secondary">Close</button>
+        </div>
+    </div>
+</div>
+
 <script>
 // Staff data for JavaScript operations
 const staffData = <?php echo json_encode($staff_members); ?>;
@@ -3544,6 +3917,199 @@ function downloadContractPDF(contractId) {
     link.click();
     document.body.removeChild(link);
 }
+
+// Staff Management Functions
+function viewStaff(staffId) {
+    // Find staff data
+    const staff = staffData.find(s => s.id == staffId);
+    if (!staff) {
+        alert('Staff member not found');
+        return;
+    }
+    
+    // Populate view modal
+    document.getElementById('viewStaffId').textContent = staff.staff_id;
+    document.getElementById('viewFullName').textContent = staff.full_name;
+    document.getElementById('viewJobTitle').textContent = staff.job_title || 'Not specified';
+    document.getElementById('viewDepartment').textContent = staff.department || 'Not specified';
+    document.getElementById('viewManager').textContent = staff.manager || 'Not specified';
+    document.getElementById('viewRegion').textContent = staff.region || 'Not specified';
+    document.getElementById('viewNexiEmail').textContent = staff.nexi_email || 'Not specified';
+    document.getElementById('viewPrivateEmail').textContent = staff.private_email || 'Not specified';
+    document.getElementById('viewPhoneNumber').textContent = staff.phone_number || 'Not specified';
+    document.getElementById('viewDiscordUsername').textContent = staff.discord_username || 'Not specified';
+    document.getElementById('viewNationality').textContent = staff.nationality || 'Not specified';
+    document.getElementById('viewCountryOfResidence').textContent = staff.country_of_residence || 'Not specified';
+    document.getElementById('viewDateOfBirth').textContent = staff.date_of_birth || 'Not specified';
+    document.getElementById('viewDateJoined').textContent = staff.date_joined || 'Not specified';
+    document.getElementById('viewAccountStatus').textContent = staff.account_status || 'Active';
+    document.getElementById('viewTwoFaStatus').textContent = staff.two_fa_status ? 'Enabled' : 'Disabled';
+    document.getElementById('viewTimeOffBalance').textContent = staff.time_off_balance || '0';
+    document.getElementById('viewContractCompleted').textContent = staff.contract_completed ? 'Yes' : 'No';
+    
+    openViewModal();
+}
+
+function editStaff(staffId) {
+    // Find staff data
+    const staff = staffData.find(s => s.id == staffId);
+    if (!staff) {
+        alert('Staff member not found');
+        return;
+    }
+    
+    // Populate edit modal
+    document.getElementById('editId').value = staff.id;
+    document.getElementById('editStaffId').value = staff.staff_id;
+    document.getElementById('editFullName').value = staff.full_name;
+    document.getElementById('editJobTitle').value = staff.job_title || '';
+    document.getElementById('editDepartment').value = staff.department || '';
+    document.getElementById('editManager').value = staff.manager || '';
+    document.getElementById('editRegion').value = staff.region || '';
+    document.getElementById('editPreferredName').value = staff.preferred_name || '';
+    document.getElementById('editNexiEmail').value = staff.nexi_email || '';
+    document.getElementById('editPrivateEmail').value = staff.private_email || '';
+    document.getElementById('editPhoneNumber').value = staff.phone_number || '';
+    document.getElementById('editDiscordUsername').value = staff.discord_username || '';
+    document.getElementById('editDiscordId').value = staff.discord_id || '';
+    document.getElementById('editNationality').value = staff.nationality || '';
+    document.getElementById('editCountryOfResidence').value = staff.country_of_residence || '';
+    document.getElementById('editDateOfBirth').value = staff.date_of_birth || '';
+    document.getElementById('editDateJoined').value = staff.date_joined || '';
+    document.getElementById('editTimeOffBalance').value = staff.time_off_balance || '0';
+    document.getElementById('editAccountStatus').value = staff.account_status || 'Active';
+    document.getElementById('editTwoFaStatus').checked = staff.two_fa_status == 1;
+    document.getElementById('editContractCompleted').checked = staff.contract_completed == 1;
+    
+    openEditModal();
+}
+
+function deleteStaff(staffId, staffName) {
+    if (confirm(`Are you sure you want to delete ${staffName}? This action cannot be undone.`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '';
+        
+        const actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = 'delete';
+        
+        const idInput = document.createElement('input');
+        idInput.type = 'hidden';
+        idInput.name = 'id';
+        idInput.value = staffId;
+        
+        form.appendChild(actionInput);
+        form.appendChild(idInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Contract Management Functions
+function viewContract(contractId) {
+    const contract = contractData.find(c => c.id == contractId);
+    if (!contract) {
+        alert('Contract not found');
+        return;
+    }
+    
+    document.getElementById('viewContractName').textContent = contract.name;
+    document.getElementById('viewContractType').textContent = contract.type;
+    document.getElementById('viewContractContent').innerHTML = contract.content;
+    document.getElementById('viewContractAssignable').textContent = contract.is_assignable ? 'Yes' : 'No';
+    
+    document.getElementById('viewContractModal').style.display = 'block';
+}
+
+function closeViewContractModal() {
+    document.getElementById('viewContractModal').style.display = 'none';
+}
+
+function editContract(contractId) {
+    const contract = contractData.find(c => c.id == contractId);
+    if (!contract) {
+        alert('Contract not found');
+        return;
+    }
+    
+    document.getElementById('editContractId').value = contract.id;
+    document.getElementById('editContractName').value = contract.name;
+    document.getElementById('editContractType').value = contract.type;
+    document.getElementById('editContractContent').value = contract.content;
+    document.getElementById('editContractAssignable').checked = contract.is_assignable == 1;
+    
+    openEditContractModal();
+}
+
+function deleteContract(contractId, contractName) {
+    if (confirm(`Are you sure you want to delete contract "${contractName}"? This action cannot be undone.`)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '';
+        
+        const actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = 'delete_contract';
+        
+        const idInput = document.createElement('input');
+        idInput.type = 'hidden';
+        idInput.name = 'contract_id';
+        idInput.value = contractId;
+        
+        form.appendChild(actionInput);
+        form.appendChild(idInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// E-Learning Functions
+function resetElearning(staffId) {
+    if (confirm('Are you sure you want to reset this staff member\'s e-learning progress? This will delete all their progress and certificates.')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '';
+        
+        const actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = 'reset_elearning';
+        
+        const idInput = document.createElement('input');
+        idInput.type = 'hidden';
+        idInput.name = 'staff_id';
+        idInput.value = staffId;
+        
+        form.appendChild(actionInput);
+        form.appendChild(idInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Modal Functions
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+// Window click outside modal to close
+window.onclick = function(event) {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Any initialization code here
+    console.log('Staff Dashboard loaded successfully');
+});
 </script>
 
 <style>
