@@ -60,36 +60,15 @@ $modules = [
         'quiz_questions' => 3,
         'content' => '
             <h2>🚀 Welcome to the Nexi Hub Family!</h2>
-            
-            <p>Congratulations on joining Nexi Hub! We\'re excited to have you as part of our innovative team. This training module will introduce you to our company, our mission, and what makes us unique in the industry.</p>
-            
-            <h3>Our Story</h3>
-            <p>Nexi Hub was founded with a simple yet powerful vision: to revolutionize how businesses connect, communicate, and grow in the digital age. We started as a small team of passionate technologists and have grown into a dynamic company serving clients worldwide.</p>
-            
+            <p>Congratulations on joining Nexi Hub! We\'re excited to have you as part of our innovative team.</p>
             <h3>Our Mission</h3>
-            <div class="mission-box">
-                <p><strong>"To empower businesses with cutting-edge digital solutions that drive growth, efficiency, and success."</strong></p>
-            </div>
-            
+            <p><strong>"To empower businesses with cutting-edge digital solutions that drive growth, efficiency, and success."</strong></p>
             <h3>What We Do</h3>
             <ul>
-                <li><strong>Nexi Web:</strong> Custom web development and design solutions</li>
-                <li><strong>Nexi Bot:</strong> Intelligent automation and chatbot development</li>
+                <li><strong>Nexi Web:</strong> Custom web development solutions</li>
+                <li><strong>Nexi Bot:</strong> Intelligent automation development</li>
                 <li><strong>Nexi Pulse:</strong> Advanced analytics and business intelligence</li>
             </ul>
-            
-            <h3>Your Role Matters</h3>
-            <p>Every team member at Nexi Hub plays a crucial role in our success. Whether you\'re in development, design, marketing, or support, your contributions help us deliver exceptional value to our clients and push the boundaries of what\'s possible.</p>
-            
-            <div class="key-points">
-                <h4>Key Takeaways:</h4>
-                <ul>
-                    <li>Nexi Hub is a technology company focused on digital solutions</li>
-                    <li>We serve businesses worldwide with web, bot, and analytics solutions</li>
-                    <li>Every team member contributes to our collective success</li>
-                    <li>Innovation and excellence are at the core of everything we do</li>
-                </ul>
-            </div>
         '
     ],
     2 => [
@@ -98,42 +77,23 @@ $modules = [
         'quiz_questions' => 4,
         'content' => '
             <h2>💎 Our Core Values</h2>
-            
-            <p>At Nexi Hub, our values guide every decision we make and every interaction we have. These principles define who we are and how we work together to achieve our goals.</p>
-            
             <div class="values-grid">
                 <div class="value-card">
                     <h3>🎯 Excellence</h3>
-                    <p>We strive for excellence in everything we do. From code quality to customer service, we never settle for "good enough."</p>
+                    <p>We strive for excellence in everything we do.</p>
                 </div>
-                
                 <div class="value-card">
                     <h3>🚀 Innovation</h3>
-                    <p>We embrace new technologies and creative solutions. Innovation is not just encouraged—it\'s essential to our success.</p>
+                    <p>We embrace new technologies and creative solutions.</p>
                 </div>
-                
                 <div class="value-card">
                     <h3>🤝 Collaboration</h3>
-                    <p>We believe in the power of teamwork. Great things happen when talented people work together toward a common goal.</p>
+                    <p>We believe in the power of teamwork.</p>
                 </div>
-                
                 <div class="value-card">
                     <h3>📈 Growth</h3>
-                    <p>We\'re committed to continuous learning and improvement, both as individuals and as a company.</p>
+                    <p>We\'re committed to continuous learning and improvement.</p>
                 </div>
-            </div>
-            
-            <h3>Our Work Culture</h3>
-            <ul>
-                <li><strong>Remote-First:</strong> We support flexible work arrangements that promote work-life balance</li>
-                <li><strong>Open Communication:</strong> We encourage honest, transparent communication at all levels</li>
-                <li><strong>Learning-Oriented:</strong> We invest in your professional development and growth</li>
-                <li><strong>Results-Focused:</strong> We measure success by outcomes, not hours worked</li>
-            </ul>
-            
-            <div class="culture-highlight">
-                <h4>Living Our Values Daily</h4>
-                <p>Our values aren\'t just words on a wall—they\'re principles we live by. In your day-to-day work, you\'ll see these values in action through our decision-making processes, team interactions, and client relationships.</p>
             </div>
         '
     ],
@@ -143,51 +103,13 @@ $modules = [
         'quiz_questions' => 3,
         'content' => '
             <h2>💬 Communication Excellence</h2>
-            
-            <p>Effective communication is the foundation of our success at Nexi Hub. This module covers our communication standards, tools, and best practices.</p>
-            
+            <p>Effective communication is the foundation of our success at Nexi Hub.</p>
             <h3>Internal Communication</h3>
-            
-            <h4>Discord - Our Primary Platform</h4>
             <ul>
-                <li><strong>General channels:</strong> Company announcements and casual conversation</li>
-                <li><strong>Project channels:</strong> Specific project discussions and updates</li>
-                <li><strong>Department channels:</strong> Team-specific communications</li>
-                <li><strong>Direct messages:</strong> One-on-one conversations and private matters</li>
+                <li>Use Discord for team discussions</li>
+                <li>Email for formal communications</li>
+                <li>Respond within 4 hours during business hours</li>
             </ul>
-            
-            <h4>Email Guidelines</h4>
-            <ul>
-                <li>Use for formal communications and external correspondence</li>
-                <li>Include clear, descriptive subject lines</li>
-                <li>Keep messages concise and professional</li>
-                <li>Use proper formatting and proofread before sending</li>
-            </ul>
-            
-            <h3>Client Communication</h3>
-            
-            <div class="communication-standards">
-                <h4>Professional Standards:</h4>
-                <ul>
-                    <li><strong>Response Time:</strong> Acknowledge emails within 4 hours during business hours</li>
-                    <li><strong>Tone:</strong> Always professional, helpful, and positive</li>
-                    <li><strong>Clarity:</strong> Use clear, jargon-free language</li>
-                    <li><strong>Follow-up:</strong> Confirm understanding and next steps</li>
-                </ul>
-            </div>
-            
-            <h3>Meeting Etiquette</h3>
-            <ul>
-                <li>Join meetings on time and come prepared</li>
-                <li>Mute when not speaking in larger meetings</li>
-                <li>Contribute actively and stay engaged</li>
-                <li>Follow up with action items and deadlines</li>
-            </ul>
-            
-            <div class="communication-tip">
-                <h4>💡 Pro Tip</h4>
-                <p>When in doubt about communication approach, ask yourself: "Is this clear, professional, and helpful?" If yes, you\'re on the right track!</p>
-            </div>
         '
     ],
     4 => [
@@ -196,400 +118,424 @@ $modules = [
         'quiz_questions' => 5,
         'content' => '
             <h2>🔒 Security & Data Protection</h2>
-            
-            <p>At Nexi Hub, we take data protection and security seriously. This module covers essential security practices and our data protection policies.</p>
-            
-            <h3>Password Security</h3>
-            
+            <p>At Nexi Hub, we take data protection and security seriously.</p>
             <div class="security-checklist">
                 <h4>✅ Password Requirements:</h4>
                 <ul>
                     <li>Minimum 12 characters long</li>
                     <li>Include uppercase, lowercase, numbers, and symbols</li>
                     <li>Use unique passwords for each account</li>
-                    <li>Enable two-factor authentication (2FA) wherever possible</li>
-                    <li>Use a password manager</li>
+                    <li>Enable two-factor authentication (2FA)</li>
                 </ul>
-            </div>
-            
-            <h3>Data Handling</h3>
-            
-            <h4>Client Data Protection:</h4>
-            <ul>
-                <li><strong>Confidentiality:</strong> Never share client data without authorization</li>
-                <li><strong>Access Control:</strong> Only access data necessary for your role</li>
-                <li><strong>Secure Storage:</strong> Use approved cloud storage solutions</li>
-                <li><strong>Data Retention:</strong> Follow our data retention policies</li>
-            </ul>
-            
-            <h4>Personal Data (GDPR Compliance):</h4>
-            <ul>
-                <li>Obtain proper consent before collecting personal data</li>
-                <li>Process data only for specified purposes</li>
-                <li>Allow individuals to access and correct their data</li>
-                <li>Report data breaches within 72 hours</li>
-            </ul>
-            
-            <h3>Common Security Threats</h3>
-            
-            <div class="threat-warnings">
-                <div class="threat-item">
-                    <h4>🎣 Phishing Attacks</h4>
-                    <p>Be cautious of suspicious emails asking for login credentials or personal information. Always verify the sender\'s identity.</p>
-                </div>
-                
-                <div class="threat-item">
-                    <h4>🦠 Malware</h4>
-                    <p>Keep your software updated and use reputable antivirus protection. Avoid downloading suspicious files.</p>
-                </div>
-                
-                <div class="threat-item">
-                    <h4>📱 Social Engineering</h4>
-                    <p>Be wary of unsolicited phone calls or messages requesting sensitive information, even if they claim to be from legitimate sources.</p>
-                </div>
-            </div>
-            
-            <h3>Incident Reporting</h3>
-            <p>If you suspect a security incident or data breach, immediately contact the IT security team at <strong>security@nexihub.uk</strong></p>
-            
-            <div class="security-reminder">
-                <h4>🛡️ Remember</h4>
-                <p>Security is everyone\'s responsibility. Your vigilance helps protect our company, our clients, and your colleagues.</p>
             </div>
         '
     ],
     5 => [
+        'title' => 'Working with Clients',
+        'duration' => '20 minutes',
+        'quiz_questions' => 4,
+        'content' => '
+            <h2>🤝 Client Relations</h2>
+            <p>Our clients are the heart of our business. This module covers best practices for client interactions.</p>
+            <h3>Professional Standards</h3>
+            <ul>
+                <li>Always maintain professional communication</li>
+                <li>Respond promptly to client inquiries</li>
+                <li>Set clear expectations and deliver on promises</li>
+                <li>Keep clients informed of project progress</li>
+            </ul>
+        '
+    ],
+    6 => [
+        'title' => 'Tools & Technologies',
+        'duration' => '18 minutes',
+        'quiz_questions' => 4,
+        'content' => '
+            <h2>🛠️ Our Technology Stack</h2>
+            <p>Learn about the tools and technologies we use at Nexi Hub.</p>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h4>Development</h4>
+                    <ul>
+                        <li>VS Code</li>
+                        <li>Git & GitHub</li>
+                        <li>Docker</li>
+                    </ul>
+                </div>
+                <div class="tool-card">
+                    <h4>Communication</h4>
+                    <ul>
+                        <li>Discord</li>
+                        <li>Zoom</li>
+                        <li>Email</li>
+                    </ul>
+                </div>
+            </div>
+        '
+    ],
+    7 => [
         'title' => 'Final Assessment',
         'duration' => '10 minutes',
         'quiz_questions' => 8,
         'content' => '
             <h2>🎓 Final Assessment</h2>
-            
-            <p>Congratulations on completing all the training modules! This final assessment will test your understanding of the key concepts covered in your onboarding training.</p>
-            
+            <p>Congratulations on completing all the training modules! This final assessment will test your understanding.</p>
             <div class="assessment-info">
                 <h3>Assessment Details:</h3>
                 <ul>
                     <li><strong>Questions:</strong> 8 multiple-choice questions</li>
                     <li><strong>Passing Score:</strong> 80% (7 out of 8 correct)</li>
-                    <li><strong>Time Limit:</strong> No time limit</li>
-                    <li><strong>Attempts:</strong> You can retake the assessment if needed</li>
+                    <li><strong>Attempts:</strong> You can retake if needed</li>
                 </ul>
             </div>
-            
-            <h3>Topics Covered:</h3>
-            <ul>
-                <li>Nexi Hub company overview and mission</li>
-                <li>Core values and company culture</li>
-                <li>Communication guidelines and best practices</li>
-                <li>Data protection and security protocols</li>
-            </ul>
-            
-            <div class="success-message">
-                <h3>🏆 Upon Successful Completion:</h3>
-                <ul>
-                    <li>You\'ll receive a completion certificate</li>
-                    <li>Your training status will be updated to "Completed"</li>
-                    <li>You\'ll have full access to all company resources</li>
-                    <li>Welcome to the Nexi Hub team!</li>
-                </ul>
-            </div>
-            
-            <p><strong>Take your time and answer thoughtfully. Good luck!</strong></p>
         '
     ]
 ];
 
 $current_module = $modules[$module_id];
-$page_title = $current_module['title'] . " - Nexi Hub E-Learning";
-
-include __DIR__ . '/../includes/header.php';
 ?>
 
-<style>
-/* E-Learning Module Styles */
-.module-container {
-    background: var(--background-dark);
-    min-height: 100vh;
-    padding: 2rem 0;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo htmlspecialchars($current_module['title']); ?> - E-Learning Portal</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-.module-header {
-    background: var(--background-light);
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-.breadcrumb a {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: 600;
-}
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
 
-.breadcrumb a:hover {
-    text-decoration: underline;
-}
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
 
-.module-info {
-    margin-top: 1rem;
-}
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2rem;
+        }
 
-.module-meta {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-}
+        .header .subtitle {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
 
-.module-number {
-    background: var(--primary-color);
-    color: white;
-    padding: 0.3rem 0.8rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 600;
-}
+        .content {
+            padding: 30px;
+        }
 
-.module-title {
-    color: var(--text-primary);
-    font-size: 2rem;
-    font-weight: 700;
-    margin: 0.5rem 0;
-}
+        .module-nav {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-.module-duration {
-    color: var(--text-secondary);
-    font-size: 1rem;
-}
+        .nav-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: transform 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-.module-content {
-    background: var(--background-light);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-}
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
 
-.module-content h2 {
-    color: var(--primary-color);
-    font-size: 1.8rem;
-    margin: 0 0 1rem 0;
-}
+        .nav-btn.disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
 
-.module-content h3 {
-    color: var(--text-primary);
-    font-size: 1.4rem;
-    margin: 1.5rem 0 1rem 0;
-}
+        .module-content {
+            line-height: 1.6;
+            color: #333;
+        }
 
-.module-content h4 {
-    color: var(--text-primary);
-    font-size: 1.2rem;
-    margin: 1rem 0 0.5rem 0;
-}
+        .module-content h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
 
-.module-content p {
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin: 0 0 1rem 0;
-}
+        .module-content h3 {
+            color: #444;
+            margin: 25px 0 15px 0;
+            font-size: 1.5rem;
+        }
 
-.module-content ul, .module-content ol {
-    color: var(--text-secondary);
-    margin: 0 0 1rem 1.5rem;
-}
+        .module-content h4 {
+            color: #555;
+            margin: 20px 0 10px 0;
+            font-size: 1.2rem;
+        }
 
-.module-content li {
-    margin: 0.5rem 0;
-    line-height: 1.5;
-}
+        .module-content p {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
 
-.mission-box {
-    background: rgba(230, 79, 33, 0.1);
-    border: 1px solid rgba(230, 79, 33, 0.2);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin: 1rem 0;
-    text-align: center;
-}
+        .module-content ul, .module-content ol {
+            margin: 15px 0 15px 30px;
+        }
 
-.mission-box p {
-    color: var(--primary-color);
-    font-size: 1.1rem;
-    margin: 0;
-}
+        .module-content li {
+            margin-bottom: 8px;
+        }
 
-.key-points {
-    background: var(--background-dark);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin: 1.5rem 0;
-}
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
 
-.quiz-section {
-    background: var(--background-light);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-}
+        .value-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
 
-.quiz-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
+        .value-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
 
-.quiz-header h2 {
-    color: var(--text-primary);
-    margin: 0 0 0.5rem 0;
-}
+        .security-checklist {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+        }
 
-.quiz-header p {
-    color: var(--text-secondary);
-    margin: 0;
-}
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
 
-.quiz-container {
-    margin: 1.5rem 0;
-}
+        .tool-card {
+            background: white;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
 
-.quiz-info {
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    border-radius: 12px;
-    padding: 1rem;
-    color: #3b82f6;
-    text-align: center;
-}
+        .tool-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
 
-.quiz-info i {
-    margin-right: 0.5rem;
-}
+        .assessment-info {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 25px 0;
+            border-left: 4px solid #2196f3;
+        }
 
-.quiz-actions {
-    text-align: center;
-    margin-top: 2rem;
-}
+        .quiz-section {
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            text-align: center;
+            border: 2px solid #4caf50;
+        }
 
-.btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem 2rem;
-    border: none;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-}
+        .quiz-section h3 {
+            color: #2e7d32;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
 
-.btn-primary {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    box-shadow: 0 4px 15px rgba(230, 79, 33, 0.3);
-}
+        .quiz-section p {
+            color: #388e3c;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+        }
 
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(230, 79, 33, 0.4);
-}
+        .complete-btn {
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
 
-.completed-section {
-    background: var(--background-light);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 3rem 2rem;
-    text-align: center;
-}
+        .complete-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
 
-.completion-message i {
-    font-size: 3rem;
-    color: #10b981;
-    margin-bottom: 1rem;
-}
+        .complete-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
 
-.completion-message h3 {
-    color: var(--text-primary);
-    font-size: 1.8rem;
-    margin: 0 0 1rem 0;
-}
+        .completed-section {
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            text-align: center;
+            border: 2px solid #4caf50;
+        }
 
-.completion-message p {
-    color: var(--text-secondary);
-    margin: 0.5rem 0;
-}
+        .completion-message {
+            color: #2e7d32;
+        }
 
-.navigation-actions {
-    margin-top: 2rem;
-}
+        .completion-message i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
 
-@media (max-width: 768px) {
-    .module-container {
-        padding: 1rem 0;
-    }
-    
-    .module-header, .module-content, .quiz-section, .completed-section {
-        margin: 1rem;
-        padding: 1.5rem;
-    }
-    
-    .module-title {
-        font-size: 1.5rem;
-    }
-}
-</style>
+        .completion-message h3 {
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
 
-<link rel="stylesheet" href="/elearning/assets/elearning.css">
+        .quiz-info {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+        }
 
-<div class="module-container">
-    <div class="module-header">
-        <div class="container">
-            <div class="breadcrumb">
-                <a href="/elearning/"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
-            </div>
-            
-            <div class="module-info">
-                <div class="module-meta">
-                    <span class="module-number">Module <?php echo $module_id; ?></span>
-                    <span class="module-duration">
-                        <i class="fas fa-clock"></i>
-                        <?php echo $current_module['duration']; ?>
-                    </span>
-                    <?php if ($is_completed): ?>
-                    <span class="completion-badge">
-                        <i class="fas fa-check-circle"></i>
-                        Completed
-                    </span>
+        .quiz-info i {
+            color: #856404;
+            margin-right: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .module-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .values-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><?php echo htmlspecialchars($current_module['title']); ?></h1>
+            <div class="subtitle">Module <?php echo $module_id; ?> of 7 • <?php echo $current_module['duration']; ?></div>
+        </div>
+
+        <div class="content">
+            <div class="module-nav">
+                <div>
+                    <a href="/elearning/" class="nav-btn">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Dashboard
+                    </a>
+                </div>
+                <div>
+                    <?php if ($module_id > 1): ?>
+                        <a href="/elearning/module.php?id=<?php echo $module_id - 1; ?>" class="nav-btn">
+                            <i class="fas fa-chevron-left"></i>
+                            Previous
+                        </a>
+                    <?php endif; ?>
+                    
+                    <?php if ($module_id < 7 && $is_completed): ?>
+                        <a href="/elearning/module.php?id=<?php echo $module_id + 1; ?>" class="nav-btn">
+                            Next
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
                     <?php endif; ?>
                 </div>
-                <h1><?php echo htmlspecialchars($current_module['title']); ?></h1>
             </div>
-        </div>
-    </div>
 
-    <div class="container">
-        <div class="module-content">
-            <div class="content-section">
+            <div class="module-content">
                 <?php echo $current_module['content']; ?>
             </div>
             
             <?php if (!$is_completed): ?>
             <div class="quiz-section">
                 <h3><i class="fas fa-question-circle"></i> Knowledge Check</h3>
-                <p>Complete this quick quiz to finish the module.</p>
+                <p>Complete this quick quiz to finish the module and progress to the next one.</p>
                 
                 <div id="quiz-container">
-                    <!-- Quiz questions will be loaded by JavaScript -->
+                    <div class="quiz-info">
+                        <p><i class="fas fa-info-circle"></i> This module includes <?php echo $current_module['quiz_questions']; ?> quiz questions to test your understanding.</p>
+                        <p>Click "Complete Module & Take Quiz" when you're ready to finish.</p>
+                    </div>
                 </div>
                 
                 <div class="quiz-actions">
-                    <button id="complete-module-btn" class="btn btn-primary" onclick="completeModule(<?php echo $module_id; ?>)">
+                    <button id="complete-module-btn" class="complete-btn" onclick="completeModule(<?php echo $module_id; ?>)">
                         <i class="fas fa-check"></i>
-                        Complete Module
+                        Complete Module & Take Quiz
                     </button>
                 </div>
             </div>
@@ -604,12 +550,12 @@ include __DIR__ . '/../includes/header.php';
                 
                 <div class="navigation-actions">
                     <?php if ($module_id < 7): ?>
-                    <a href="/elearning/module.php?id=<?php echo $module_id + 1; ?>" class="btn btn-primary">
+                    <a href="/elearning/module.php?id=<?php echo $module_id + 1; ?>" class="complete-btn">
                         <i class="fas fa-arrow-right"></i>
                         Next Module
                     </a>
                     <?php else: ?>
-                    <a href="/elearning/" class="btn btn-primary">
+                    <a href="/elearning/" class="complete-btn">
                         <i class="fas fa-trophy"></i>
                         View Certificate
                     </a>
@@ -619,72 +565,56 @@ include __DIR__ . '/../includes/header.php';
             <?php endif; ?>
         </div>
     </div>
-</div>
 
-<script>
-const moduleId = <?php echo $module_id; ?>;
-const isCompleted = <?php echo $is_completed ? 'true' : 'false'; ?>;
-
-function completeModule(moduleId) {
-    console.log('Starting module completion for module:', moduleId);
-    
-    // Show loading state
-    const btn = document.getElementById('complete-module-btn');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-    btn.disabled = true;
-    
-    // Simple completion - in a real implementation, you'd have an actual quiz
-    const score = Math.floor(Math.random() * 21) + 80; // Random score between 80-100
-    
-    fetch('complete-module.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            module_id: moduleId,
-            quiz_score: score
-        })
-    })
-    .then(response => {
-        console.log('Response status:', response.status);
-        if (!response.ok) {
-            throw new Error('Network response was not ok: ' + response.status);
+    <script>
+        function completeModule(moduleId) {
+            console.log('Starting module completion for module:', moduleId);
+            
+            // Show loading state
+            const btn = document.getElementById('complete-module-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            btn.disabled = true;
+            
+            // Simple completion - in a real implementation, you'd have an actual quiz
+            const score = Math.floor(Math.random() * 21) + 80; // Random score between 80-100
+            
+            fetch('complete-module.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    module_id: moduleId,
+                    quiz_score: score
+                })
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    alert('🎉 Module completed successfully!\n\nQuiz Score: ' + score + '%\n\nGreat job! You can now proceed to the next module.');
+                    location.reload();
+                } else {
+                    alert('Error completing module: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Network error. Please try again. Error: ' + error.message);
+            })
+            .finally(() => {
+                // Restore button state
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
         }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Response data:', data);
-        if (data.success) {
-            alert('Module completed successfully! Quiz Score: ' + score + '%');
-            location.reload();
-        } else {
-            alert('Error completing module: ' + (data.message || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Network error. Please try again. Error: ' + error.message);
-    })
-    .finally(() => {
-        // Restore button state
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    });
-}
-
-// Load quiz questions (simplified for demo)
-if (!isCompleted) {
-    document.getElementById('quiz-container').innerHTML = `
-        <div class="quiz-info">
-            <p><i class="fas fa-info-circle"></i> This module includes ${<?php echo $current_module['quiz_questions']; ?>} quiz questions to test your understanding.</p>
-            <p>Click "Complete Module" when you're ready to finish and take the quiz.</p>
-        </div>
-    `;
-}
-</script>
-
-<script src="/elearning/assets/elearning.js"></script>
-
-<?php include __DIR__ . '/../includes/footer.php'; ?>
+    </script>
+</body>
+</html>
