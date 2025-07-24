@@ -626,6 +626,14 @@ const moduleId = <?php echo $module_id; ?>;
 const isCompleted = <?php echo $is_completed ? 'true' : 'false'; ?>;
 
 function completeModule(moduleId) {
+    console.log('Starting module completion for module:', moduleId);
+    
+    // Show loading state
+    const btn = document.getElementById('complete-module-btn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    btn.disabled = true;
+    
     // Simple completion - in a real implementation, you'd have an actual quiz
     const score = Math.floor(Math.random() * 21) + 80; // Random score between 80-100
     
@@ -639,18 +647,30 @@ function completeModule(moduleId) {
             quiz_score: score
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.status);
+        }
+        return response.json();
+    })
     .then(data => {
+        console.log('Response data:', data);
         if (data.success) {
             alert('Module completed successfully! Quiz Score: ' + score + '%');
             location.reload();
         } else {
-            alert('Error completing module: ' + data.message);
+            alert('Error completing module: ' + (data.message || 'Unknown error'));
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Network error. Please try again.');
+        alert('Network error. Please try again. Error: ' + error.message);
+    })
+    .finally(() => {
+        // Restore button state
+        btn.innerHTML = originalText;
+        btn.disabled = false;
     });
 }
 
