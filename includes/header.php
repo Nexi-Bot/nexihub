@@ -37,6 +37,9 @@
                         <li><a href="/careers" class="nav-link <?php echo ($current_route == 'careers') ? 'active' : ''; ?>">Careers</a></li>
                         <li><a href="/contact" class="nav-link <?php echo ($current_route == 'contact') ? 'active' : ''; ?>">Contact</a></li>
                         <li><a href="/legal" class="nav-link <?php echo ($current_route == 'legal') ? 'active' : ''; ?>">Legal</a></li>
+                        <?php if (isset($_SESSION['staff_id'])): ?>
+                        <li><a href="/elearning" class="nav-link <?php echo (strpos($current_route, 'elearning') === 0) ? 'active' : ''; ?>">E-Learning</a></li>
+                        <?php endif; ?>
                     </ul>
                 </nav>
                 

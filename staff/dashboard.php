@@ -1474,6 +1474,9 @@ include __DIR__ . '/../includes/header.php';
             <button class="tab-button" onclick="showTab('contracts-tab')">
                 <i class="fas fa-file-contract"></i> Contract Management
             </button>
+            <button class="tab-button" onclick="showTab('elearning-tab')">
+                <i class="fas fa-graduation-cap"></i> E-Learning Portal
+            </button>
             <button class="tab-button" onclick="showTab('contract-portal-tab')">
                 <i class="fas fa-signature"></i> Nexi HR Portal Access
             </button>
@@ -1672,6 +1675,155 @@ include __DIR__ . '/../includes/header.php';
                         <p>Create your first contract template to get started.</p>
                     </div>
                 <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- E-Learning Portal Tab -->
+        <div id="elearning-tab" class="tab-content">
+            <div class="portal-header">
+                <h2>E-Learning Portal Management</h2>
+                <p>Monitor staff training progress and manage e-learning completion status</p>
+            </div>
+
+            <div class="portal-info-card">
+                <h3>E-Learning Portal Access</h3>
+                <div class="login-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Portal URL:</span>
+                        <span class="detail-value">
+                            <a href="/elearning" target="_blank" class="portal-link">
+                                https://nexihub.uk/elearning
+                            </a>
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Access Method:</span>
+                        <span class="detail-value">Same login as HR Portal (Discord + Email + 2FA)</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Training Modules:</span>
+                        <span class="detail-value">7 comprehensive modules covering company policies and procedures</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="elearning-stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🎓</div>
+                    <div class="stat-content">
+                        <div class="stat-number">
+                            <?php 
+                            $completed_count = 0;
+                            foreach ($staff_members as $member) {
+                                if ($member['elearning_status'] === 'Completed') $completed_count++;
+                            }
+                            echo $completed_count;
+                            ?>
+                        </div>
+                        <div class="stat-label">Completed Training</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-content">
+                        <div class="stat-number">
+                            <?php 
+                            $in_progress_count = 0;
+                            foreach ($staff_members as $member) {
+                                if ($member['elearning_status'] === 'In Progress') $in_progress_count++;
+                            }
+                            echo $in_progress_count;
+                            ?>
+                        </div>
+                        <div class="stat-label">In Progress</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-content">
+                        <div class="stat-number">
+                            <?php 
+                            $not_started_count = 0;
+                            foreach ($staff_members as $member) {
+                                if ($member['elearning_status'] === 'Not Started') $not_started_count++;
+                            }
+                            echo $not_started_count;
+                            ?>
+                        </div>
+                        <div class="stat-label">Not Started</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-content">
+                        <div class="stat-number">
+                            <?php 
+                            $total_staff = count($staff_members);
+                            $completion_rate = $total_staff > 0 ? round(($completed_count / $total_staff) * 100) : 0;
+                            echo $completion_rate . '%';
+                            ?>
+                        </div>
+                        <div class="stat-label">Completion Rate</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="elearning-staff-table">
+                <h3>Staff Training Status</h3>
+                <div class="table-responsive">
+                    <table class="staff-table">
+                        <thead>
+                            <tr>
+                                <th>Staff Member</th>
+                                <th>Department</th>
+                                <th>E-Learning Status</th>
+                                <th>Date Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($staff_members as $member): ?>
+                                <tr>
+                                    <td>
+                                        <div class="staff-info">
+                                            <strong><?php echo htmlspecialchars($member['full_name']); ?></strong>
+                                            <small><?php echo htmlspecialchars($member['nexi_email']); ?></small>
+                                        </div>
+                                    </td>
+                                    <td><?php echo htmlspecialchars($member['department']); ?></td>
+                                    <td>
+                                        <span class="status-badge <?php 
+                                            echo strtolower(str_replace(' ', '-', $member['elearning_status'])); 
+                                        ?>">
+                                            <?php 
+                                            $status = $member['elearning_status'];
+                                            switch($status) {
+                                                case 'Completed':
+                                                    echo '✅ Completed';
+                                                    break;
+                                                case 'In Progress':
+                                                    echo '📚 In Progress';
+                                                    break;
+                                                default:
+                                                    echo '⏳ Not Started';
+                                            }
+                                            ?>
+                                        </span>
+                                    </td>
+                                    <td><?php echo $member['date_joined'] ? date('M j, Y', strtotime($member['date_joined'])) : 'N/A'; ?></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline" onclick="resetElearning(<?php echo $member['id']; ?>)">
+                                            <i class="fas fa-redo"></i> Reset Progress
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -2391,6 +2543,36 @@ function showTab(tabId) {
     
     // Add active class to clicked button
     event.target.classList.add('active');
+}
+
+// E-Learning Management Functions
+function resetElearning(staffId) {
+    if (!confirm('Are you sure you want to reset this staff member\'s e-learning progress? This will remove all completed modules and restart their training.')) {
+        return;
+    }
+    
+    fetch('/staff/reset-elearning.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            staff_id: staffId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('E-learning progress has been reset successfully.');
+            location.reload();
+        } else {
+            alert('Error resetting e-learning progress: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Network error. Please try again.');
+    });
 }
 
 // Contract Management Functions

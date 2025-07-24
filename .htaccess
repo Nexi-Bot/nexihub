@@ -6,6 +6,10 @@ ErrorDocument 403 /403.php
 ErrorDocument 500 /500.php
 ErrorDocument 503 /503.php
 
+# E-Learning portal routing
+RewriteRule ^elearning/?$ elearning/index.php [L]
+RewriteRule ^elearning/(.*)$ elearning/$1 [L]
+
 # Staff portal routing - handle before general routing
 RewriteRule ^staff/login/?$ staff/login.php [L]
 RewriteRule ^staff/dashboard/?$ staff/dashboard.php [L]
