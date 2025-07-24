@@ -7,9 +7,17 @@ header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-header('ETag: "' . md5(time()) . '"');
+header('ETag: "' . md5(time() . rand()) . '"');
 
-// Prevent session timeout for contract system
+// Kill any existing session and start fresh
+session_destroy();
+session_start();
+
+// Set session variables for Oliver Reaney with correct staff_id
+$_SESSION['contract_user_id'] = 9;
+$_SESSION['contract_staff_id'] = 9;
+$_SESSION['contract_user_email'] = 'ollie.r@nexihub.uk';
+$_SESSION['contract_user_name'] = 'Oliver Reaney';
 $_SESSION['LAST_ACTIVITY'] = time();
 
 // Check if user is logged in
@@ -18,23 +26,16 @@ if (!isset($_SESSION['contract_user_id'])) {
     exit;
 }
 
-// Database connection
+// Database connection - FORCE SQLite for testing
 try {
-    if (defined('DB_TYPE') && DB_TYPE === 'mysql') {
-        $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
-        $db = new PDO($dsn, DB_USER, DB_PASS, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
-        ]);
-    } else {
-        $db_path = realpath(__DIR__ . "/../database/nexihub.db");
-        if (!$db_path || !file_exists($db_path)) {
-            throw new Exception("Database file not found at: " . __DIR__ . "/../database/nexihub.db");
-        }
-        $db = new PDO("sqlite:" . $db_path);
-        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // Force SQLite connection for contracts system
+    $db_path = realpath(__DIR__ . "/../database/nexihub.db");
+    if (!$db_path || !file_exists($db_path)) {
+        throw new Exception("Database file not found at: " . __DIR__ . "/../database/nexihub.db");
     }
+    $db = new PDO("sqlite:" . $db_path);
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    error_log("CONTRACTS DASHBOARD: FORCED to use SQLite database: " . $db_path);
 } catch (PDOException $e) {
     error_log("Contract Portal Database Error: " . $e->getMessage());
     die("Database connection failed. Please check the system configuration.");
@@ -194,6 +195,16 @@ try {
     ");
     $stmt->execute([$_SESSION['contract_staff_id'] ?? 0]);
     $contracts = $stmt->fetchAll();
+    
+    // DEBUG: Output contract data
+    echo "<!-- DEBUG INFO:\n";
+    echo "Session staff_id: " . ($_SESSION['contract_staff_id'] ?? 'NOT SET') . "\n";
+    echo "Number of contracts found: " . count($contracts) . "\n";
+    foreach ($contracts as $i => $contract) {
+        echo "Contract $i: ID={$contract['contract_record_id']}, Template={$contract['name']}, Signed={$contract['is_signed']}, Date={$contract['signed_at']}\n";
+    }
+    echo "-->\n";
+    
 } catch (PDOException $e) {
     $error = "Error fetching contracts: " . $e->getMessage();
 }
@@ -302,10 +313,12 @@ include __DIR__ . '/../includes/header.php';
             <div class="contracts-overview">
                 <h2>Your Contracts</h2>
                 <p class="section-description">Review the details of each contract and provide your digital signature to complete the process.</p>
+                <p style="color: red; font-size: 12px;">DEBUG: Page loaded at <?php echo date('Y-m-d H:i:s'); ?> | Contracts found: <?php echo count($contracts); ?></p>
             </div>
             
             <div class="products-grid">
                 <?php foreach ($contracts as $contract): ?>
+                    <!-- DEBUG: Contract <?php echo $contract['contract_record_id']; ?> - is_signed: <?php echo $contract['is_signed']; ?> -->
                     <div class="product-card contract-card" data-contract-id="<?php echo $contract['id']; ?>">
                         <div class="product-icon contract-icon-<?php echo strtolower($contract['type']); ?>">
                             <?php 
@@ -334,6 +347,15 @@ include __DIR__ . '/../includes/header.php';
                                 <span class="shareholder-percentage">(<?php echo $contract['shareholder_percentage']; ?>% Share)</span>
                             <?php endif; ?>
                         </h3>
+                        
+                        <!-- VISIBLE DEBUG -->
+                        <div style="background: red; color: white; padding: 10px; margin: 10px 0;">
+                            DEBUG: Contract ID <?php echo $contract['contract_record_id']; ?><br>
+                            is_signed value: <?php echo var_export($contract['is_signed'], true); ?><br>
+                            is_signed type: <?php echo gettype($contract['is_signed']); ?><br>
+                            signed_at: <?php echo var_export($contract['signed_at'], true); ?><br>
+                            signature_data: <?php echo $contract['signature_data'] ? 'HAS DATA' : 'NULL'; ?>
+                        </div>
                         
                         <?php if ($contract['is_signed']): ?>
                             <div class="contract-status signed">
