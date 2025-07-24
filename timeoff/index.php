@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $request_id = $_POST['request_id'];
                         
                         // Get request details
-                        $stmt = $pdo->prepare("SELECT tor.*, sp.name, sp.time_off_balance FROM time_off_requests tor JOIN staff_profiles sp ON tor.staff_id = sp.id WHERE tor.id = ?");
+                        $stmt = $pdo->prepare("SELECT tor.*, sp.full_name, sp.time_off_balance FROM time_off_requests tor JOIN staff_profiles sp ON tor.staff_id = sp.id WHERE tor.id = ?");
                         $stmt->execute([$request_id]);
                         $request = $stmt->fetch();
                         
@@ -90,11 +90,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             
                             // Log action
                             $stmt = $pdo->prepare("INSERT INTO time_off_audit_log (request_id, staff_id, action, details, created_at) VALUES (?, ?, 'approved', ?, NOW())");
-                            $stmt->execute([$request_id, $staff['id'], "Request approved by " . $staff['name']]);
+                            $stmt->execute([$request_id, $staff['id'], "Request approved by " . $staff['full_name']]);
                             
                             // Send email notification
                             sendNotificationEmail('request_approved', $request, [
-                                'approved_by' => $staff['name']
+                                'approved_by' => $staff['full_name']
                             ]);
                             
                             $message = 'Request approved successfully!';
@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $denial_reason = $_POST['denial_reason'];
                         
                         // Get request details
-                        $stmt = $pdo->prepare("SELECT tor.*, sp.name FROM time_off_requests tor JOIN staff_profiles sp ON tor.staff_id = sp.id WHERE tor.id = ?");
+                        $stmt = $pdo->prepare("SELECT tor.*, sp.full_name FROM time_off_requests tor JOIN staff_profiles sp ON tor.staff_id = sp.id WHERE tor.id = ?");
                         $stmt->execute([$request_id]);
                         $request = $stmt->fetch();
                         
@@ -120,11 +120,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             
                             // Log action
                             $stmt = $pdo->prepare("INSERT INTO time_off_audit_log (request_id, staff_id, action, details, created_at) VALUES (?, ?, 'denied', ?, NOW())");
-                            $stmt->execute([$request_id, $staff['id'], "Request denied by " . $staff['name'] . ": " . $denial_reason]);
+                            $stmt->execute([$request_id, $staff['id'], "Request denied by " . $staff['full_name'] . ": " . $denial_reason]);
                             
                             // Send email notification
                             sendNotificationEmail('request_denied', $request, [
-                                'denied_by' => $staff['name'],
+                                'denied_by' => $staff['full_name'],
                                 'denial_reason' => $denial_reason
                             ]);
                             
@@ -149,8 +149,8 @@ $user_requests = $stmt->fetchAll();
 
 // Get all requests for HR/Admin
 $all_requests = [];
-if ($staff['role'] === 'HR' || $staff['role'] === 'Admin') {
-    $stmt = $pdo->prepare("SELECT tor.*, sp.name, sp.email FROM time_off_requests tor JOIN staff_profiles sp ON tor.staff_id = sp.id ORDER BY tor.created_at DESC");
+if ($staff['job_title'] === 'HR' || $staff['job_title'] === 'Admin') {
+    $stmt = $pdo->prepare("SELECT tor.*, sp.full_name, sp.nexi_email FROM time_off_requests tor JOIN staff_profiles sp ON tor.staff_id = sp.id ORDER BY tor.created_at DESC");
     $stmt->execute();
     $all_requests = $stmt->fetchAll();
 }
@@ -164,9 +164,9 @@ function sendNotificationEmail($type, $data, $extra = []) {
     switch ($type) {
         case 'request_submitted':
             $to = 'hr@nexihub.com'; // HR email
-            $subject = 'New Time Off Request - ' . $data['name'];
+            $subject = 'New Time Off Request - ' . $data['full_name'];
             $message = "A new time off request has been submitted:\n\n";
-            $message .= "Employee: " . $data['name'] . "\n";
+            $message .= "Employee: " . $data['full_name'] . "\n";
             $message .= "Type: " . ucfirst($extra['type']) . "\n";
             $message .= "Dates: " . $extra['start_date'] . " to " . $extra['end_date'] . "\n";
             $message .= "Days: " . $extra['days_requested'] . "\n";
@@ -175,7 +175,7 @@ function sendNotificationEmail($type, $data, $extra = []) {
             break;
             
         case 'request_approved':
-            $to = $data['email'] ?? 'staff@nexihub.com';
+            $to = $data['nexi_email'] ?? 'staff@nexihub.com';
             $subject = 'Time Off Request Approved';
             $message = "Your time off request has been approved!\n\n";
             $message .= "Type: " . ucfirst($data['type']) . "\n";
@@ -186,7 +186,7 @@ function sendNotificationEmail($type, $data, $extra = []) {
             break;
             
         case 'request_denied':
-            $to = $data['email'] ?? 'staff@nexihub.com';
+            $to = $data['nexi_email'] ?? 'staff@nexihub.com';
             $subject = 'Time Off Request Denied';
             $message = "Your time off request has been denied.\n\n";
             $message .= "Type: " . ucfirst($data['type']) . "\n";
@@ -219,7 +219,7 @@ function sendNotificationEmail($type, $data, $extra = []) {
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #e64f21 0%, #ff6b35 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -234,7 +234,7 @@ function sendNotificationEmail($type, $data, $extra = []) {
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #e64f21 0%, #ff6b35 100%);
             color: white;
             padding: 20px;
             text-align: center;
@@ -296,8 +296,8 @@ function sendNotificationEmail($type, $data, $extra = []) {
         }
 
         .tab.active {
-            color: #667eea;
-            border-bottom: 3px solid #667eea;
+            color: #e64f21;
+            border-bottom: 3px solid #e64f21;
         }
 
         .tab-content {
@@ -334,11 +334,11 @@ function sendNotificationEmail($type, $data, $extra = []) {
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #e64f21;
         }
 
         .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #e64f21 0%, #ff6b35 100%);
             color: white;
             padding: 12px 25px;
             border: none;
@@ -489,8 +489,8 @@ function sendNotificationEmail($type, $data, $extra = []) {
             <h1>Time Off Portal</h1>
             <div class="user-info">
                 <div>
-                    <strong><?php echo htmlspecialchars($staff['name']); ?></strong>
-                    <span>(<?php echo htmlspecialchars($staff['role']); ?>)</span>
+                    <strong><?php echo htmlspecialchars($staff['full_name']); ?></strong>
+                    <span>(<?php echo htmlspecialchars($staff['job_title']); ?>)</span>
                 </div>
                 <a href="logout.php" class="logout-btn">Logout</a>
             </div>
@@ -512,7 +512,7 @@ function sendNotificationEmail($type, $data, $extra = []) {
             <div class="tabs">
                 <button class="tab active" onclick="showTab('submit')">Submit Request</button>
                 <button class="tab" onclick="showTab('my-requests')">My Requests</button>
-                <?php if ($staff['role'] === 'HR' || $staff['role'] === 'Admin'): ?>
+                <?php if ($staff['job_title'] === 'HR' || $staff['job_title'] === 'Admin'): ?>
                     <button class="tab" onclick="showTab('manage')">Manage Requests</button>
                 <?php endif; ?>
             </div>
@@ -592,7 +592,7 @@ function sendNotificationEmail($type, $data, $extra = []) {
             </div>
 
             <!-- Manage Requests Tab (HR/Admin only) -->
-            <?php if ($staff['role'] === 'HR' || $staff['role'] === 'Admin'): ?>
+            <?php if ($staff['job_title'] === 'HR' || $staff['job_title'] === 'Admin'): ?>
                 <div id="manage" class="tab-content">
                     <h3>Manage All Requests</h3>
                     <?php if (empty($all_requests)): ?>
@@ -614,7 +614,7 @@ function sendNotificationEmail($type, $data, $extra = []) {
                             <tbody>
                                 <?php foreach ($all_requests as $request): ?>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($request['name']); ?></td>
+                                        <td><?php echo htmlspecialchars($request['full_name']); ?></td>
                                         <td><?php echo ucfirst(htmlspecialchars($request['type'])); ?></td>
                                         <td><?php echo htmlspecialchars($request['start_date']) . ' to ' . htmlspecialchars($request['end_date']); ?></td>
                                         <td><?php echo $request['days_requested']; ?></td>

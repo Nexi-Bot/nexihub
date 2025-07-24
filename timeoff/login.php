@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             // Check contract_users table
-            $stmt = $pdo->prepare("SELECT cu.*, sp.name, sp.role FROM contract_users cu 
+            $stmt = $pdo->prepare("SELECT cu.*, sp.full_name, sp.job_title FROM contract_users cu 
                                    LEFT JOIN staff_profiles sp ON cu.staff_id = sp.id 
                                    WHERE cu.email = ?");
             $stmt->execute([$email]);
@@ -27,8 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if ($user && password_verify($password, $user['password_hash'])) {
                 $_SESSION['contract_user_id'] = $user['id'];
-                $_SESSION['user_name'] = $user['name'];
-                $_SESSION['user_role'] = $user['role'];
+                $_SESSION['user_name'] = $user['full_name'];
+                $_SESSION['user_role'] = $user['job_title'];
                 
                 header('Location: index.php');
                 exit;
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #e64f21 0%, #ff6b35 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .login-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #e64f21 0%, #ff6b35 100%);
             color: white;
             padding: 30px 20px;
             text-align: center;
@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .form-group input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #e64f21;
         }
 
         .error {
@@ -132,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .btn {
             width: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #e64f21 0%, #ff6b35 100%);
             color: white;
             padding: 12px;
             border: none;
@@ -155,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .login-footer a {
-            color: #667eea;
+            color: #e64f21;
             text-decoration: none;
         }
 
