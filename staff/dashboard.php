@@ -1222,6 +1222,180 @@ include __DIR__ . '/../includes/header.php';
     justify-content: center;
 }
 
+/* E-Learning Styles */
+.elearning-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px var(--shadow-medium);
+    border-color: var(--primary-color);
+}
+
+.stat-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.elearning-staff-table {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+}
+
+.elearning-staff-table h3 {
+    color: var(--text-primary);
+    margin: 0 0 1.5rem 0;
+    font-size: 1.3rem;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.staff-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--background-dark);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.staff-table th,
+.staff-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.staff-table th {
+    background: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.staff-table tr:last-child td {
+    border-bottom: none;
+}
+
+.staff-table tr:hover {
+    background: var(--background-light);
+}
+
+.staff-info strong {
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.staff-info small {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-badge.completed {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.status-badge.in-progress {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.status-badge.not-started {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.btn-outline:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.portal-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.portal-link:hover {
+    text-decoration: underline;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--background-dark);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 0.75rem;
+}
+
+.detail-item:last-child {
+    margin-bottom: 0;
+}
+
+.detail-label {
+    font-weight: 500;
+    color: var(--text-primary);
+    min-width: 120px;
+}
+
+.detail-value {
+    color: var(--text-secondary);
+    text-align: right;
+}
+
 /* Portal Access Styles */
 .portal-header {
     background: var(--background-light);
@@ -1409,6 +1583,371 @@ include __DIR__ . '/../includes/header.php';
     font-size: 0.75rem !important;
 }
 
+/* E-Learning Portal Management Styles */
+.elearning-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.stat-card {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    transform: scaleX(0);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover::before {
+    transform: scaleX(1);
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px var(--shadow-medium);
+    border-color: var(--primary-color);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.stat-label {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin: 0;
+}
+
+.elearning-staff-table {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+.elearning-staff-table h3 {
+    color: var(--text-primary);
+    margin: 0 0 1.5rem 0;
+    font-size: 1.3rem;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.staff-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--background-dark);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px var(--shadow-light);
+}
+
+.staff-table thead {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+}
+
+.staff-table th,
+.staff-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.staff-table th {
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.staff-table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.staff-table tbody tr:hover {
+    background: var(--background-light);
+}
+
+.staff-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.staff-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.staff-info strong {
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.staff-info small {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.completed {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-badge.in-progress {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.status-badge.not-started {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-outline:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Time Off Management Styles */
+.timeoff-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.timeoff-section {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    margin: 2rem 0;
+}
+
+.timeoff-section h3 {
+    color: var(--text-primary);
+    margin: 0 0 1.5rem 0;
+    font-size: 1.3rem;
+}
+
+.timeoff-requests-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+}
+
+.timeoff-request-card {
+    background: var(--background-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.timeoff-request-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: 12px 12px 0 0;
+}
+
+.timeoff-request-card.pending::before {
+    background: #f59e0b;
+}
+
+.timeoff-request-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px var(--shadow-light);
+    border-color: var(--primary-color);
+}
+
+.request-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.request-header h4 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.request-details {
+    margin-bottom: 1rem;
+}
+
+.request-reason {
+    background: var(--background-light);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid var(--primary-color);
+}
+
+.request-reason strong {
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.request-reason p {
+    color: var(--text-secondary);
+    margin: 0.5rem 0;
+    line-height: 1.5;
+}
+
+.request-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.request-actions form {
+    width: 100%;
+}
+
+.request-actions input[type="text"] {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--background-light);
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    box-sizing: border-box;
+}
+
+.request-actions input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(230, 79, 33, 0.1);
+}
+
+.timeoff-all-requests {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+.timeoff-all-requests h3 {
+    color: var(--text-primary);
+    margin: 0 0 1.5rem 0;
+    font-size: 1.3rem;
+}
+
+.timeoff-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--background-dark);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px var(--shadow-light);
+}
+
+.timeoff-table thead {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+}
+
+.timeoff-table th,
+.timeoff-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.timeoff-table th {
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.timeoff-table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.timeoff-table tbody tr:hover {
+    background: var(--background-light);
+}
+
+.timeoff-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.text-muted {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
 @media (max-width: 768px) {
     .dashboard-header h1 {
         font-size: 2rem;
@@ -1476,6 +2015,9 @@ include __DIR__ . '/../includes/header.php';
             </button>
             <button class="tab-button" onclick="showTab('elearning-tab')">
                 <i class="fas fa-graduation-cap"></i> E-Learning Portal
+            </button>
+            <button class="tab-button" onclick="showTab('timeoff-tab')">
+                <i class="fas fa-calendar-alt"></i> Time Off Management
             </button>
             <button class="tab-button" onclick="showTab('contract-portal-tab')">
                 <i class="fas fa-signature"></i> Nexi HR Portal Access
@@ -1818,6 +2360,337 @@ include __DIR__ . '/../includes/header.php';
                                         <button class="btn btn-sm btn-outline" onclick="resetElearning(<?php echo $member['id']; ?>)">
                                             <i class="fas fa-redo"></i> Reset Progress
                                         </button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Time Off Management Tab -->
+        <div id="timeoff-tab" class="tab-content">
+            <div class="portal-header">
+                <h2>Time Off Management</h2>
+                <p>Manage staff time off requests and view portal access information</p>
+            </div>
+
+            <div class="portal-info-card">
+                <h3>Time Off Portal Access</h3>
+                <div class="login-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Portal URL:</span>
+                        <span class="detail-value">
+                            <a href="/timeoff" target="_blank" class="portal-link">
+                                https://nexihub.uk/timeoff
+                            </a>
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Access Method:</span>
+                        <span class="detail-value">Same login as HR Portal (Email + Password)</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Features:</span>
+                        <span class="detail-value">Submit requests, track status, email notifications</span>
+                    </div>
+                </div>
+            </div>
+
+            <?php
+            // Get all time off requests for management
+            $timeoff_stmt = $pdo->prepare("
+                SELECT tor.*, sp.full_name, sp.staff_id, sp.department, sp.nexi_email,
+                       reviewer.full_name as reviewer_name
+                FROM time_off_requests tor
+                LEFT JOIN staff_profiles sp ON tor.staff_id = sp.id
+                LEFT JOIN staff_profiles reviewer ON tor.reviewed_by = reviewer.id
+                ORDER BY tor.created_at DESC
+            ");
+            $timeoff_stmt->execute();
+            $timeoff_requests = $timeoff_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Handle time off management actions
+            if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['timeoff_action'])) {
+                $action = $_POST['timeoff_action'];
+                $request_id = $_POST['request_id'];
+                $review_notes = $_POST['review_notes'] ?? '';
+                
+                if (in_array($action, ['approve', 'deny'])) {
+                    $new_status = $action === 'approve' ? 'approved' : 'denied';
+                    
+                    // Get the request details first
+                    $request_stmt = $pdo->prepare("
+                        SELECT tor.*, sp.full_name, sp.nexi_email, sp.time_off_balance 
+                        FROM time_off_requests tor 
+                        LEFT JOIN staff_profiles sp ON tor.staff_id = sp.id 
+                        WHERE tor.id = ?
+                    ");
+                    $request_stmt->execute([$request_id]);
+                    $request = $request_stmt->fetch();
+                    
+                    if ($request) {
+                        // Update the request
+                        $update_stmt = $pdo->prepare("
+                            UPDATE time_off_requests 
+                            SET status = ?, reviewed_by = ?, reviewed_at = NOW(), review_notes = ? 
+                            WHERE id = ?
+                        ");
+                        $update_stmt->execute([$new_status, 1, $review_notes, $request_id]); // Using 1 as admin user
+                        
+                        // Add audit log
+                        $audit_stmt = $pdo->prepare("
+                            INSERT INTO time_off_audit_log (request_id, staff_id, action, old_status, new_status, notes, created_by)
+                            VALUES (?, ?, ?, 'pending', ?, ?, 1)
+                        ");
+                        $audit_stmt->execute([$request_id, $request['staff_id'], $action, $new_status, $review_notes]);
+                        
+                        // If approved, update staff time off balance
+                        if ($new_status === 'approved') {
+                            $new_balance = max(0, $request['time_off_balance'] - $request['total_days']);
+                            $balance_stmt = $pdo->prepare("UPDATE staff_profiles SET time_off_balance = ? WHERE id = ?");
+                            $balance_stmt->execute([$new_balance, $request['staff_id']]);
+                        }
+                        
+                        // Send email notification
+                        sendTimeOffNotificationEmail($request, $new_status, $review_notes);
+                        
+                        $success_message = "Request " . $new_status . " successfully!";
+                        
+                        // Refresh the data
+                        $timeoff_stmt->execute();
+                        $timeoff_requests = $timeoff_stmt->fetchAll(PDO::FETCH_ASSOC);
+                    }
+                }
+            }
+
+            // Email notification function
+            function sendTimeOffNotificationEmail($request, $status, $notes = '') {
+                $to_staff = $request['nexi_email'];
+                $to_hr = 'hr@nexihub.uk';
+                
+                $subject = "Time Off Request " . ucfirst($status) . " - " . $request['full_name'];
+                
+                $message = "
+                <html>
+                <head>
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .header { background: #e64f21; color: white; padding: 20px; text-align: center; }
+                        .content { padding: 20px; }
+                        .details { background: #f9f9f9; padding: 15px; border-left: 4px solid #e64f21; margin: 15px 0; }
+                        .footer { text-align: center; padding: 10px; color: #666; font-size: 12px; }
+                        .status-" . $status . " { color: " . ($status === 'approved' ? '#10b981' : '#ef4444') . "; font-weight: bold; }
+                    </style>
+                </head>
+                <body>
+                    <div class='header'>
+                        <h2>Nexi Hub - Time Off Request " . ucfirst($status) . "</h2>
+                    </div>
+                    <div class='content'>
+                        <h3>Your request has been <span class='status-" . $status . "'>" . strtoupper($status) . "</span></h3>
+                        <div class='details'>
+                            <p><strong>Staff Member:</strong> " . htmlspecialchars($request['full_name']) . "</p>
+                            <p><strong>Request Type:</strong> " . htmlspecialchars($request['request_type']) . "</p>
+                            <p><strong>Dates:</strong> " . date('M j, Y', strtotime($request['start_date'])) . " to " . date('M j, Y', strtotime($request['end_date'])) . "</p>
+                            <p><strong>Total Days:</strong> " . $request['total_days'] . "</p>
+                            <p><strong>Reason:</strong> " . htmlspecialchars($request['reason']) . "</p>
+                            " . ($notes ? "<p><strong>Review Notes:</strong> " . htmlspecialchars($notes) . "</p>" : "") . "
+                            <p><strong>Reviewed Date:</strong> " . date('M j, Y g:i A') . "</p>
+                        </div>
+                        " . ($status === 'approved' ? 
+                            "<p style='color: #10b981; font-weight: bold;'>✅ Your time off request has been approved. Please ensure proper handover of responsibilities.</p>" : 
+                            "<p style='color: #ef4444; font-weight: bold;'>❌ Your time off request has been denied. Please contact HR if you have any questions.</p>") . "
+                    </div>
+                    <div class='footer'>
+                        <p>This is an automated message from the Nexi Hub Time Off Portal.</p>
+                    </div>
+                </body>
+                </html>
+                ";
+                
+                $headers = "MIME-Version: 1.0" . "\r\n";
+                $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+                $headers .= "From: Nexi Hub <noreply@nexihub.uk>" . "\r\n";
+                
+                // Send to staff
+                if ($to_staff) {
+                    @mail($to_staff, $subject, $message, $headers);
+                }
+                
+                // Send to HR
+                @mail($to_hr, $subject, $message, $headers);
+            }
+
+            // Group requests by status
+            $pending_requests = array_filter($timeoff_requests, function($r) { return $r['status'] === 'pending'; });
+            $approved_requests = array_filter($timeoff_requests, function($r) { return $r['status'] === 'approved'; });
+            $denied_requests = array_filter($timeoff_requests, function($r) { return $r['status'] === 'denied'; });
+            ?>
+
+            <div class="timeoff-stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-content">
+                        <div class="stat-number"><?php echo count($pending_requests); ?></div>
+                        <div class="stat-label">Pending Requests</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-content">
+                        <div class="stat-number"><?php echo count($approved_requests); ?></div>
+                        <div class="stat-label">Approved</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">❌</div>
+                    <div class="stat-content">
+                        <div class="stat-number"><?php echo count($denied_requests); ?></div>
+                        <div class="stat-label">Denied</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-content">
+                        <div class="stat-number"><?php echo count($timeoff_requests); ?></div>
+                        <div class="stat-label">Total Requests</div>
+                    </div>
+                </div>
+            </div>
+
+            <?php if (!empty($pending_requests)): ?>
+                <div class="timeoff-section">
+                    <h3>Pending Requests - Require Action</h3>
+                    <div class="timeoff-requests-grid">
+                        <?php foreach ($pending_requests as $request): ?>
+                            <div class="timeoff-request-card pending">
+                                <div class="request-header">
+                                    <h4><?php echo htmlspecialchars($request['full_name']); ?></h4>
+                                    <span class="staff-id"><?php echo htmlspecialchars($request['staff_id']); ?></span>
+                                </div>
+                                
+                                <div class="request-details">
+                                    <div class="detail-row">
+                                        <span class="detail-label">Type:</span>
+                                        <span class="detail-value"><?php echo ucfirst(str_replace('_', ' ', $request['request_type'])); ?></span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Dates:</span>
+                                        <span class="detail-value">
+                                            <?php echo date('M j', strtotime($request['start_date'])); ?> - 
+                                            <?php echo date('M j, Y', strtotime($request['end_date'])); ?>
+                                        </span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Days:</span>
+                                        <span class="detail-value"><?php echo $request['total_days']; ?> day<?php echo $request['total_days'] > 1 ? 's' : ''; ?></span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Department:</span>
+                                        <span class="detail-value"><?php echo htmlspecialchars($request['department']); ?></span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Submitted:</span>
+                                        <span class="detail-value"><?php echo date('M j, Y g:i A', strtotime($request['created_at'])); ?></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="request-reason">
+                                    <strong>Reason:</strong>
+                                    <p><?php echo htmlspecialchars($request['reason']); ?></p>
+                                    <?php if ($request['notes']): ?>
+                                        <strong>Notes:</strong>
+                                        <p><?php echo htmlspecialchars($request['notes']); ?></p>
+                                    <?php endif; ?>
+                                </div>
+                                
+                                <div class="request-actions">
+                                    <form method="POST" style="display: inline-block; margin-right: 10px;">
+                                        <input type="hidden" name="timeoff_action" value="approve">
+                                        <input type="hidden" name="request_id" value="<?php echo $request['id']; ?>">
+                                        <input type="text" name="review_notes" placeholder="Approval notes (optional)" 
+                                               style="margin-bottom: 10px; width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                                        <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Approve this request?')">
+                                            <i class="fas fa-check"></i> Approve
+                                        </button>
+                                    </form>
+                                    
+                                    <form method="POST" style="display: inline-block;">
+                                        <input type="hidden" name="timeoff_action" value="deny">
+                                        <input type="hidden" name="request_id" value="<?php echo $request['id']; ?>">
+                                        <input type="text" name="review_notes" placeholder="Denial reason (required)" 
+                                               style="margin-bottom: 10px; width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" required>
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Deny this request?')">
+                                            <i class="fas fa-times"></i> Deny
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <div class="timeoff-all-requests">
+                <h3>All Time Off Requests</h3>
+                <div class="table-responsive">
+                    <table class="timeoff-table">
+                        <thead>
+                            <tr>
+                                <th>Staff Member</th>
+                                <th>Type</th>
+                                <th>Dates</th>
+                                <th>Days</th>
+                                <th>Status</th>
+                                <th>Submitted</th>
+                                <th>Reviewed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($timeoff_requests as $request): ?>
+                                <tr>
+                                    <td>
+                                        <div class="staff-info">
+                                            <strong><?php echo htmlspecialchars($request['full_name']); ?></strong>
+                                            <small><?php echo htmlspecialchars($request['staff_id']) . ' - ' . htmlspecialchars($request['department']); ?></small>
+                                        </div>
+                                    </td>
+                                    <td><?php echo ucfirst(str_replace('_', ' ', $request['request_type'])); ?></td>
+                                    <td>
+                                        <?php 
+                                        echo date('M j', strtotime($request['start_date'])); 
+                                        if ($request['start_date'] !== $request['end_date']) {
+                                            echo ' - ' . date('M j, Y', strtotime($request['end_date']));
+                                        } else {
+                                            echo ', ' . date('Y', strtotime($request['start_date']));
+                                        }
+                                        ?>
+                                    </td>
+                                    <td><?php echo $request['total_days']; ?></td>
+                                    <td>
+                                        <span class="status-badge <?php echo $request['status']; ?>">
+                                            <i class="fas fa-<?php 
+                                                echo $request['status'] === 'approved' ? 'check-circle' : 
+                                                    ($request['status'] === 'denied' ? 'times-circle' : 'clock'); 
+                                            ?>"></i>
+                                            <?php echo ucfirst($request['status']); ?>
+                                        </span>
+                                    </td>
+                                    <td><?php echo date('M j, Y', strtotime($request['created_at'])); ?></td>
+                                    <td>
+                                        <?php if ($request['reviewed_at']): ?>
+                                            <?php echo date('M j, Y', strtotime($request['reviewed_at'])); ?>
+                                            <?php if ($request['reviewer_name']): ?>
+                                                <br><small>by <?php echo htmlspecialchars($request['reviewer_name']); ?></small>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                            <span class="text-muted">-</span>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -2179,9 +3052,6 @@ include __DIR__ . '/../includes/header.php';
                                 <option value="Company Leadership Team">Company Leadership Team</option>
                             </select>
                         </div>
-                    </div>
-                    
-                    <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Region</label>
                             <select name="region" id="edit_region" class="form-control">
@@ -2191,9 +3061,6 @@ include __DIR__ . '/../includes/header.php';
                                 <option value="APAC">Asia-Pacific (APAC)</option>
                                 <option value="LATAM">Latin America (LATAM)</option>
                             </select>
-                        </div>
-                        <div class="form-group">
-                            <!-- Empty for balance -->
                         </div>
                     </div>
                 </div>
@@ -2332,11 +3199,9 @@ include __DIR__ . '/../includes/header.php';
             <h2 class="modal-title">Staff Member Details</h2>
             <span class="close" onclick="closeViewModal()">&times;</span>
         </div>
-        
         <div class="modal-body" id="viewModalBody">
             <!-- Content will be dynamically populated -->
         </div>
-        
         <div class="modal-footer">
             <button type="button" onclick="closeViewModal()" class="btn btn-secondary">Close</button>
             <button type="button" onclick="editStaffFromView()" class="btn btn-primary" id="editFromViewBtn">Edit Staff</button>
@@ -2350,8 +3215,7 @@ include __DIR__ . '/../includes/header.php';
         <div class="modal-header">
             <h2 class="modal-title">Add Contract Template</h2>
             <span class="close" onclick="closeAddContractModal()">&times;</span>
-        </div>
-        
+        </div>    <div class="form-section">
         <form method="POST" action="">
             <input type="hidden" name="action" value="add_contract_template">
             
@@ -2435,82 +3299,39 @@ include __DIR__ . '/../includes/header.php';
     </div>
 </div>
 
-<!-- View Contract Modal -->
-<div id="viewContractModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 class="modal-title" id="viewContractTitle">Contract Template</h2>
-            <span class="close" onclick="closeViewContractModal()">&times;</span>
-        </div>
-        
-        <div class="modal-body" id="viewContractBody">
-            <!-- Content will be populated by JavaScript -->
-        </div>
-        
-        <div class="modal-footer">
-            <button type="button" onclick="closeViewContractModal()" class="btn btn-secondary">Close</button>
-            <button type="button" onclick="editContractFromView()" class="btn btn-primary" id="editContractFromViewBtn">Edit Contract</button>
-        </div>
-    </div>
-</div>
-
 <!-- Create Contract User Modal -->
 <div id="createContractUserModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header">    
             <h2 class="modal-title">Create Contract User</h2>
             <span class="close" onclick="closeCreateContractUserModal()">&times;</span>
-        </div>
-        
+        </div>        <h3>Contract Information</h3>
         <form method="POST" action="">
             <input type="hidden" name="action" value="create_contract_user">
-            
             <div class="modal-body">
                 <div class="form-section">
                     <h3>User Account Information</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Staff Member *</label>
-                            <select name="staff_id" class="form-control" required>
-                                <option value="">Select Staff Member</option>
-                                <?php foreach ($staff_members as $staff): ?>
-                                    <option value="<?php echo $staff['id']; ?>">
-                                        <?php echo htmlspecialchars($staff['full_name'] . ' (' . $staff['staff_id'] . ')'); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">Staff Member *</label>
+                        <select name="staff_id" class="form-control" required>
+                            <option value="">Select Staff Member</option>
+                            <?php foreach ($staff_members as $staff): ?>
+                                <option value="<?php echo $staff['id']; ?>">
+                                    <?php echo htmlspecialchars($staff['full_name'] . ' (' . $staff['staff_id'] . ')'); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Login Email *</label>
-                            <input type="email" name="email" class="form-control" required placeholder="user@example.com">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Temporary Password *</label>
-                            <input type="password" name="password" class="form-control" required placeholder="Temporary password">
-                            <small class="form-text">User will be required to reset this password on first login</small>
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">Login Email *</label>
+                        <input type="email" name="email" class="form-control" required placeholder="user@example.com">
                     </div>
-                </div>
-                
-                <div class="form-section">
-                    <h3>Contract Assignments</h3>
-                    <p>Select which contracts this user needs to sign:</p>
-                    <div class="contract-checkboxes">
-                        <?php foreach ($contract_templates as $template): ?>
-                            <div class="checkbox-group">
-                                <input type="checkbox" 
-                                       name="selected_contracts[]" 
-                                       value="<?php echo $template['id']; ?>" 
-                                       id="contract_<?php echo $template['id']; ?>">
-                                <label for="contract_<?php echo $template['id']; ?>">
-                                    <?php echo htmlspecialchars($template['name']); ?>
-                                    <span class="contract-type">(<?php echo ucfirst($template['type']); ?>)</span>
-                                </label>
-                            </div>
-                        <?php endforeach; ?>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Temporary Password *</label>
+                        <input type="password" name="password" class="form-control" required placeholder="Temporary password">
+                        <small class="form-text">User will be required to reset this password on first login</small>
                     </div>
                 </div>
             </div>
@@ -2540,162 +3361,8 @@ function showTab(tabId) {
     
     // Show selected tab
     document.getElementById(tabId).classList.add('active');
-    
-    // Add active class to clicked button
     event.target.classList.add('active');
 }
-
-// E-Learning Management Functions
-function resetElearning(staffId) {
-    if (!confirm('Are you sure you want to reset this staff member\'s e-learning progress? This will remove all completed modules and restart their training.')) {
-        return;
-    }
-    
-    fetch('/staff/reset-elearning.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            staff_id: staffId
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('E-learning progress has been reset successfully.');
-            location.reload();
-        } else {
-            alert('Error resetting e-learning progress: ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Network error. Please try again.');
-    });
-}
-
-// Contract Management Functions
-function openAddContractModal() {
-    document.getElementById('addContractModal').style.display = 'block';
-}
-
-function closeAddContractModal() {
-    document.getElementById('addContractModal').style.display = 'none';
-}
-
-function openEditContractModal() {
-    document.getElementById('editContractModal').style.display = 'block';
-}
-
-function closeEditContractModal() {
-    document.getElementById('editContractModal').style.display = 'none';
-}
-
-// Contract User Management Functions
-function openCreateContractUserModal() {
-    document.getElementById('createContractUserModal').style.display = 'block';
-}
-
-function closeCreateContractUserModal() {
-    document.getElementById('createContractUserModal').style.display = 'none';
-}
-
-function openViewContractModal() {
-    document.getElementById('viewContractModal').style.display = 'block';
-}
-
-function closeViewContractModal() {
-    document.getElementById('viewContractModal').style.display = 'none';
-}
-
-function viewContract(contractId) {
-    const contract = contractData.find(c => c.id == contractId);
-    if (!contract) {
-        alert('Contract not found');
-        return;
-    }
-    
-    document.getElementById('viewContractTitle').textContent = contract.name;
-    document.getElementById('viewContractBody').innerHTML = `
-        <div class="form-section">
-            <h3>Contract Details</h3>
-            <div class="contract-details">
-                <div class="detail-row">
-                    <span class="detail-label">Name:</span>
-                    <span class="detail-value">${contract.name}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Type:</span>
-                    <span class="detail-value">${contract.type.charAt(0).toUpperCase() + contract.type.slice(1)}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Created:</span>
-                    <span class="detail-value">${new Date(contract.created_at).toLocaleDateString()}</span>
-                </div>
-            </div>
-        </div>
-        <div class="form-section">
-            <h3>Contract Content</h3>
-            <div class="contract-full-content">
-                ${contract.content.replace(/\n/g, '<br>')}
-            </div>
-        </div>
-    `;
-    
-    document.getElementById('editContractFromViewBtn').onclick = () => editContract(contractId);
-    openViewContractModal();
-}
-
-function editContract(contractId) {
-    const contract = contractData.find(c => c.id == contractId);
-    if (!contract) {
-        alert('Contract not found');
-        return;
-    }
-    
-    document.getElementById('edit_contract_id').value = contract.id;
-    document.getElementById('edit_contract_name').value = contract.name;
-    document.getElementById('edit_contract_type').value = contract.type;
-    document.getElementById('edit_contract_content').value = contract.content;
-    
-    closeViewContractModal();
-    openEditContractModal();
-}
-
-function editContractFromView() {
-    const contractId = document.getElementById('edit_contract_id').value;
-    editContract(contractId);
-}
-
-function deleteContract(contractId, contractName) {
-    if (confirm(`Are you sure you want to delete "${contractName}"?\n\nThis action cannot be undone and will remove all associated staff assignments.`)) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.innerHTML = `
-            <input type="hidden" name="action" value="delete_contract_template">
-            <input type="hidden" name="contract_id" value="${contractId}">
-        `;
-        document.body.appendChild(form);
-        form.submit();
-    }
-}
-
-function assignContract(staffId, templateId) {
-    if (confirm('Are you sure you want to assign this contract to the staff member?')) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.innerHTML = `
-            <input type="hidden" name="action" value="assign_contract">
-            <input type="hidden" name="staff_id" value="${staffId}">
-            <input type="hidden" name="template_id" value="${templateId}">
-        `;
-        document.body.appendChild(form);
-        form.submit();
-    }
-}
-
-// Staff Management Functions
 
 function openAddModal() {
     document.getElementById('addModal').style.display = 'block';
@@ -2721,281 +3388,29 @@ function closeViewModal() {
     document.getElementById('viewModal').style.display = 'none';
 }
 
-// Toggle shareholder percentage field visibility
-function toggleShareholderPercentage() {
-    const staffType = document.getElementById('staff_type').value;
-    const percentageGroup = document.getElementById('shareholder_percentage_group');
-    const percentageInput = document.getElementById('shareholder_percentage');
-    
-    if (staffType === 'shareholder') {
-        percentageGroup.style.display = 'block';
-        percentageInput.required = true;
-    } else {
-        percentageGroup.style.display = 'none';
-        percentageInput.required = false;
-        percentageInput.value = '0.00';
-    }
+function openAddContractModal() {
+    document.getElementById('addContractModal').style.display = 'block';
 }
 
-function toggleEditShareholderPercentage() {
-    const staffType = document.getElementById('edit_staff_type').value;
-    const percentageGroup = document.getElementById('edit_shareholder_percentage_group');
-    const percentageInput = document.getElementById('edit_shareholder_percentage');
-    
-    if (staffType === 'shareholder') {
-        percentageGroup.style.display = 'block';
-        percentageInput.required = true;
-    } else {
-        percentageGroup.style.display = 'none';
-        percentageInput.required = false;
-        percentageInput.value = '0.00';
-    }
+function closeAddContractModal() {
+    document.getElementById('addContractModal').style.display = 'none';
 }
 
-// Initialize form visibility on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize add form
-    toggleShareholderPercentage();
-});
-
-// Close modal when clicking outside
-window.onclick = function(event) {
-    const modals = document.getElementsByClassName('modal');
-    for (let modal of modals) {
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
-    }
+function openEditContractModal() {
+    document.getElementById('editContractModal').style.display = 'block';
 }
 
-function viewStaff(staffId) {
-    const staff = staffData.find(s => s.id == staffId);
-    if (!staff) {
-        alert('Staff member not found');
-        return;
-    }
-    
-    const age = staff.date_of_birth ? calculateAge(staff.date_of_birth) : 'N/A';
-    const isMinor = age !== 'N/A' && age < 16;
-    
-    const modalBody = document.getElementById('viewModalBody');
-    modalBody.innerHTML = `
-        <div class="form-section">
-            <h3>Basic Information</h3>
-            <div class="staff-view-grid">
-                <div class="view-item">
-                    <span class="view-label">Staff ID:</span>
-                    <span class="view-value">${staff.staff_id || 'Not Set'}</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Full Name:</span>
-                    <span class="view-value">${staff.full_name || 'Not Set'}</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Preferred Name:</span>
-                    <span class="view-value">${staff.preferred_name || 'Not Set'}</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Manager:</span>
-                    <span class="view-value">${staff.manager || 'Not Set'}</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Job Title:</span>
-                    <span class="view-value">${staff.job_title || 'Not Set'}</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Department:</span>
-                    <span class="view-value">${staff.department || 'Not Set'}</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Region:</span>
-                    <span class="view-value">${staff.region || 'Not Set'}</span>
-                </div>
-                ${isMinor ? `
-                <div class="view-item">
-                    <span class="view-label">Age:</span>
-                    <span class="view-value" style="color: var(--primary-color); font-weight: 600;">${age} (Minor)</span>
-                </div>
-                ` : ''}
-            </div>
-        </div>
-        
-        <div class="form-section">
-            <h3>Contact Information</h3>
-            <div class="staff-view-grid">
-                <div class="view-item">
-                    <span class="view-label">Nexi Email:</span>
-                    <span class="view-value">${staff.nexi_email || 'Not Set'}</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Private Email:</span>
-                    <span class="view-value">${staff.private_email || 'Not Set'}</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Phone Number:</span>
-                    <span class="view-value">${staff.phone_number || 'Not Set'}</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Date of Birth:</span>
-                    <span class="view-value">${staff.date_of_birth ? formatDate(staff.date_of_birth) : 'Not Set'}</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Contract Status:</span>
-                    <span class="view-value ${staff.contract_completed == '1' ? 'contract-completed' : 'contract-pending'}">${staff.contract_completed == '1' ? 'Completed' : 'Pending'}</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Discord Username:</span>
-                    <span class="view-value">${staff.discord_username || 'Not Set'}</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Discord ID:</span>
-                    <span class="view-value">${staff.discord_id || 'Not Set'}</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Nationality:</span>
-                    <span class="view-value">${staff.nationality || 'Not Set'}</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Country of Residence:</span>
-                    <span class="view-value">${staff.country_of_residence || 'Not Set'}</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="form-section">
-            <h3>Employment Details</h3>
-            <div class="staff-view-grid">
-                <div class="view-item">
-                    <span class="view-label">Date Joined:</span>
-                    <span class="view-value">${staff.date_joined ? formatDate(staff.date_joined) : 'Not Set'}</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">E-learning Status:</span>
-                    <span class="view-value">${staff.elearning_status || 'Not Set'}</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Time Off Balance:</span>
-                    <span class="view-value">${staff.time_off_balance || 0} days</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Account Status:</span>
-                    <span class="view-value ${staff.account_status === 'Active' ? 'status-active' : 'status-inactive'}">${staff.account_status || 'Not Set'}</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Two-Factor Auth:</span>
-                    <span class="view-value ${staff.two_fa_status ? 'two-fa-enabled' : 'two-fa-disabled'}">${staff.two_fa_status ? 'Enabled' : 'Disabled'}</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Staff Type:</span>
-                    <span class="view-value ${(staff.staff_type || 'volunteer') === 'shareholder' ? 'staff-shareholder' : 'staff-volunteer'}">
-                        ${(staff.staff_type || 'volunteer').charAt(0).toUpperCase() + (staff.staff_type || 'volunteer').slice(1)}
-                        ${(staff.staff_type || 'volunteer') === 'shareholder' && staff.shareholder_percentage ? ` (${parseFloat(staff.shareholder_percentage).toFixed(2)}%)` : ''}
-                    </span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Last Login:</span>
-                    <span class="view-value">${staff.last_login ? formatDateTime(staff.last_login) : 'Never'}</span>
-                </div>
-            </div>
-        </div>
-        
-        ${isMinor && staff.parent_contact ? `
-        <div class="form-section">
-            <h3>Parent Contact</h3>
-            <div class="view-item-full">
-                <span class="view-value">${staff.parent_contact}</span>
-            </div>
-        </div>
-        ` : ''}
-        
-        ${staff.internal_notes ? `
-        <div class="form-section">
-            <h3>Internal Notes</h3>
-            <div class="view-item-full">
-                <span class="view-value">${staff.internal_notes}</span>
-            </div>
-        </div>
-        ` : ''}
-        
-        <div class="form-section">
-            <h3>Record Information</h3>
-            <div class="staff-view-grid">
-                <div class="view-item">
-                    <span class="view-label">Created:</span>
-                    <span class="view-value">${staff.created_at ? formatDateTime(staff.created_at) : 'Not Set'}</span>
-                </div>
-                <div class="view-item">
-                    <span class="view-label">Last Updated:</span>
-                    <span class="view-value">${staff.updated_at ? formatDateTime(staff.updated_at) : 'Not Set'}</span>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.getElementById('editFromViewBtn').onclick = () => editStaff(staffId);
-    openViewModal();
+function closeEditContractModal() {
+    document.getElementById('editContractModal').style.display = 'none';
 }
 
-function editStaff(staffId) {
-    const staff = staffData.find(s => s.id == staffId);
-    if (!staff) {
-        alert('Staff member not found');
-        return;
-    }
-    
-    // Populate edit form
-    document.getElementById('edit_staff_id').value = staff.id;
-    document.getElementById('edit_staff_id_display').value = staff.staff_id || '';
-    document.getElementById('edit_manager').value = staff.manager || '';
-    document.getElementById('edit_full_name').value = staff.full_name || '';
-    document.getElementById('edit_preferred_name').value = staff.preferred_name || '';
-    document.getElementById('edit_job_title').value = staff.job_title || '';
-    document.getElementById('edit_department').value = staff.department || '';
-    document.getElementById('edit_region').value = staff.region || '';
-    document.getElementById('edit_nexi_email').value = staff.nexi_email || '';
-    document.getElementById('edit_private_email').value = staff.private_email || '';
-    document.getElementById('edit_phone_number').value = staff.phone_number || '';
-    document.getElementById('edit_date_of_birth').value = staff.date_of_birth || '';
-    document.getElementById('edit_discord_username').value = staff.discord_username || '';
-    document.getElementById('edit_discord_id').value = staff.discord_id || '';
-    document.getElementById('edit_nationality').value = staff.nationality || '';
-    document.getElementById('edit_country_of_residence').value = staff.country_of_residence || '';
-    document.getElementById('edit_date_joined').value = staff.date_joined || '';
-    document.getElementById('edit_elearning_status').value = staff.elearning_status || 'Not Started';
-    document.getElementById('edit_time_off_balance').value = staff.time_off_balance || 0;
-    document.getElementById('edit_account_status').value = staff.account_status || 'Active';
-    document.getElementById('edit_parent_contact').value = staff.parent_contact || '';        
-    document.getElementById('edit_internal_notes').value = staff.internal_notes || '';
-    document.getElementById('edit_two_fa_status').checked = staff.two_fa_status == '1';
-    document.getElementById('edit_contract_completed').checked = staff.contract_completed == '1';
-    
-    // Set shareholder fields
-    document.getElementById('edit_staff_type').value = staff.staff_type || 'volunteer';
-    document.getElementById('edit_shareholder_percentage').value = staff.shareholder_percentage || '0.00';
-    
-    // Toggle percentage field visibility based on staff type
-    toggleEditShareholderPercentage();
-    
-    closeViewModal();
-    openEditModal();
+// Contract User Management Functions
+function openCreateContractUserModal() {
+    document.getElementById('createContractUserModal').style.display = 'block';
 }
 
-function editStaffFromView() {
-    const staffId = document.getElementById('edit_staff_id').value;
-    editStaff(staffId);
-}
-
-function deleteStaff(staffId, staffName) {
-    if (confirm(`Are you sure you want to delete ${staffName}?\n\nThis action cannot be undone and will permanently remove all staff data.`)) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.innerHTML = `
-            <input type="hidden" name="action" value="delete_staff">
-            <input type="hidden" name="delete_staff_id" value="${staffId}">
-        `;
-        document.body.appendChild(form);
-        form.submit();
-    }
+function closeCreateContractUserModal() {
+    document.getElementById('createContractUserModal').style.display = 'none';
 }
 
 // Contract viewing and download functions
@@ -3220,6 +3635,182 @@ function downloadContractPDF(contractId) {
     color: var(--text-primary);
     text-align: right;
 }
+
+/* E-Learning Styles */
+.elearning-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px var(--shadow-medium);
+    border-color: var(--primary-color);
+}
+
+.stat-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.elearning-staff-table {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+}
+
+.elearning-staff-table h3 {
+    color: var(--text-primary);
+    margin: 0 0 1.5rem 0;
+    font-size: 1.3rem;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.staff-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--background-dark);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.staff-table th,
+.staff-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.staff-table th {
+    background: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.staff-table tr:last-child td {
+    border-bottom: none;
+}
+
+.staff-table tr:hover {
+    background: var(--background-light);
+}
+
+.staff-info strong {
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.staff-info small {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-badge.completed {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.status-badge.in-progress {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.status-badge.not-started {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.btn-outline:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.portal-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.portal-link:hover {
+    text-decoration: underline;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--background-dark);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 0.75rem;
+}
+
+.detail-item:last-child {
+    margin-bottom: 0;
+}
+
+.detail-label {
+    font-weight: 500;
+    color: var(--text-primary);
+    min-width: 120px;
+}
+
+.detail-value {
+    color: var(--text-secondary);
+    text-align: right;
+}
+
+/* Portal Access Styles */
 </style>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

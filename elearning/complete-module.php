@@ -3,8 +3,21 @@ require_once '../config/config.php';
 
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['staff_id'])) {
+// Check if user is logged in via contract user session
+if (!isset($_SESSION['contract_user_id'])) {
     echo json_encode(['success' => false, 'message' => 'Not authenticated']);
+    exit;
+}
+
+// Get staff information
+$stmt = $pdo->prepare("SELECT sp.* FROM staff_profiles sp 
+                       JOIN contract_users cu ON sp.id = cu.staff_id 
+                       WHERE cu.id = ?");
+$stmt->execute([$_SESSION['contract_user_id']]);
+$staff = $stmt->fetch();
+
+if (!$staff) {
+    echo json_encode(['success' => false, 'message' => 'Staff not found']);
     exit;
 }
 
@@ -29,11 +42,11 @@ try {
         VALUES (?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE completed_at = VALUES(completed_at), quiz_score = VALUES(quiz_score)
     ");
-    $stmt->execute([$_SESSION['staff_id'], $module_id, date('Y-m-d H:i:s'), $quiz_score]);
+    $stmt->execute([$staff['id'], $module_id, date('Y-m-d H:i:s'), $quiz_score]);
     
     // Check how many modules completed
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM elearning_progress WHERE staff_id = ?");
-    $stmt->execute([$_SESSION['staff_id']]);
+    $stmt->execute([$staff['id']]);
     $completed_count = $stmt->fetchColumn();
     
     $total_modules = 5;
@@ -42,10 +55,10 @@ try {
     // Update staff profile status
     if ($all_completed) {
         $stmt = $pdo->prepare("UPDATE staff_profiles SET elearning_status = 'Completed' WHERE id = ?");
-        $stmt->execute([$_SESSION['staff_id']]);
+        $stmt->execute([$staff['id']]);
     } else {
         $stmt = $pdo->prepare("UPDATE staff_profiles SET elearning_status = 'In Progress' WHERE id = ?");
-        $stmt->execute([$_SESSION['staff_id']]);
+        $stmt->execute([$staff['id']]);
     }
     
     $response = [

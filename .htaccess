@@ -10,6 +10,10 @@ ErrorDocument 503 /503.php
 RewriteRule ^elearning/?$ elearning/index.php [L]
 RewriteRule ^elearning/(.*)$ elearning/$1 [L]
 
+# Time Off portal routing
+RewriteRule ^timeoff/?$ timeoff/index.php [L]
+RewriteRule ^timeoff/(.*)$ timeoff/$1 [L]
+
 # Staff portal routing - handle before general routing
 RewriteRule ^staff/login/?$ staff/login.php [L]
 RewriteRule ^staff/dashboard/?$ staff/dashboard.php [L]

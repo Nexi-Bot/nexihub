@@ -1,23 +1,6 @@
 <?php
-require_once '../config/config.php';
-
-// Check if user is logged in via contract user session
-if (!isset($_SESSION['contract_user_id'])) {
-    header('Location: /elearning/');
-    exit;
-}
-
-// Get staff information
-$stmt = $pdo->prepare("SELECT sp.* FROM staff_profiles sp 
-                       JOIN contract_users cu ON sp.id = cu.staff_id 
-                       WHERE cu.id = ?");
-$stmt->execute([$_SESSION['contract_user_id']]);
-$staff = $stmt->fetch();
-
-if (!$staff) {
-    header('Location: /elearning/');
-    exit;
-}
+require_once __DIR__ . '/../config/config.php';
+requireAuth();
 
 $module_id = intval($_GET['id'] ?? 1);
 
@@ -27,13 +10,24 @@ if ($module_id < 1 || $module_id > 5) {
     exit;
 }
 
-// Check if user can access this module
-$can_access = true;
-if ($module_id > 1) {
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM elearning_progress WHERE staff_id = ? AND module_id = ?");
-    $stmt->execute([$staff['id'], $module_id - 1]);
-    $prev_completed = $stmt->fetchColumn() > 0;
-    $can_access = $prev_completed;
+// Get staff profile and check module access
+try {
+    $stmt = $pdo->prepare("SELECT * FROM staff_profiles WHERE id = ?");
+    $stmt->execute([$_SESSION['staff_id']]);
+    $staff_profile = $stmt->fetch();
+    
+    if (!$staff_profile) {
+        throw new Exception("Staff profile not found");
+    }
+    
+    // Check if user can access this module
+    // Module 1 is always accessible, others require previous module completion
+    $can_access = true;
+    if ($module_id > 1) {
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM elearning_progress WHERE staff_id = ? AND module_id = ?");
+        $stmt->execute([$_SESSION['staff_id'], $module_id - 1]);
+        $prev_completed = $stmt->fetchColumn() > 0;
+        $can_access = $prev_completed;
     }
     
     if (!$can_access) {

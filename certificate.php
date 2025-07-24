@@ -1,30 +1,24 @@
 <?php
-require_once '../config/config.php';
-require_once '../vendor/autoload.php';
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
-// Check if user is logged in via contract user session
-if (!isset($_SESSION['contract_user_id'])) {
-    die("Please log in to access your certificate.");
-}
-
-// Get staff information
-$stmt = $pdo->prepare("SELECT sp.* FROM staff_profiles sp 
-                       JOIN contract_users cu ON sp.id = cu.staff_id 
-                       WHERE cu.id = ?");
-$stmt->execute([$_SESSION['contract_user_id']]);
-$staff = $stmt->fetch();
-
-if (!$staff) {
-    die("Staff profile not found.");
+// Check if user is logged in via E-Learning portal
+if (!isset($_SESSION['contract_user_id']) || !isset($_SESSION['staff_id'])) {
+    header('Location: ./login');
+    exit;
 }
 
 try {
-    // Check if all modules completed
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM elearning_progress WHERE staff_id = ?");
-    $stmt->execute([$staff['id']]);
-    $completed_count = $stmt->fetchColumn();
+    // Get staff profile and progress
+    $stmt = $pdo->prepare("SELECT * FROM staff_profiles WHERE id = ?");
+    $stmt->execute([$_SESSION['staff_id']]);
+    $staff_profile = $stmt->fetch();
     
-    if ($completed_count < 5) {
+    $stmt = $pdo->prepare("SELECT * FROM elearning_progress WHERE staff_id = ? AND status = 'completed'");
+    $stmt->execute([$_SESSION['staff_id']]);
+    $progress = $stmt->fetch();
+    
+    if (!$staff_profile || !$progress) {
         die("Certificate not available. Please complete all training modules first.");
     }
     
@@ -101,7 +95,7 @@ try {
     $pdf->SetXY(20, 110);
     $pdf->SetFont('helvetica', 'B', 24);
     $pdf->SetTextColor($secondary_color[0], $secondary_color[1], $secondary_color[2]);
-    $staff_name = $staff['full_name'];
+    $staff_name = $staff_profile['full_name'];
     $pdf->Cell(257, 15, strtoupper($staff_name), 0, 1, 'C');
     
     // Completion text
@@ -116,7 +110,7 @@ try {
     $pdf->Cell(257, 10, 'NEXI HUB E-LEARNING TRAINING PROGRAM', 0, 1, 'C');
     
     // Completion details
-    $completion_date = date('F j, Y');
+    $completion_date = date('F j, Y', strtotime($progress['completed_at']));
     $pdf->SetXY(20, 155);
     $pdf->SetFont('helvetica', '', 12);
     $pdf->SetTextColor($dark_color[0], $dark_color[1], $dark_color[2]);
@@ -130,7 +124,7 @@ try {
     $pdf->Cell(0, 6, $completion_date, 0, 1, 'L');
     
     // Certificate ID
-    $certificate_id = 'NEXI-' . str_pad($staff['id'], 4, '0', STR_PAD_LEFT) . '-' . date('Y');
+    $certificate_id = 'NEXI-' . str_pad($_SESSION['staff_id'], 4, '0', STR_PAD_LEFT) . '-' . date('Y', strtotime($progress['completed_at']));
     $pdf->SetXY(180, 175);
     $pdf->SetFont('helvetica', '', 10);
     $pdf->Cell(60, 6, 'Certificate ID:', 0, 0, 'L');
