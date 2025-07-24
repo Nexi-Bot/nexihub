@@ -190,23 +190,10 @@ try {
         INNER JOIN staff_contracts sc ON ct.id = sc.template_id 
         LEFT JOIN staff_profiles sp ON sc.staff_id = sp.id
         WHERE sc.staff_id = ?
-        ORDER BY ct.name, sc.is_signed ASC, sc.id DESC
+        ORDER BY ct.name, sc.id DESC
     ");
     $stmt->execute([$_SESSION['contract_staff_id'] ?? 0]);
-    $all_contracts = $stmt->fetchAll();
-    
-    // Group contracts by template_id to avoid showing duplicates
-    $contract_groups = [];
-    foreach ($all_contracts as $contract) {
-        $template_id = $contract['id'];
-        
-        // Only keep the first record for each template (signed status takes priority due to ORDER BY)
-        if (!isset($contract_groups[$template_id])) {
-            $contract_groups[$template_id] = $contract;
-        }
-    }
-    
-    $contracts = array_values($contract_groups);
+    $contracts = $stmt->fetchAll();
 } catch (PDOException $e) {
     $error = "Error fetching contracts: " . $e->getMessage();
 }
