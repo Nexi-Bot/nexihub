@@ -44,6 +44,62 @@ try {
     error_log("Error creating time off tables: " . $e->getMessage());
 }
 
+// Email function
+function sendTimeOffEmail($staff, $request_type, $start_date, $end_date, $total_days, $reason, $action, $notes = '') {
+    $to_staff = $staff['nexi_email'];
+    $to_hr = 'hr@nexihub.uk';
+    
+    $subject = "Time Off Request " . ucfirst($action) . " - " . $staff['full_name'];
+    
+    $message = "
+    <html>
+    <head>
+        <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .header { background: #e64f21; color: white; padding: 20px; text-align: center; }
+            .content { padding: 20px; }
+            .details { background: #f9f9f9; padding: 15px; border-left: 4px solid #e64f21; margin: 15px 0; }
+            .footer { text-align: center; padding: 10px; color: #666; font-size: 12px; }
+        </style>
+    </head>
+    <body>
+        <div class='header'>
+            <h2>Nexi Hub - Time Off Request " . ucfirst($action) . "</h2>
+        </div>
+        <div class='content'>
+            <h3>Request Details</h3>
+            <div class='details'>
+                <p><strong>Staff Member:</strong> " . htmlspecialchars($staff['full_name']) . " (" . htmlspecialchars($staff['staff_id']) . ")</p>
+                <p><strong>Department:</strong> " . htmlspecialchars($staff['department']) . "</p>
+                <p><strong>Request Type:</strong> " . htmlspecialchars($request_type) . "</p>
+                <p><strong>Dates:</strong> " . date('M j, Y', strtotime($start_date)) . " to " . date('M j, Y', strtotime($end_date)) . "</p>
+                <p><strong>Total Days:</strong> " . $total_days . "</p>
+                <p><strong>Reason:</strong> " . htmlspecialchars($reason) . "</p>
+                " . ($notes ? "<p><strong>Notes:</strong> " . htmlspecialchars($notes) . "</p>" : "") . "
+                <p><strong>Status:</strong> " . ucfirst($action) . "</p>
+                <p><strong>Date:</strong> " . date('M j, Y g:i A') . "</p>
+            </div>
+        </div>
+        <div class='footer'>
+            <p>This is an automated message from the Nexi Hub Time Off Portal.</p>
+        </div>
+    </body>
+    </html>
+    ";
+    
+    $headers = "MIME-Version: 1.0" . "\r\n";
+    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+    $headers .= "From: Nexi Hub <noreply@nexihub.uk>" . "\r\n";
+    
+    // Send to staff
+    if ($to_staff) {
+        @mail($to_staff, $subject, $message, $headers);
+    }
+    
+    // Send to HR
+    @mail($to_hr, $subject, $message, $headers);
+}
+
 // Handle login
 $error_message = '';
 $success_message = '';
@@ -400,62 +456,6 @@ $remaining_days = max(0, $staff['time_off_balance'] - $used_days);
 $page_title = "Time Off Portal";
 $page_description = "Manage your time off requests";
 include '../includes/header.php';
-
-// Email function
-function sendTimeOffEmail($staff, $request_type, $start_date, $end_date, $total_days, $reason, $action, $notes = '') {
-    $to_staff = $staff['nexi_email'];
-    $to_hr = 'hr@nexihub.uk';
-    
-    $subject = "Time Off Request " . ucfirst($action) . " - " . $staff['full_name'];
-    
-    $message = "
-    <html>
-    <head>
-        <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .header { background: #e64f21; color: white; padding: 20px; text-align: center; }
-            .content { padding: 20px; }
-            .details { background: #f9f9f9; padding: 15px; border-left: 4px solid #e64f21; margin: 15px 0; }
-            .footer { text-align: center; padding: 10px; color: #666; font-size: 12px; }
-        </style>
-    </head>
-    <body>
-        <div class='header'>
-            <h2>Nexi Hub - Time Off Request " . ucfirst($action) . "</h2>
-        </div>
-        <div class='content'>
-            <h3>Request Details</h3>
-            <div class='details'>
-                <p><strong>Staff Member:</strong> " . htmlspecialchars($staff['full_name']) . " (" . htmlspecialchars($staff['staff_id']) . ")</p>
-                <p><strong>Department:</strong> " . htmlspecialchars($staff['department']) . "</p>
-                <p><strong>Request Type:</strong> " . htmlspecialchars($request_type) . "</p>
-                <p><strong>Dates:</strong> " . date('M j, Y', strtotime($start_date)) . " to " . date('M j, Y', strtotime($end_date)) . "</p>
-                <p><strong>Total Days:</strong> " . $total_days . "</p>
-                <p><strong>Reason:</strong> " . htmlspecialchars($reason) . "</p>
-                " . ($notes ? "<p><strong>Notes:</strong> " . htmlspecialchars($notes) . "</p>" : "") . "
-                <p><strong>Status:</strong> " . ucfirst($action) . "</p>
-                <p><strong>Date:</strong> " . date('M j, Y g:i A') . "</p>
-            </div>
-        </div>
-        <div class='footer'>
-            <p>This is an automated message from the Nexi Hub Time Off Portal.</p>
-        </div>
-    </body>
-    </html>
-    ";
-    
-    $headers = "MIME-Version: 1.0" . "\r\n";
-    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    $headers .= "From: Nexi Hub <noreply@nexihub.uk>" . "\r\n";
-    
-    // Send to staff
-    if ($to_staff) {
-        @mail($to_staff, $subject, $message, $headers);
-    }
-    
-    // Send to HR
-    @mail($to_hr, $subject, $message, $headers);
-}
 ?>
 
 <style>
