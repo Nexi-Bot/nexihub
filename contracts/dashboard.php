@@ -9,15 +9,7 @@ header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
 header('ETag: "' . md5(time() . rand()) . '"');
 
-// Kill any existing session and start fresh
-session_destroy();
-session_start();
-
-// Set session variables for Oliver Reaney with correct staff_id
-$_SESSION['contract_user_id'] = 9;
-$_SESSION['contract_staff_id'] = 9;
-$_SESSION['contract_user_email'] = 'ollie.r@nexihub.uk';
-$_SESSION['contract_user_name'] = 'Oliver Reaney';
+// Prevent session timeout for contract system
 $_SESSION['LAST_ACTIVITY'] = time();
 
 // Check if user is logged in
@@ -26,16 +18,23 @@ if (!isset($_SESSION['contract_user_id'])) {
     exit;
 }
 
-// Database connection - FORCE SQLite for testing
+// Database connection - Use config settings
 try {
-    // Force SQLite connection for contracts system
-    $db_path = realpath(__DIR__ . "/../database/nexihub.db");
-    if (!$db_path || !file_exists($db_path)) {
-        throw new Exception("Database file not found at: " . __DIR__ . "/../database/nexihub.db");
+    if (DB_TYPE === 'sqlite') {
+        // SQLite connection for local development
+        $db_path = realpath(__DIR__ . "/../database/nexihub.db");
+        if (!$db_path || !file_exists($db_path)) {
+            throw new Exception("Database file not found at: " . __DIR__ . "/../database/nexihub.db");
+        }
+        $db = new PDO("sqlite:" . $db_path);
+        error_log("CONTRACTS DASHBOARD: Using SQLite database: " . $db_path);
+    } else {
+        // MySQL connection for production
+        $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+        $db = new PDO($dsn, DB_USER, DB_PASS);
+        error_log("CONTRACTS DASHBOARD: Using MySQL database: " . DB_HOST);
     }
-    $db = new PDO("sqlite:" . $db_path);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    error_log("CONTRACTS DASHBOARD: FORCED to use SQLite database: " . $db_path);
 } catch (PDOException $e) {
     error_log("Contract Portal Database Error: " . $e->getMessage());
     die("Database connection failed. Please check the system configuration.");
@@ -196,15 +195,6 @@ try {
     $stmt->execute([$_SESSION['contract_staff_id'] ?? 0]);
     $contracts = $stmt->fetchAll();
     
-    // DEBUG: Output contract data
-    echo "<!-- DEBUG INFO:\n";
-    echo "Session staff_id: " . ($_SESSION['contract_staff_id'] ?? 'NOT SET') . "\n";
-    echo "Number of contracts found: " . count($contracts) . "\n";
-    foreach ($contracts as $i => $contract) {
-        echo "Contract $i: ID={$contract['contract_record_id']}, Template={$contract['name']}, Signed={$contract['is_signed']}, Date={$contract['signed_at']}\n";
-    }
-    echo "-->\n";
-    
 } catch (PDOException $e) {
     $error = "Error fetching contracts: " . $e->getMessage();
 }
@@ -347,15 +337,6 @@ include __DIR__ . '/../includes/header.php';
                                 <span class="shareholder-percentage">(<?php echo $contract['shareholder_percentage']; ?>% Share)</span>
                             <?php endif; ?>
                         </h3>
-                        
-                        <!-- VISIBLE DEBUG -->
-                        <div style="background: red; color: white; padding: 10px; margin: 10px 0;">
-                            DEBUG: Contract ID <?php echo $contract['contract_record_id']; ?><br>
-                            is_signed value: <?php echo var_export($contract['is_signed'], true); ?><br>
-                            is_signed type: <?php echo gettype($contract['is_signed']); ?><br>
-                            signed_at: <?php echo var_export($contract['signed_at'], true); ?><br>
-                            signature_data: <?php echo $contract['signature_data'] ? 'HAS DATA' : 'NULL'; ?>
-                        </div>
                         
                         <?php if ($contract['is_signed']): ?>
                             <div class="contract-status signed">
