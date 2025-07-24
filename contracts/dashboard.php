@@ -303,12 +303,10 @@ include __DIR__ . '/../includes/header.php';
             <div class="contracts-overview">
                 <h2>Your Contracts</h2>
                 <p class="section-description">Review the details of each contract and provide your digital signature to complete the process.</p>
-                <p style="color: red; font-size: 12px;">DEBUG: Page loaded at <?php echo date('Y-m-d H:i:s'); ?> | Contracts found: <?php echo count($contracts); ?></p>
             </div>
             
             <div class="products-grid">
                 <?php foreach ($contracts as $contract): ?>
-                    <!-- DEBUG: Contract <?php echo $contract['contract_record_id']; ?> - is_signed: <?php echo $contract['is_signed']; ?> -->
                     <div class="product-card contract-card" data-contract-id="<?php echo $contract['id']; ?>">
                         <div class="product-icon contract-icon-<?php echo strtolower($contract['type']); ?>">
                             <?php 
@@ -1302,7 +1300,7 @@ function viewContract(contractId) {
     console.log('Found signed contract:', contract);
     
     // Set current viewing contract ID for PDF download
-    window.currentViewingContractId = contract.id; // Use template ID for PDF download
+    window.currentViewingContractId = contract.contract_record_id; // Use contract record ID for PDF download
     
     document.getElementById('viewModalTitle').textContent = contract.name;
     

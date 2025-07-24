@@ -183,7 +183,7 @@ function generateContractPDF($contract) {
     // Clean and format the contract content
     $content = $contract['content'];
     
-    // Remove HTML structure and extract clean text content
+    // Remove HTML structure and convert to formatted text
     if (strpos($content, '<html') !== false || strpos($content, '<!DOCTYPE') !== false) {
         // Full HTML document - extract body content
         libxml_use_internal_errors(true);
@@ -220,63 +220,106 @@ function generateContractPDF($contract) {
         }
     }
     
+    // Convert specific HTML tags to formatted text markers
+    $content = preg_replace('/<h[1-6][^>]*>(.*?)<\/h[1-6]>/is', "\n\n**HEADER**$1**HEADER**\n\n", $content);
+    $content = preg_replace('/<p[^>]*>(.*?)<\/p>/is', "$1\n\n", $content);
+    $content = preg_replace('/<br\s*\/?>/i', "\n", $content);
+    $content = preg_replace('/<strong[^>]*>(.*?)<\/strong>/is', "**$1**", $content);
+    $content = preg_replace('/<b[^>]*>(.*?)<\/b>/is', "**$1**", $content);
+    $content = preg_replace('/<em[^>]*>(.*?)<\/em>/is', "*$1*", $content);
+    $content = preg_replace('/<i[^>]*>(.*?)<\/i>/is', "*$1*", $content);
+    $content = preg_replace('/<li[^>]*>(.*?)<\/li>/is', "• $1\n", $content);
+    $content = preg_replace('/<ul[^>]*>(.*?)<\/ul>/is', "$1\n", $content);
+    $content = preg_replace('/<ol[^>]*>(.*?)<\/ol>/is', "$1\n", $content);
+    
     // Remove all remaining HTML tags
     $content = strip_tags($content);
     
     // Clean up HTML entities
     $content = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
     
-    // Clean up excessive whitespace
-    $content = preg_replace('/\s+/', ' ', $content);
-    $content = preg_replace('/\n\s*\n/', "\n\n", $content);
+    // Clean up excessive whitespace but preserve paragraph breaks
+    $content = preg_replace('/[ \t]+/', ' ', $content); // Multiple spaces/tabs to single space
+    $content = preg_replace('/\n[ \t]*\n/', "\n\n", $content); // Clean up line breaks
+    $content = preg_replace('/\n{3,}/', "\n\n", $content); // Max 2 consecutive line breaks
     $content = trim($content);
     
-    // Split into meaningful sections
-    $sections = preg_split('/\n{2,}/', $content);
-    $paragraphs = [];
+    // Split into meaningful sections based on double line breaks
+    $sections = explode("\n\n", $content);
+    $formattedSections = [];
     
     foreach ($sections as $section) {
         $section = trim($section);
         if (!empty($section)) {
-            // Split long sections into smaller paragraphs if needed
-            if (strlen($section) > 400) {
-                $sentences = preg_split('/(?<=[.!?])\s+/', $section);
-                $currentParagraph = '';
-                foreach ($sentences as $sentence) {
-                    if (strlen($currentParagraph . $sentence) > 400 && !empty($currentParagraph)) {
-                        $paragraphs[] = trim($currentParagraph);
-                        $currentParagraph = $sentence;
-                    } else {
-                        $currentParagraph .= ($currentParagraph ? ' ' : '') . $sentence;
-                    }
-                }
-                if (!empty($currentParagraph)) {
-                    $paragraphs[] = trim($currentParagraph);
-                }
-            } else {
-                $paragraphs[] = $section;
-            }
+            $formattedSections[] = $section;
         }
     }
     
-    foreach ($paragraphs as $paragraph) {
-        $paragraph = trim($paragraph);
-        if (empty($paragraph)) continue;
+    // Render the formatted sections
+    foreach ($formattedSections as $section) {
+        $section = trim($section);
+        if (empty($section)) continue;
+        
+        // Check if it's a header marked with our special markers
+        if (strpos($section, '**HEADER**') !== false) {
+            $headerText = str_replace('**HEADER**', '', $section);
+            $headerText = trim($headerText);
+            
+            $pdf->Ln(5);
+            $pdf->SetFont('helvetica', 'B', 12);
+            $pdf->SetTextColor($primary_color[0], $primary_color[1], $primary_color[2]);
+            $pdf->MultiCell(0, 7, $headerText, 0, 'L');
+            $pdf->SetFont('helvetica', '', 11);
+            $pdf->SetTextColor($dark_gray[0], $dark_gray[1], $dark_gray[2]);
+            $pdf->Ln(3);
+            continue;
+        }
         
         // Check if it's a section header (short text, likely a heading)
-        if (strlen($paragraph) < 100 && 
-            (preg_match('/^(ARTICLE|SECTION|\d+\.\d+|\d+\.|NON-DISCLOSURE|AGREEMENT|PARTIES|DEFINITION)/i', $paragraph) ||
-             preg_match('/^[A-Z\s\-:]{5,}$/', $paragraph))) {
-            $pdf->Ln(3);
+        if (strlen($section) < 150 && 
+            (preg_match('/^(ARTICLE|SECTION|\d+\.\d+|\d+\.|NON-DISCLOSURE|AGREEMENT|PARTIES|DEFINITION|TERMS|CONDITIONS|OBLIGATIONS|CONFIDENTIALITY)/i', $section) ||
+             preg_match('/^[A-Z\s\-:]{10,}$/', $section) ||
+             preg_match('/^\d+\.\s*[A-Z]/', $section))) {
+            
+            $pdf->Ln(4);
             $pdf->SetFont('helvetica', 'B', 11);
             $pdf->SetTextColor($primary_color[0], $primary_color[1], $primary_color[2]);
-            $pdf->MultiCell(0, 6, $paragraph, 0, 'L');
+            $pdf->MultiCell(0, 6, $section, 0, 'L');
             $pdf->SetFont('helvetica', '', 11);
             $pdf->SetTextColor($dark_gray[0], $dark_gray[1], $dark_gray[2]);
             $pdf->Ln(2);
         } else {
-            // Regular paragraph text
-            $pdf->MultiCell(0, 5.5, $paragraph, 0, 'L');
+            // Process bold and italic formatting in regular text
+            $lines = explode("\n", $section);
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if (empty($line)) continue;
+                
+                // Handle bold text formatting
+                if (strpos($line, '**') !== false) {
+                    // Split by bold markers and render alternately
+                    $parts = explode('**', $line);
+                    $isBold = false;
+                    
+                    foreach ($parts as $part) {
+                        if (!empty($part)) {
+                            if ($isBold) {
+                                $pdf->SetFont('helvetica', 'B', 11);
+                                $pdf->Write(5.5, $part);
+                                $pdf->SetFont('helvetica', '', 11);
+                            } else {
+                                $pdf->Write(5.5, $part);
+                            }
+                        }
+                        $isBold = !$isBold;
+                    }
+                    $pdf->Ln(5.5);
+                } else {
+                    // Regular text
+                    $pdf->MultiCell(0, 5.5, $line, 0, 'L');
+                    if (count($lines) > 1) $pdf->Ln(1);
+                }
+            }
             $pdf->Ln(3);
         }
     }
