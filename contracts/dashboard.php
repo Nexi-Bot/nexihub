@@ -2,6 +2,11 @@
 // Include config first (which handles session initialization)
 require_once __DIR__ . '/../config/config.php';
 
+// Prevent caching to ensure fresh data
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
+
 // Prevent session timeout for contract system
 $_SESSION['LAST_ACTIVITY'] = time();
 
@@ -183,7 +188,7 @@ try {
         INNER JOIN staff_contracts sc ON ct.id = sc.template_id 
         LEFT JOIN staff_profiles sp ON sc.staff_id = sp.id
         WHERE sc.staff_id = ?
-        ORDER BY ct.name, sc.is_signed DESC, sc.id DESC
+        ORDER BY ct.name, sc.is_signed ASC, sc.id DESC
     ");
     $stmt->execute([$_SESSION['contract_staff_id'] ?? 0]);
     $all_contracts = $stmt->fetchAll();
