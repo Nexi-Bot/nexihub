@@ -404,8 +404,8 @@ function generateContractPDF($contract) {
         $pdf->SetTextColor($light_gray[0], $light_gray[1], $light_gray[2]);
         $pdf->Cell(0, 4, 'DIGITAL SIGNATURE:', 0, 1, 'L');
         
-        // Add signature image with border
-        $sig_y = $pdf->GetY() + 2;
+        // Add signature image with border - ensure consistent positioning
+        $sig_y = $current_y + 6; // Fixed offset from current_y
         $pdf->SetDrawColor(200, 200, 200);
         $pdf->Rect($col2_x, $sig_y, 60, 20);
         
@@ -488,7 +488,8 @@ function generateContractPDF($contract) {
             $pdf->SetTextColor($light_gray[0], $light_gray[1], $light_gray[2]);
             $pdf->Cell(0, 4, 'GUARDIAN SIGNATURE:', 0, 1, 'L');
             
-            $sig_y = $pdf->GetY() + 2;
+            // Fixed positioning for guardian signature box
+            $sig_y = $current_y + 6; // Fixed offset from current_y
             $pdf->SetDrawColor(230, 79, 33);
             $pdf->Rect($col2_x, $sig_y, 60, 20);
             
