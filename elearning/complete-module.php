@@ -30,26 +30,26 @@ $data = json_decode(file_get_contents('php://input'), true);
 $module_id = intval($data['module_id'] ?? 0);
 $quiz_score = intval($data['quiz_score'] ?? 80);
 
-if ($module_id < 1 || $module_id > 5) {
+if ($module_id < 1 || $module_id > 7) {
     echo json_encode(['success' => false, 'message' => 'Invalid module ID']);
     exit;
 }
 
 try {
-    // Record module completion
+    // Record module completion 
     $stmt = $pdo->prepare("
-        INSERT INTO elearning_progress (staff_id, module_id, completed_at, quiz_score) 
-        VALUES (?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE completed_at = VALUES(completed_at), quiz_score = VALUES(quiz_score)
+        INSERT INTO elearning_module_progress (staff_id, module_id, completed, completed_at, quiz_score) 
+        VALUES (?, ?, 1, NOW(), ?)
+        ON DUPLICATE KEY UPDATE completed = 1, completed_at = NOW(), quiz_score = VALUES(quiz_score)
     ");
-    $stmt->execute([$staff['id'], $module_id, date('Y-m-d H:i:s'), $quiz_score]);
+    $stmt->execute([$staff['id'], $module_id, $quiz_score]);
     
     // Check how many modules completed
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM elearning_progress WHERE staff_id = ?");
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM elearning_module_progress WHERE staff_id = ? AND completed = 1");
     $stmt->execute([$staff['id']]);
     $completed_count = $stmt->fetchColumn();
     
-    $total_modules = 5;
+    $total_modules = 7;
     $all_completed = $completed_count >= $total_modules;
     
     // Update staff profile status

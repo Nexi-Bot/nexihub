@@ -292,7 +292,7 @@ if (!$staff) {
 }
 
 // Get user's E-Learning progress
-$stmt = $pdo->prepare("SELECT * FROM elearning_module_progress WHERE staff_id = ? ORDER BY module_id");
+$stmt = $pdo->prepare("SELECT * FROM elearning_progress WHERE staff_id = ? ORDER BY module_id");
 $stmt->execute([$staff['id']]);
 $progress = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

@@ -22,18 +22,19 @@ if (!$staff) {
 $module_id = intval($_GET['id'] ?? 1);
 
 // Validate module ID
-if ($module_id < 1 || $module_id > 5) {
+if ($module_id < 1 || $module_id > 7) {
     header('Location: /elearning/');
     exit;
 }
 
-// Check if user can access this module
-$can_access = true;
-if ($module_id > 1) {
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM elearning_progress WHERE staff_id = ? AND module_id = ?");
-    $stmt->execute([$staff['id'], $module_id - 1]);
-    $prev_completed = $stmt->fetchColumn() > 0;
-    $can_access = $prev_completed;
+try {
+    // Check if user can access this module
+    $can_access = true;
+    if ($module_id > 1) {
+        $stmt = $pdo->prepare("SELECT completed FROM elearning_module_progress WHERE staff_id = ? AND module_id = ?");
+        $stmt->execute([$staff['id'], $module_id - 1]);
+        $prev_completed = $stmt->fetchColumn();
+        $can_access = ($prev_completed == 1);
     }
     
     if (!$can_access) {
@@ -42,10 +43,10 @@ if ($module_id > 1) {
     }
     
     // Check if current module is completed
-    $stmt = $pdo->prepare("SELECT * FROM elearning_progress WHERE staff_id = ? AND module_id = ?");
-    $stmt->execute([$_SESSION['staff_id'], $module_id]);
+    $stmt = $pdo->prepare("SELECT * FROM elearning_module_progress WHERE staff_id = ? AND module_id = ?");
+    $stmt->execute([$staff['id'], $module_id]);
     $module_progress = $stmt->fetch();
-    $is_completed = $module_progress !== false;
+    $is_completed = ($module_progress && $module_progress['completed'] == 1);
     
 } catch (Exception $e) {
     die("Error loading progress: " . $e->getMessage());
